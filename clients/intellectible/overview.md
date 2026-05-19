@@ -27,3 +27,11 @@ ACV ~$44K (consistent across recent HubSpot pipeline — confirm with team).
 - Joe — Co-founder or senior leadership
 - Zak — Team member (role TBD)
 - Armistead Whitney — Board member / investor
+
+## Tooling stack (visible)
+- **HubSpot** — CRM
+- **Calendly** — scheduling; discovery call forms push company/title/agenda into HubSpot meetings
+- **Apollo** — outbound cold calling; recordings in HubSpot calls
+- **Google Workspace / Meet** — Calendly-booked discovery calls
+- **Zoom** — board calls and longer internal meetings
+- **Fathom** — call recording; per-user OAuth to HubSpot (not org-level — confirm each rep has connected)
