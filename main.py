@@ -53,6 +53,11 @@ def main():
             console.print("[dim]Shutting down.[/dim]")
             break
 
+        if user_input.strip() == "/status":
+            from workflows.client_status import run as show_status
+            show_status()
+            continue
+
         history = run_agent(user_input, history, client_name=client_name)
 
 
