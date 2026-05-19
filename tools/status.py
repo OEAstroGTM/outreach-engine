@@ -32,10 +32,10 @@ def fetch_eb_workspaces(instance: str) -> list[dict]:
         return []
 
 
-def fetch_eb_mailbox_count(instance: str, team_id: int) -> int | None:
+def fetch_eb_mailboxes(instance: str, team_id: int) -> list[dict]:
     base_url, api_key = _EB_INSTANCES.get(instance, (None, None))
     if not base_url or not api_key:
-        return None
+        return []
     try:
         session = requests.Session()
         session.headers.update(_eb_headers(api_key))
@@ -43,13 +43,34 @@ def fetch_eb_mailbox_count(instance: str, team_id: int) -> int | None:
             f"{base_url}/api/workspaces/v1.1/switch-workspace",
             json={"team_id": team_id}, timeout=10
         )
-        r = session.get(f"{base_url}/api/sender-emails", timeout=10)
-        r.raise_for_status()
-        data = r.json()
-        accounts = data.get("data", data) if isinstance(data, dict) else data
-        return len(accounts) if isinstance(accounts, list) else None
+        all_accounts = []
+        page = 1
+        while True:
+            r = session.get(
+                f"{base_url}/api/sender-emails",
+                params={"page": page, "per_page": 100},
+                timeout=10,
+            )
+            r.raise_for_status()
+            data = r.json()
+            # Check for API-reported total first (avoids unnecessary pages)
+            if isinstance(data, dict) and "total" in data and page == 1:
+                total = data["total"]
+                accounts = data.get("data", [])
+                all_accounts.extend(accounts if isinstance(accounts, list) else [])
+                if len(all_accounts) >= total:
+                    break
+            else:
+                accounts = data.get("data", data) if isinstance(data, dict) else data
+                if not isinstance(accounts, list) or not accounts:
+                    break
+                all_accounts.extend(accounts)
+                if len(accounts) < 100:
+                    break
+            page += 1
+        return all_accounts
     except Exception:
-        return None
+        return []
 
 
 # ── MasterInbox ───────────────────────────────────────────────────────────────
@@ -133,9 +154,12 @@ def build_client_status() -> list[dict]:
         tags      = [t.lower() for t in client.get("inboxing_tags", [])]
 
         # EmailBison
-        eb_instance = sequencer if sequencer in ("eb_send", "eb_personal") else None
-        eb_ws_map   = eb_send_ws if sequencer == "eb_send" else eb_personal_ws
+        eb_instance  = sequencer if sequencer in ("eb_send", "eb_personal") else None
+        eb_ws_map    = eb_send_ws if sequencer == "eb_send" else eb_personal_ws
         eb_connected = eb_ws_id is not None and eb_ws_id in eb_ws_map
+        eb_mailboxes = fetch_eb_mailboxes(eb_instance, eb_ws_id) if eb_connected else []
+        eb_mailbox_count = len(eb_mailboxes)
+        eb_connected_count = sum(1 for m in eb_mailboxes if m.get("status", "").lower() == "connected")
 
         # MasterInbox
         mi_connected = mi_ws_id is not None and mi_ws_id in mi_ws
@@ -158,19 +182,21 @@ def build_client_status() -> list[dict]:
         active_domains  = [d for d in unique_domains if d.get("status") == "active"]
 
         statuses.append({
-            "name":            name,
-            "sequencer":       sequencer,
-            "eb_ws_id":        eb_ws_id,
-            "eb_connected":    eb_connected,
-            "eb_instance":     eb_instance,
-            "mi_ws_id":        mi_ws_id,
-            "mi_connected":    mi_connected,
-            "mi_name":         mi_name,
-            "mi_key":          mi_key_ok,
-            "domains":         unique_domains,
-            "active_domains":  len(active_domains),
-            "total_domains":   len(unique_domains),
-            "total_mailboxes": total_mailboxes,
+            "name":               name,
+            "sequencer":          sequencer,
+            "eb_ws_id":           eb_ws_id,
+            "eb_connected":       eb_connected,
+            "eb_instance":        eb_instance,
+            "eb_mailbox_count":   eb_mailbox_count,
+            "eb_connected_count": eb_connected_count,
+            "mi_ws_id":           mi_ws_id,
+            "mi_connected":       mi_connected,
+            "mi_name":            mi_name,
+            "mi_key":             mi_key_ok,
+            "domains":            unique_domains,
+            "active_domains":     len(active_domains),
+            "total_domains":      len(unique_domains),
+            "total_mailboxes":    total_mailboxes,
         })
 
     return statuses

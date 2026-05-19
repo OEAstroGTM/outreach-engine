@@ -16,13 +16,14 @@ def run():
 
     # ── Summary table ──────────────────────────────────────────────────────
     table = Table(title="Client Status", show_lines=True)
-    table.add_column("Client",      style="bold")
-    table.add_column("Sequencer",   style="dim")
-    table.add_column("EB",          justify="center")
-    table.add_column("MI",          justify="center")
-    table.add_column("MI Key",      justify="center")
-    table.add_column("Domains",     justify="right")
-    table.add_column("Mailboxes",   justify="right")
+    table.add_column("Client",        style="bold")
+    table.add_column("Sequencer",     style="dim")
+    table.add_column("EB",            justify="center")
+    table.add_column("EB Mailboxes",  justify="right")
+    table.add_column("MI",            justify="center")
+    table.add_column("MI Key",        justify="center")
+    table.add_column("Domains",       justify="right")
+    table.add_column("Inboxing MBs",  justify="right")
 
     for s in statuses:
         sequencer_label = {
@@ -38,10 +39,18 @@ def run():
             else Text("—", style="dim")
         )
 
+        eb_mb = s["eb_mailbox_count"]
+        eb_ok = s["eb_connected_count"]
+        eb_mb_cell = (
+            Text(f"{eb_ok}/{eb_mb}", style="green" if eb_ok == eb_mb and eb_mb > 0 else "yellow")
+            if eb_mb > 0 else Text("—", style="dim")
+        )
+
         table.add_row(
             s["name"],
             sequencer_label,
             _check(s["eb_connected"]) if s["sequencer"].startswith("eb_") else Text("n/a", style="dim"),
+            eb_mb_cell if s["sequencer"].startswith("eb_") else Text("n/a", style="dim"),
             _check(s["mi_connected"]),
             _check(s["mi_key"]),
             str(domains_cell),
