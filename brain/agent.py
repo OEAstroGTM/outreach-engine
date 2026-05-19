@@ -1,10 +1,13 @@
 import anthropic
-from config import ANTHROPIC_API_KEY, CLAUDE_MODEL
+from config import ANTHROPIC_API_KEY, CLAUDE_MODEL, CLIENTS
 from brain.prompts import build_system_prompt
 from brain.context import load_client_context
 from tools.research import get_research_tools
 from tools.campaigns import get_campaign_tools
 from tools.inbox import get_inbox_tools
+import tools.research as _t_research
+import tools.campaigns as _t_campaigns
+import tools.inbox as _t_inbox
 from rich.console import Console
 from rich.markdown import Markdown
 
@@ -20,9 +23,19 @@ def get_all_tools():
     ]
 
 
+def _wire_client(client_name: str) -> None:
+    config = next((c for c in CLIENTS if c["name"] == client_name), {})
+    _t_research.set_client(config)
+    _t_campaigns.set_client(config)
+    _t_inbox.set_client(config)
+
+
 def run_agent(user_message: str, conversation_history: list = None, client_name: str = None):
     if conversation_history is None:
         conversation_history = []
+
+    if client_name:
+        _wire_client(client_name)
 
     context = load_client_context(client_name) if client_name else ""
     system = build_system_prompt(context)

@@ -1,107 +1,195 @@
 import requests
 from config import MASTERINBOX_API_KEY
 
-MASTERINBOX_BASE = "https://api.masterinbox.io/v1"
+_MI_BASE = "https://api.masterinbox.com/api/api-webhook/v1/api"
 
+# ── Client state ──────────────────────────────────────────────────────────────
+
+_client: dict = {}
+
+def set_client(config: dict) -> None:
+    global _client
+    _client = config
+
+
+def _headers() -> dict:
+    return {"Authorization": f"Bearer {MASTERINBOX_API_KEY}", "Content-Type": "application/json"}
+
+
+def _ws_id() -> str | None:
+    ws = _client.get("mi_ws_id")
+    return str(ws) if ws else None
+
+
+# ── Tool schemas ──────────────────────────────────────────────────────────────
 
 def get_inbox_tools():
     return [
         {
             "name": "list_replies",
-            "description": "List recent email replies across all inboxes.",
+            "description": "List replies/messages for the current client in MasterInbox. Optionally filter by label.",
             "input_schema": {
                 "type": "object",
                 "properties": {
-                    "limit": {"type": "integer", "description": "Max replies to return", "default": 20},
-                    "label": {"type": "string", "description": "Filter by label, e.g. 'interested', 'not_interested'"},
+                    "label_id": {"type": "string", "description": "Filter by label ID — use list_labels to get IDs"},
+                    "page":     {"type": "integer", "description": "Page number"},
+                    "limit":    {"type": "integer", "description": "Results per page"},
                 },
                 "required": [],
             },
         },
         {
+            "name": "list_labels",
+            "description": "List all labels in MasterInbox (e.g. Interested, Not Interested, Demo Booked).",
+            "input_schema": {"type": "object", "properties": {}, "required": []},
+        },
+        {
             "name": "get_reply_thread",
-            "description": "Get the full conversation thread for a specific reply.",
+            "description": "Get the full conversation thread for a prospect by email or prospect ID.",
             "input_schema": {
                 "type": "object",
                 "properties": {
-                    "thread_id": {"type": "string"},
+                    "prospect_email": {"type": "string"},
+                    "prospect_id":    {"type": "string"},
                 },
-                "required": ["thread_id"],
+                "required": [],
             },
         },
         {
             "name": "tag_reply",
-            "description": "Tag a reply as interested, not interested, follow-up, etc.",
+            "description": "Assign a label to a prospect (e.g. mark as Interested).",
             "input_schema": {
                 "type": "object",
                 "properties": {
-                    "thread_id": {"type": "string"},
-                    "tag": {"type": "string", "enum": ["interested", "not_interested", "follow_up", "wrong_person", "timing"]},
+                    "prospect_id": {"type": "string"},
+                    "label_id":    {"type": "string", "description": "Get label IDs from list_labels"},
                 },
-                "required": ["thread_id", "tag"],
+                "required": ["prospect_id", "label_id"],
             },
         },
         {
             "name": "send_reply",
-            "description": "Send a reply to a prospect in an existing thread.",
+            "description": "Send a reply message to a prospect in MasterInbox.",
             "input_schema": {
                 "type": "object",
                 "properties": {
-                    "thread_id": {"type": "string"},
-                    "message": {"type": "string", "description": "The reply message to send"},
+                    "prospect_id": {"type": "string"},
+                    "message":     {"type": "string"},
                 },
-                "required": ["thread_id", "message"],
+                "required": ["prospect_id", "message"],
+            },
+        },
+        {
+            "name": "find_prospect",
+            "description": "Search for a prospect by name, email, or label in the current client workspace.",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "search":   {"type": "string", "description": "Name or email to search"},
+                    "label_id": {"type": "string"},
+                    "page":     {"type": "integer"},
+                    "limit":    {"type": "integer"},
+                },
+                "required": [],
             },
         },
     ]
 
 
+# ── Executor ──────────────────────────────────────────────────────────────────
+
 def execute_inbox_tool(tool_name: str, tool_input: dict):
-    if tool_name == "list_replies":
-        return _list_replies(tool_input)
-    elif tool_name == "get_reply_thread":
-        return _get_thread(tool_input)
-    elif tool_name == "tag_reply":
-        return _tag_reply(tool_input)
-    elif tool_name == "send_reply":
-        return _send_reply(tool_input)
+    if tool_name == "list_replies":    return _list_replies(tool_input)
+    if tool_name == "list_labels":     return _list_labels()
+    if tool_name == "get_reply_thread": return _get_thread(tool_input)
+    if tool_name == "tag_reply":       return _tag_reply(tool_input)
+    if tool_name == "send_reply":      return _send_reply(tool_input)
+    if tool_name == "find_prospect":   return _find_prospect(tool_input)
     return None
 
 
+# ── Implementations ───────────────────────────────────────────────────────────
+
 def _list_replies(params: dict):
     try:
-        r = requests.get(f"{MASTERINBOX_BASE}/replies",
-                         headers={"Authorization": f"Bearer {MASTERINBOX_API_KEY}"},
-                         params={"limit": params.get("limit", 20), "label": params.get("label")})
-        return r.json()
+        return requests.post(
+            f"{_MI_BASE}/get-messages",
+            headers=_headers(),
+            json={
+                "workspace_id": _ws_id(),
+                "label_id":     params.get("label_id"),
+                "page":         params.get("page"),
+                "limit":        params.get("limit", 20),
+            },
+            timeout=10,
+        ).json()
+    except Exception as e:
+        return {"error": str(e)}
+
+
+def _list_labels():
+    try:
+        return requests.get(f"{_MI_BASE}/get-labels", headers=_headers(), timeout=10).json()
     except Exception as e:
         return {"error": str(e)}
 
 
 def _get_thread(params: dict):
     try:
-        r = requests.get(f"{MASTERINBOX_BASE}/threads/{params['thread_id']}",
-                         headers={"Authorization": f"Bearer {MASTERINBOX_API_KEY}"})
-        return r.json()
+        return requests.post(
+            f"{_MI_BASE}/get-messages",
+            headers=_headers(),
+            json={
+                "prospect_email": params.get("prospect_email"),
+                "prospect_id":    params.get("prospect_id"),
+            },
+            timeout=10,
+        ).json()
     except Exception as e:
         return {"error": str(e)}
 
 
 def _tag_reply(params: dict):
     try:
-        r = requests.post(f"{MASTERINBOX_BASE}/threads/{params['thread_id']}/tag",
-                          headers={"Authorization": f"Bearer {MASTERINBOX_API_KEY}"},
-                          json={"tag": params["tag"]})
-        return r.json()
+        return requests.post(
+            f"{_MI_BASE}/add-prospect-label",
+            headers=_headers(),
+            json={"prospect_id": params["prospect_id"], "label_id": params["label_id"]},
+            timeout=10,
+        ).json()
     except Exception as e:
         return {"error": str(e)}
 
 
 def _send_reply(params: dict):
     try:
-        r = requests.post(f"{MASTERINBOX_BASE}/threads/{params['thread_id']}/reply",
-                          headers={"Authorization": f"Bearer {MASTERINBOX_API_KEY}"},
-                          json={"message": params["message"]})
-        return r.json()
+        return requests.post(
+            f"{_MI_BASE}/send-message",
+            headers=_headers(),
+            json={
+                "prospect_id":  params["prospect_id"],
+                "message":      params["message"],
+                "workspace_id": _ws_id(),
+            },
+            timeout=10,
+        ).json()
+    except Exception as e:
+        return {"error": str(e)}
+
+
+def _find_prospect(params: dict):
+    try:
+        return requests.post(
+            f"{_MI_BASE}/get-prospects",
+            headers=_headers(),
+            json={
+                "workspace_id": _ws_id(),
+                "search":       params.get("search"),
+                "label_id":     params.get("label_id"),
+                "page":         params.get("page"),
+                "limit":        params.get("limit", 20),
+            },
+            timeout=10,
+        ).json()
     except Exception as e:
         return {"error": str(e)}

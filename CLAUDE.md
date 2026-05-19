@@ -54,9 +54,9 @@ Select a client (or general mode), then type your goal. The agent will research,
 
 ## Tools available
 
-- **Research**: `find_company`, `find_contacts`, `enrich_contact` (wire to Clay via `CLAY_API_KEY`)
-- **Campaigns**: `list_campaigns`, `create_campaign`, `add_leads_to_campaign`, `launch_campaign`, `get_campaign_stats` (EmailBison + Instantly)
-- **Inbox**: `list_replies`, `get_reply_thread`, `tag_reply`, `send_reply` (MasterInbox)
+- **Research**: `find_company`, `find_contacts`, `enrich_contact` (Apollo via `APOLLO_API_KEY`)
+- **Campaigns**: `list_campaigns`, `create_campaign`, `add_leads_to_campaign`, `launch_campaign`, `pause_campaign`, `get_campaign_stats`, `create_lead` (EmailBison + Instantly; auto-detected from client sequencer)
+- **Inbox**: `list_replies`, `list_labels`, `get_reply_thread`, `tag_reply`, `send_reply`, `find_prospect` (MasterInbox)
 
 ## Environment
 
