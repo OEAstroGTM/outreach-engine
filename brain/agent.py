@@ -1,6 +1,7 @@
 import anthropic
 from config import ANTHROPIC_API_KEY, CLAUDE_MODEL
-from brain.prompts import SYSTEM_PROMPT
+from brain.prompts import build_system_prompt
+from brain.context import load_client_context
 from tools.research import get_research_tools
 from tools.campaigns import get_campaign_tools
 from tools.inbox import get_inbox_tools
@@ -19,9 +20,12 @@ def get_all_tools():
     ]
 
 
-def run_agent(user_message: str, conversation_history: list = None):
+def run_agent(user_message: str, conversation_history: list = None, client_name: str = None):
     if conversation_history is None:
         conversation_history = []
+
+    context = load_client_context(client_name) if client_name else ""
+    system = build_system_prompt(context)
 
     conversation_history.append({"role": "user", "content": user_message})
 
@@ -31,7 +35,7 @@ def run_agent(user_message: str, conversation_history: list = None):
         response = client.messages.create(
             model=CLAUDE_MODEL,
             max_tokens=4096,
-            system=SYSTEM_PROMPT,
+            system=system,
             tools=tools,
             messages=conversation_history,
         )

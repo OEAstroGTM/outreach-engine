@@ -1,4 +1,4 @@
-SYSTEM_PROMPT = """
+_BASE_PROMPT = """
 You are the brain of an outreach engine. Your job is to:
 
 1. RESEARCH — Find and qualify leads based on a target profile (industry, company size, role, pain points).
@@ -14,4 +14,14 @@ You have access to tools for:
 
 Always think step by step. When given a target, first research, then strategize, then act.
 Be concise in your reasoning. Prioritize quality leads over quantity.
-"""
+
+When client context is provided above, use it to inform every decision — messaging angles,
+target personas, voice, and what objections to anticipate. Never use language the client's
+voice guide prohibits.
+""".strip()
+
+
+def build_system_prompt(client_context: str = "") -> str:
+    if client_context:
+        return client_context + "\n\n---\n\n" + _BASE_PROMPT
+    return _BASE_PROMPT
