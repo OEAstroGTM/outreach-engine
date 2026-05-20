@@ -248,6 +248,64 @@ server.tool("get_interested_replies",
   }
 );
 
+// ─── Sender email tools ───────────────────────────────────────────────────────
+async function ebSenderFetch(method, sender_email_id, instance, body) {
+  const base = instance === "personal" ? EB_PERSONAL_BASE : EB_SEND_BASE;
+  const key  = instance === "personal" ? EB_PERSONAL_KEY  : EB_SEND_KEY;
+  const res  = await fetch(`${base}/sender-emails/${sender_email_id}`, {
+    method,
+    headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const text = await res.text();
+  let data;
+  try { data = JSON.parse(text); } catch { data = { raw: text }; }
+  return { status: res.status, data };
+}
+
+server.tool("emailbison_get_sender_email",
+  "Retrieve details of a specific sender email account by its numeric ID.",
+  {
+    instance:        z.enum(["send", "personal"]).describe("Which EmailBison instance"),
+    sender_email_id: z.number().describe("Numeric ID of the sender email account"),
+  },
+  async ({ instance, sender_email_id }) => {
+    const result = await ebSenderFetch("GET", sender_email_id, instance);
+    return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+  }
+);
+
+server.tool("emailbison_update_sender_email",
+  "Update settings for a sender email account (name, daily_limit, email_signature).",
+  {
+    instance:        z.enum(["send", "personal"]).describe("Which EmailBison instance"),
+    sender_email_id: z.number().describe("Numeric ID of the sender email account"),
+    name:            z.string().optional().describe("Display name for the sender"),
+    daily_limit:     z.number().optional().describe("Max emails per day"),
+    email_signature: z.string().nullable().optional().describe("HTML email signature"),
+  },
+  async ({ instance, sender_email_id, name, daily_limit, email_signature }) => {
+    const body = {};
+    if (name            !== undefined) body.name            = name;
+    if (daily_limit     !== undefined) body.daily_limit     = daily_limit;
+    if (email_signature !== undefined) body.email_signature = email_signature;
+    const result = await ebSenderFetch("PATCH", sender_email_id, instance, body);
+    return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+  }
+);
+
+server.tool("emailbison_delete_sender_email",
+  "Delete a sender email account from EmailBison by its numeric ID.",
+  {
+    instance:        z.enum(["send", "personal"]).describe("Which EmailBison instance"),
+    sender_email_id: z.number().describe("Numeric ID of the sender email account to delete"),
+  },
+  async ({ instance, sender_email_id }) => {
+    const result = await ebSenderFetch("DELETE", sender_email_id, instance);
+    return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+  }
+);
+
 // ─── Start ────────────────────────────────────────────────────────────────────
 const transport = new StdioServerTransport();
 await server.connect(transport);
