@@ -14,6 +14,9 @@ const require = createRequire(import.meta.url);
 // ── Config ────────────────────────────────────────────────────────────────────
 const CLIENTS = JSON.parse(readFileSync(join(__dirname, "../clients.json"), "utf8"));
 
+const APOLLO_BASE = "https://api.apollo.io/api/v1";
+const APOLLO_KEY  = process.env.APOLLO_API_KEY;
+
 const EB_SEND_BASE     = "https://send.outreachenginedashboard.co/api";
 const EB_PERSONAL_BASE = "https://personal.outreachenginedashboard.co/api";
 const EB_SEND_KEY      = process.env.EMAILBISON_SEND_API_KEY;
@@ -80,6 +83,24 @@ async function ebFetch(method, path, client, body) {
     body: body ? JSON.stringify(body) : undefined,
   });
   return res.json();
+}
+
+async function apolloFetch(path, body) {
+  if (!APOLLO_KEY) throw new Error("APOLLO_API_KEY is not set in the MCP env config");
+  const res = await fetch(`${APOLLO_BASE}${path}`, {
+    method: "POST",
+    headers: { "x-api-key": APOLLO_KEY, "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  return res.json();
+}
+
+function apolloOk(data) {
+  return { content: [{ type: "text", text: JSON.stringify(data, null, 2) }] };
+}
+
+function apolloErr(e) {
+  return { content: [{ type: "text", text: `Apollo error: ${e.message}` }], isError: true };
 }
 
 async function miFetch(method, path, client, body) {
@@ -303,6 +324,77 @@ server.tool("emailbison_delete_sender_email",
   async ({ instance, sender_email_id }) => {
     const result = await ebSenderFetch("DELETE", sender_email_id, instance);
     return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+  }
+);
+
+// ─── Apollo research tools ────────────────────────────────────────────────────
+server.tool("find_company",
+  "Search Apollo for a company by name or domain. Returns industry, headcount, location, tech stack, revenue estimates, and LinkedIn URL. Provide domain when available — it significantly improves accuracy.",
+  {
+    company_name: z.string().describe("Company name to search for"),
+    domain:       z.string().optional().describe("Company domain, e.g. acme.com — improves match accuracy"),
+  },
+  async ({ company_name, domain }) => {
+    try {
+      const body = { q_organization_name: company_name, per_page: 1 };
+      if (domain) body.q_organization_domains = [domain];
+      const data = await apolloFetch("/mixed_companies/search", body);
+      const orgs = data?.organizations ?? data?.accounts ?? [];
+      if (!orgs.length) return apolloOk({ note: "No company found", query: { company_name, domain } });
+      return apolloOk(orgs[0]);
+    } catch (e) { return apolloErr(e); }
+  }
+);
+
+server.tool("find_contacts",
+  "Find decision-maker contacts at a company matching target job titles. Returns names, titles, LinkedIn URLs, and any revealed emails. Use this to build a lead list before launching a campaign.",
+  {
+    company_name: z.string().describe("Company to search within"),
+    domain:       z.string().optional().describe("Company domain — avoids name collisions and improves accuracy"),
+    titles:       z.array(z.string()).describe("Target job titles, e.g. [\"VP of Business Development\", \"Head of Growth\"]"),
+    limit:        z.number().optional().describe("Max contacts to return (default 5, max 25)"),
+  },
+  async ({ company_name, domain, titles, limit }) => {
+    try {
+      const body = {
+        q_organization_name: company_name,
+        person_titles:       titles,
+        per_page:            Math.min(limit ?? 5, 25),
+      };
+      if (domain) body.q_organization_domains = [domain];
+      const data  = await apolloFetch("/mixed_people/search", body);
+      const people = data?.people ?? [];
+      const total  = data?.pagination?.total_entries ?? people.length;
+      return apolloOk({ total_found: total, contacts: people });
+    } catch (e) { return apolloErr(e); }
+  }
+);
+
+server.tool("enrich_contact",
+  "Enrich a specific person in Apollo — returns verified work email, personal email (if available), LinkedIn URL, phone numbers, title, and seniority. Minimum: first_name + last_name + company. Adding domain or linkedin_url greatly improves the match.",
+  {
+    first_name:              z.string().describe("Contact's first name"),
+    last_name:               z.string().describe("Contact's last name"),
+    company:                 z.string().describe("Company the contact works at"),
+    domain:                  z.string().optional().describe("Company domain — strongly recommended"),
+    linkedin_url:            z.string().optional().describe("LinkedIn profile URL — most reliable identifier"),
+    reveal_personal_emails:  z.boolean().optional().describe("Attempt to reveal personal emails (default true, uses Apollo credits)"),
+  },
+  async ({ first_name, last_name, company, domain, linkedin_url, reveal_personal_emails }) => {
+    try {
+      const body = {
+        first_name,
+        last_name,
+        organization_name:       company,
+        reveal_personal_emails:  reveal_personal_emails ?? true,
+      };
+      if (domain)       body.domain       = domain;
+      if (linkedin_url) body.linkedin_url = linkedin_url;
+      const data   = await apolloFetch("/people/match", body);
+      const person = data?.person ?? data;
+      if (!person) return apolloOk({ note: "No match found", query: { first_name, last_name, company } });
+      return apolloOk(person);
+    } catch (e) { return apolloErr(e); }
   }
 );
 
