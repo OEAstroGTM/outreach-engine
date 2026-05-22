@@ -95,6 +95,15 @@ async function apolloFetch(path, body) {
   return res.json();
 }
 
+async function apolloGet(path) {
+  if (!APOLLO_KEY) throw new Error("APOLLO_API_KEY is not set in the MCP env config");
+  const res = await fetch(`${APOLLO_BASE}${path}`, {
+    method: "GET",
+    headers: { "x-api-key": APOLLO_KEY, "Content-Type": "application/json" },
+  });
+  return res.json();
+}
+
 function apolloOk(data) {
   return { content: [{ type: "text", text: JSON.stringify(data, null, 2) }] };
 }
@@ -394,6 +403,50 @@ server.tool("enrich_contact",
       const person = data?.person ?? data;
       if (!person) return apolloOk({ note: "No match found", query: { first_name, last_name, company } });
       return apolloOk(person);
+    } catch (e) { return apolloErr(e); }
+  }
+);
+
+server.tool("list_saved_searches",
+  "List all saved searches in Apollo. Returns the name, ID, and type (people or companies) of each saved search so you can reference them by ID in run_saved_search.",
+  {
+    type: z.enum(["people", "companies"]).optional().describe("Filter to people or company searches. Omit to return both."),
+  },
+  async ({ type }) => {
+    try {
+      const results = {};
+      if (!type || type === "people") {
+        results.people = await apolloGet("/contacts/saved_searches");
+      }
+      if (!type || type === "companies") {
+        results.companies = await apolloGet("/accounts/saved_searches");
+      }
+      return apolloOk(results);
+    } catch (e) { return apolloErr(e); }
+  }
+);
+
+server.tool("run_saved_search",
+  "Execute a saved Apollo search by ID and return matching contacts or companies. Use list_saved_searches first to find the ID. Supports pagination for pulling large lists.",
+  {
+    saved_search_id: z.string().describe("The saved search ID from list_saved_searches"),
+    type:            z.enum(["people", "companies"]).describe("Whether this is a people or company saved search"),
+    page:            z.number().optional().describe("Page number (default 1)"),
+    limit:           z.number().optional().describe("Results per page (default 25, max 100)"),
+  },
+  async ({ saved_search_id, type, page, limit }) => {
+    try {
+      const path    = type === "companies" ? "/mixed_companies/search" : "/mixed_people/search";
+      const perPage = Math.min(limit ?? 25, 100);
+      const data    = await apolloFetch(path, {
+        saved_search_id,
+        page:     page ?? 1,
+        per_page: perPage,
+      });
+      const results  = type === "companies" ? (data?.organizations ?? data?.accounts ?? []) : (data?.people ?? []);
+      const total    = data?.pagination?.total_entries ?? results.length;
+      const pages    = data?.pagination?.total_pages ?? 1;
+      return apolloOk({ total_found: total, total_pages: pages, page: page ?? 1, results });
     } catch (e) { return apolloErr(e); }
   }
 );
