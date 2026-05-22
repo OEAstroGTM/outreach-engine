@@ -535,6 +535,88 @@ server.tool("bulk_pull_contacts",
   }
 );
 
+// ─── Pipeline tools ───────────────────────────────────────────────────────────
+server.tool("bulk_push_to_campaign",
+  "Take a list of contacts (from Apollo CRM search or any source) and push them into an EmailBison campaign in one operation. Creates each contact as a lead in the correct client workspace, collects all lead IDs, then attaches them to the campaign. Use emailbison_list_campaigns first to get the campaign_id. Contacts must have at least an email address.",
+  {
+    client_name:  z.string().describe("Client name, e.g. 'AskTuring' — determines which EmailBison workspace and instance to use"),
+    campaign_id:  z.string().describe("EmailBison campaign ID to push leads into — get this from list_campaigns"),
+    contacts:     z.array(z.object({
+      email:      z.string().describe("Contact's email address (required)"),
+      first_name: z.string().optional(),
+      last_name:  z.string().optional(),
+      company:    z.string().optional(),
+      title:      z.string().optional(),
+      website:    z.string().optional(),
+    })).describe("Array of contacts to push. Must include email for each."),
+  },
+  async ({ client_name, campaign_id, contacts }) => {
+    try {
+      const client = getClient(client_name);
+      const { base, key, ws_id } = ebConfig(client);
+
+      // Switch workspace once
+      await fetch(`${base}/workspaces/v1.1/switch-workspace`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ team_id: ws_id }),
+      });
+
+      // Create leads one by one, collect IDs
+      const created = [];
+      const failed  = [];
+
+      for (const contact of contacts) {
+        if (!contact.email) { failed.push({ contact, reason: "missing email" }); continue; }
+        try {
+          const res = await fetch(`${base}/leads`, {
+            method: "POST",
+            headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email:      contact.email,
+              first_name: contact.first_name,
+              last_name:  contact.last_name,
+              company:    contact.company,
+              website:    contact.website,
+            }),
+          });
+          const data = await res.json();
+          const id   = data?.data?.id ?? data?.id;
+          if (id) created.push(id);
+          else failed.push({ contact, reason: data?.message ?? "no ID returned", raw: data });
+        } catch (e) {
+          failed.push({ contact, reason: e.message });
+        }
+      }
+
+      // Attach all created leads to the campaign in one call
+      let attachResult = null;
+      if (created.length) {
+        const attachRes = await fetch(`${base}/campaigns/${campaign_id}/leads/attach-leads`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+          body: JSON.stringify({ lead_ids: created }),
+        });
+        attachResult = await attachRes.json();
+      }
+
+      return { content: [{ type: "text", text: JSON.stringify({
+        summary: {
+          total_contacts:   contacts.length,
+          leads_created:    created.length,
+          leads_failed:     failed.length,
+          attached_to:      campaign_id,
+          attach_status:    attachResult?.message ?? attachResult?.status ?? "ok",
+        },
+        created_lead_ids: created,
+        failed,
+      }, null, 2) }] };
+    } catch (e) {
+      return { content: [{ type: "text", text: `Error: ${e.message}` }], isError: true };
+    }
+  }
+);
+
 // ─── Start ────────────────────────────────────────────────────────────────────
 const transport = new StdioServerTransport();
 await server.connect(transport);
