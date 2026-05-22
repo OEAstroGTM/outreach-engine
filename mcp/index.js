@@ -407,46 +407,130 @@ server.tool("enrich_contact",
   }
 );
 
-server.tool("list_saved_searches",
-  "List all saved searches in Apollo. Returns the name, ID, and type (people or companies) of each saved search so you can reference them by ID in run_saved_search.",
+server.tool("search_people",
+  "Search Apollo for people using rich ICP filters. Returns one page of results with full pagination metadata. Use this to explore and validate your filters before running bulk_pull_contacts. Supports title, seniority, department, industry, company size, location, and keyword filters.",
   {
-    type: z.enum(["people", "companies"]).optional().describe("Filter to people or company searches. Omit to return both."),
+    titles:                    z.array(z.string()).optional().describe("Job titles to match, e.g. [\"VP of Sales\", \"Head of Growth\"]"),
+    seniority_levels:          z.array(z.string()).optional().describe("Seniority levels: owner, founder, c_suite, vp, director, manager, senior, entry, intern"),
+    departments:               z.array(z.string()).optional().describe("Departments: sales, marketing, engineering, operations, business_development, finance, human_resources, product, legal"),
+    keywords:                  z.string().optional().describe("Keyword search across bios and profiles"),
+    industries:                z.array(z.string()).optional().describe("Industries, e.g. [\"Information Technology & Services\", \"SaaS\"]"),
+    employee_count_ranges:     z.array(z.string()).optional().describe("Company headcount ranges, e.g. [\"1,50\", \"51,200\", \"201,500\", \"501,1000\", \"1001,5000\"]"),
+    locations:                 z.array(z.string()).optional().describe("Person or company locations, e.g. [\"United States\", \"New York, New York, United States\"]"),
+    company_names:             z.array(z.string()).optional().describe("Filter to specific company names"),
+    has_email:                 z.boolean().optional().describe("If true, only return contacts where Apollo has an email address (default false)"),
+    page:                      z.number().optional().describe("Page number, starting at 1 (default 1)"),
+    per_page:                  z.number().optional().describe("Results per page, max 100 (default 25)"),
   },
-  async ({ type }) => {
+  async ({ titles, seniority_levels, departments, keywords, industries, employee_count_ranges, locations, company_names, has_email, page, per_page }) => {
     try {
-      const results = {};
-      if (!type || type === "people") {
-        results.people = await apolloGet("/contacts/saved_searches");
-      }
-      if (!type || type === "companies") {
-        results.companies = await apolloGet("/accounts/saved_searches");
-      }
-      return apolloOk(results);
+      const body = { page: page ?? 1, per_page: Math.min(per_page ?? 25, 100) };
+      if (titles?.length)               body.person_titles                    = titles;
+      if (seniority_levels?.length)     body.person_seniorities               = seniority_levels;
+      if (departments?.length)          body.person_departments               = departments;
+      if (keywords)                     body.q_keywords                       = keywords;
+      if (industries?.length)           body.organization_industry_tag_ids    = industries;
+      if (employee_count_ranges?.length) body.organization_num_employees_ranges = employee_count_ranges;
+      if (locations?.length)            body.person_locations                 = locations;
+      if (company_names?.length)        body.q_organization_name              = company_names.join(" OR ");
+
+      const data    = await apolloFetch("/mixed_people/search", body);
+      let people    = data?.people ?? [];
+      if (has_email) people = people.filter(p => p.email);
+      const total   = data?.pagination?.total_entries ?? people.length;
+      const pages   = data?.pagination?.total_pages   ?? 1;
+      return apolloOk({
+        total_found:  total,
+        total_pages:  pages,
+        current_page: page ?? 1,
+        returned:     people.length,
+        contacts:     people,
+      });
     } catch (e) { return apolloErr(e); }
   }
 );
 
-server.tool("run_saved_search",
-  "Execute a saved Apollo search by ID and return matching contacts or companies. Use list_saved_searches first to find the ID. Supports pagination for pulling large lists.",
+server.tool("bulk_pull_contacts",
+  "Pull a large list of contacts from Apollo by auto-paginating through results. Uses the same ICP filters as search_people. Returns a flat list of contacts with emails. Cap with max_results to control credit usage — Apollo charges per email reveal. Run search_people first to validate your filters and check total_found before pulling in bulk.",
   {
-    saved_search_id: z.string().describe("The saved search ID from list_saved_searches"),
-    type:            z.enum(["people", "companies"]).describe("Whether this is a people or company saved search"),
-    page:            z.number().optional().describe("Page number (default 1)"),
-    limit:           z.number().optional().describe("Results per page (default 25, max 100)"),
+    titles:                    z.array(z.string()).optional().describe("Job titles to match"),
+    seniority_levels:          z.array(z.string()).optional().describe("Seniority: owner, founder, c_suite, vp, director, manager, senior, entry"),
+    departments:               z.array(z.string()).optional().describe("Departments: sales, marketing, engineering, operations, business_development, finance, human_resources, product"),
+    keywords:                  z.string().optional().describe("Keyword search across bios and profiles"),
+    industries:                z.array(z.string()).optional().describe("Industries, e.g. [\"Information Technology & Services\", \"SaaS\"]"),
+    employee_count_ranges:     z.array(z.string()).optional().describe("Company headcount ranges, e.g. [\"1,50\", \"51,200\", \"201,500\"]"),
+    locations:                 z.array(z.string()).optional().describe("Locations, e.g. [\"United States\"]"),
+    company_names:             z.array(z.string()).optional().describe("Filter to specific company names"),
+    has_email_only:            z.boolean().optional().describe("Only return contacts where Apollo already has an email — no credit charge (default true)"),
+    max_results:               z.number().optional().describe("Total contacts to pull across all pages (default 100, max 500 per call to protect credits)"),
+    start_page:                z.number().optional().describe("Page to start from, useful for resuming a pull (default 1)"),
   },
-  async ({ saved_search_id, type, page, limit }) => {
+  async ({ titles, seniority_levels, departments, keywords, industries, employee_count_ranges, locations, company_names, has_email_only, max_results, start_page }) => {
     try {
-      const path    = type === "companies" ? "/mixed_companies/search" : "/mixed_people/search";
-      const perPage = Math.min(limit ?? 25, 100);
-      const data    = await apolloFetch(path, {
-        saved_search_id,
-        page:     page ?? 1,
-        per_page: perPage,
+      const cap      = Math.min(max_results ?? 100, 500);
+      const perPage  = 100;
+      const emailOnly = has_email_only !== false; // default true
+      let collected  = [];
+      let page       = start_page ?? 1;
+      let totalFound = null;
+      let totalPages = null;
+
+      while (collected.length < cap) {
+        const body = { page, per_page: perPage };
+        if (titles?.length)                body.person_titles                     = titles;
+        if (seniority_levels?.length)      body.person_seniorities                = seniority_levels;
+        if (departments?.length)           body.person_departments                = departments;
+        if (keywords)                      body.q_keywords                        = keywords;
+        if (industries?.length)            body.organization_industry_tag_ids     = industries;
+        if (employee_count_ranges?.length) body.organization_num_employees_ranges = employee_count_ranges;
+        if (locations?.length)             body.person_locations                  = locations;
+        if (company_names?.length)         body.q_organization_name               = company_names.join(" OR ");
+
+        const data = await apolloFetch("/mixed_people/search", body);
+        const people = data?.people ?? [];
+
+        if (totalFound === null) totalFound = data?.pagination?.total_entries ?? 0;
+        if (totalPages === null) totalPages = data?.pagination?.total_pages ?? 1;
+
+        const filtered = emailOnly ? people.filter(p => p.email) : people;
+        collected.push(...filtered);
+
+        if (people.length < perPage || page >= totalPages) break; // no more pages
+        page++;
+
+        // Small pause to be polite to the API
+        await new Promise(r => setTimeout(r, 300));
+      }
+
+      // Trim to cap and shape output
+      collected = collected.slice(0, cap);
+      const withEmail    = collected.filter(p => p.email).length;
+      const withoutEmail = collected.length - withEmail;
+
+      return apolloOk({
+        summary: {
+          total_in_apollo:   totalFound,
+          pulled:            collected.length,
+          with_email:        withEmail,
+          without_email:     withoutEmail,
+          pages_fetched:     page - (start_page ?? 1) + 1,
+          capped_at:         cap,
+        },
+        contacts: collected.map(p => ({
+          id:          p.id,
+          name:        `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim(),
+          first_name:  p.first_name,
+          last_name:   p.last_name,
+          title:       p.title,
+          email:       p.email,
+          linkedin_url: p.linkedin_url,
+          company:     p.organization?.name ?? p.organization_name,
+          domain:      p.organization?.website_url ?? p.organization_domain,
+          location:    p.city ? `${p.city}, ${p.state ?? ""}`.trim().replace(/,$/, "") : null,
+          seniority:   p.seniority,
+          phone:       p.sanitized_phone,
+        })),
       });
-      const results  = type === "companies" ? (data?.organizations ?? data?.accounts ?? []) : (data?.people ?? []);
-      const total    = data?.pagination?.total_entries ?? results.length;
-      const pages    = data?.pagination?.total_pages ?? 1;
-      return apolloOk({ total_found: total, total_pages: pages, page: page ?? 1, results });
     } catch (e) { return apolloErr(e); }
   }
 );
