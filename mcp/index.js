@@ -2,14 +2,12 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-import { createRequire } from "module";
 import { readFileSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import "dotenv/config";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const require = createRequire(import.meta.url);
 
 // ── Config ────────────────────────────────────────────────────────────────────
 const CLIENTS = JSON.parse(readFileSync(join(__dirname, "../clients.json"), "utf8"));
@@ -47,11 +45,13 @@ const MI_KEYS = {
 };
 
 const INSTANTLY_KEYS = {
-  simplexity:     process.env.INSTANTLY_SUPPLY_WISDOM_API_KEY, // placeholder
+  simplexity:     process.env.INSTANTLY_SIMPLEXITY_API_KEY,
   supply_wisdom:  process.env.INSTANTLY_SUPPLY_WISDOM_API_KEY,
   lend_home:      process.env.INSTANTLY_LEND_HOME_API_KEY,
   surety_now:     process.env.INSTANTLY_SURETY_NOW_API_KEY,
 };
+
+const APOLLO_THROTTLE_MS = 300;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function getClient(name) {
@@ -104,12 +104,12 @@ async function apolloGet(path) {
   return res.json();
 }
 
-function apolloOk(data) {
+function ok(data) {
   return { content: [{ type: "text", text: JSON.stringify(data, null, 2) }] };
 }
 
-function apolloErr(e) {
-  return { content: [{ type: "text", text: `Apollo error: ${e.message}` }], isError: true };
+function err(e) {
+  return { content: [{ type: "text", text: `Error: ${e.message}` }], isError: true };
 }
 
 async function miFetch(method, path, client, body) {
@@ -128,20 +128,16 @@ const server = new McpServer({ name: "outreach-engine", version: "1.0.0" });
 
 // ─── Client tools ─────────────────────────────────────────────────────────────
 server.tool("list_clients",
-  "List all 21 Outreach Engine clients with their sequencer platform, workspace IDs, and MasterInbox config.",
+  `List all ${CLIENTS.length} Outreach Engine clients with their sequencer platform, workspace IDs, and MasterInbox config.`,
   {},
-  async () => ({
-    content: [{ type: "text", text: JSON.stringify(
-      CLIENTS.map(c => ({
-        name: c.name,
-        sequencer: c.sequencer,
-        eb_ws_id: c.eb_ws_id ?? null,
-        mi_ws_id: c.mi_ws_id ?? null,
-        has_mi_key: !!MI_KEYS[c.name],
-        inboxing_tags: c.inboxing_tags,
-      })), null, 2
-    )}]
-  })
+  async () => ok(CLIENTS.map(c => ({
+    name: c.name,
+    sequencer: c.sequencer,
+    eb_ws_id: c.eb_ws_id ?? null,
+    mi_ws_id: c.mi_ws_id ?? null,
+    has_mi_key: !!MI_KEYS[c.name],
+    inboxing_tags: c.inboxing_tags,
+  })))
 );
 
 server.tool("get_client",
@@ -149,7 +145,7 @@ server.tool("get_client",
   { client_name: z.string().describe("Client name, e.g. 'AskTuring'") },
   async ({ client_name }) => {
     const c = getClient(client_name);
-    return { content: [{ type: "text", text: JSON.stringify(c, null, 2) }] };
+    return ok(c);
   }
 );
 
@@ -161,11 +157,12 @@ server.tool("list_campaigns",
     const client = getClient(client_name);
     if (client.sequencer === "instantly") {
       const key = INSTANTLY_KEYS[client.instantly_ws];
+      if (!key) return err(new Error(`No Instantly API key configured for workspace "${client.instantly_ws}" (client: ${client_name})`));
       const res = await fetch(`https://api.instantly.ai/api/v1/campaign/list?api_key=${key}`);
-      return { content: [{ type: "text", text: JSON.stringify(await res.json(), null, 2) }] };
+      return ok(await res.json());
     }
     const data = await ebFetch("GET", "/campaigns", client);
-    return { content: [{ type: "text", text: JSON.stringify(data, null, 2) }] };
+    return ok(data);
   }
 );
 
@@ -178,7 +175,7 @@ server.tool("get_campaign_stats",
   async ({ client_name, campaign_id }) => {
     const client = getClient(client_name);
     const data = await ebFetch("GET", `/campaigns/${campaign_id}/stats`, client);
-    return { content: [{ type: "text", text: JSON.stringify(data, null, 2) }] };
+    return ok(data);
   }
 );
 
@@ -193,7 +190,7 @@ server.tool("create_campaign",
   async ({ client_name, name, subject, body }) => {
     const client = getClient(client_name);
     const data = await ebFetch("POST", "/campaigns", client, { name, subject, body });
-    return { content: [{ type: "text", text: JSON.stringify(data, null, 2) }] };
+    return ok(data);
   }
 );
 
@@ -203,7 +200,7 @@ server.tool("launch_campaign",
   async ({ client_name, campaign_id }) => {
     const client = getClient(client_name);
     const data = await ebFetch("POST", `/campaigns/${campaign_id}/launch`, client);
-    return { content: [{ type: "text", text: JSON.stringify(data, null, 2) }] };
+    return ok(data);
   }
 );
 
@@ -213,7 +210,7 @@ server.tool("pause_campaign",
   async ({ client_name, campaign_id }) => {
     const client = getClient(client_name);
     const data = await ebFetch("POST", `/campaigns/${campaign_id}/pause`, client);
-    return { content: [{ type: "text", text: JSON.stringify(data, null, 2) }] };
+    return ok(data);
   }
 );
 
@@ -230,7 +227,7 @@ server.tool("list_replies",
     const body = { page: 1, limit };
     if (label) body.label = label;
     const data = await miFetch("POST", "/api/api-webhook/v1/api/get-threads", client, body);
-    return { content: [{ type: "text", text: JSON.stringify(data, null, 2) }] };
+    return ok(data);
   }
 );
 
@@ -240,7 +237,7 @@ server.tool("get_thread",
   async ({ client_name, thread_id }) => {
     const client = getClient(client_name);
     const data = await miFetch("POST", "/api/api-webhook/v1/api/get-thread", client, { thread_id });
-    return { content: [{ type: "text", text: JSON.stringify(data, null, 2) }] };
+    return ok(data);
   }
 );
 
@@ -254,7 +251,7 @@ server.tool("tag_reply",
   async ({ client_name, thread_id, label }) => {
     const client = getClient(client_name);
     const data = await miFetch("POST", "/api/api-webhook/v1/api/update-thread", client, { thread_id, label });
-    return { content: [{ type: "text", text: JSON.stringify(data, null, 2) }] };
+    return ok(data);
   }
 );
 
@@ -274,7 +271,7 @@ server.tool("get_interested_replies",
         results.push({ client: client.name, error: e.message });
       }
     }
-    return { content: [{ type: "text", text: JSON.stringify(results, null, 2) }] };
+    return ok(results);
   }
 );
 
@@ -301,7 +298,7 @@ server.tool("emailbison_get_sender_email",
   },
   async ({ instance, sender_email_id }) => {
     const result = await ebSenderFetch("GET", sender_email_id, instance);
-    return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+    return ok(result);
   }
 );
 
@@ -320,7 +317,7 @@ server.tool("emailbison_update_sender_email",
     if (daily_limit     !== undefined) body.daily_limit     = daily_limit;
     if (email_signature !== undefined) body.email_signature = email_signature;
     const result = await ebSenderFetch("PATCH", sender_email_id, instance, body);
-    return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+    return ok(result);
   }
 );
 
@@ -332,7 +329,7 @@ server.tool("emailbison_delete_sender_email",
   },
   async ({ instance, sender_email_id }) => {
     const result = await ebSenderFetch("DELETE", sender_email_id, instance);
-    return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+    return ok(result);
   }
 );
 
@@ -349,35 +346,12 @@ server.tool("find_company",
       if (domain) body.q_organization_domains = [domain];
       const data = await apolloFetch("/mixed_companies/search", body);
       const orgs = data?.organizations ?? data?.accounts ?? [];
-      if (!orgs.length) return apolloOk({ note: "No company found", query: { company_name, domain } });
-      return apolloOk(orgs[0]);
-    } catch (e) { return apolloErr(e); }
+      if (!orgs.length) return ok({ note: "No company found", query: { company_name, domain } });
+      return ok(orgs[0]);
+    } catch (e) { return err(e); }
   }
 );
 
-server.tool("find_contacts",
-  "Find decision-maker contacts at a company matching target job titles. Returns names, titles, LinkedIn URLs, and any revealed emails. Use this to build a lead list before launching a campaign.",
-  {
-    company_name: z.string().describe("Company to search within"),
-    domain:       z.string().optional().describe("Company domain — avoids name collisions and improves accuracy"),
-    titles:       z.array(z.string()).describe("Target job titles, e.g. [\"VP of Business Development\", \"Head of Growth\"]"),
-    limit:        z.number().optional().describe("Max contacts to return (default 5, max 25)"),
-  },
-  async ({ company_name, domain, titles, limit }) => {
-    try {
-      const body = {
-        q_organization_name: company_name,
-        person_titles:       titles,
-        per_page:            Math.min(limit ?? 5, 25),
-      };
-      if (domain) body.q_organization_domains = [domain];
-      const data  = await apolloFetch("/mixed_people/search", body);
-      const people = data?.people ?? [];
-      const total  = data?.pagination?.total_entries ?? people.length;
-      return apolloOk({ total_found: total, contacts: people });
-    } catch (e) { return apolloErr(e); }
-  }
-);
 
 server.tool("enrich_contact",
   "Enrich a specific person in Apollo — returns verified work email, personal email (if available), LinkedIn URL, phone numbers, title, and seniority. Minimum: first_name + last_name + company. Adding domain or linkedin_url greatly improves the match.",
@@ -387,7 +361,7 @@ server.tool("enrich_contact",
     company:                 z.string().describe("Company the contact works at"),
     domain:                  z.string().optional().describe("Company domain — strongly recommended"),
     linkedin_url:            z.string().optional().describe("LinkedIn profile URL — most reliable identifier"),
-    reveal_personal_emails:  z.boolean().optional().describe("Attempt to reveal personal emails (default true, uses Apollo credits)"),
+    reveal_personal_emails:  z.boolean().optional().describe("Attempt to reveal personal emails (default false — set to true only if you explicitly want to spend credits)"),
   },
   async ({ first_name, last_name, company, domain, linkedin_url, reveal_personal_emails }) => {
     try {
@@ -395,15 +369,15 @@ server.tool("enrich_contact",
         first_name,
         last_name,
         organization_name:       company,
-        reveal_personal_emails:  reveal_personal_emails ?? true,
+        reveal_personal_emails:  reveal_personal_emails ?? false,
       };
       if (domain)       body.domain       = domain;
       if (linkedin_url) body.linkedin_url = linkedin_url;
       const data   = await apolloFetch("/people/match", body);
       const person = data?.person ?? data;
-      if (!person) return apolloOk({ note: "No match found", query: { first_name, last_name, company } });
-      return apolloOk(person);
-    } catch (e) { return apolloErr(e); }
+      if (!person) return ok({ note: "No match found", query: { first_name, last_name, company } });
+      return ok(person);
+    } catch (e) { return err(e); }
   }
 );
 
@@ -439,14 +413,14 @@ server.tool("search_people",
       if (has_email) people = people.filter(p => p.email);
       const total   = data?.pagination?.total_entries ?? people.length;
       const pages   = data?.pagination?.total_pages   ?? 1;
-      return apolloOk({
+      return ok({
         total_found:  total,
         total_pages:  pages,
         current_page: page ?? 1,
         returned:     people.length,
         contacts:     people,
       });
-    } catch (e) { return apolloErr(e); }
+    } catch (e) { return err(e); }
   }
 );
 
@@ -499,7 +473,7 @@ server.tool("bulk_pull_contacts",
         page++;
 
         // Small pause to be polite to the API
-        await new Promise(r => setTimeout(r, 300));
+        await new Promise(r => setTimeout(r, APOLLO_THROTTLE_MS));
       }
 
       // Trim to cap and shape output
@@ -507,7 +481,7 @@ server.tool("bulk_pull_contacts",
       const withEmail    = collected.filter(p => p.email).length;
       const withoutEmail = collected.length - withEmail;
 
-      return apolloOk({
+      return ok({
         summary: {
           total_in_apollo:   totalFound,
           pulled:            collected.length,
@@ -531,7 +505,7 @@ server.tool("bulk_pull_contacts",
           phone:       p.sanitized_phone,
         })),
       });
-    } catch (e) { return apolloErr(e); }
+    } catch (e) { return err(e); }
   }
 );
 
@@ -577,6 +551,7 @@ server.tool("bulk_push_to_campaign",
               first_name: contact.first_name,
               last_name:  contact.last_name,
               company:    contact.company,
+              title:      contact.title,
               website:    contact.website,
             }),
           });
@@ -600,7 +575,7 @@ server.tool("bulk_push_to_campaign",
         attachResult = await attachRes.json();
       }
 
-      return { content: [{ type: "text", text: JSON.stringify({
+      return ok({
         summary: {
           total_contacts:   contacts.length,
           leads_created:    created.length,
@@ -610,9 +585,9 @@ server.tool("bulk_push_to_campaign",
         },
         created_lead_ids: created,
         failed,
-      }, null, 2) }] };
+      });
     } catch (e) {
-      return { content: [{ type: "text", text: `Error: ${e.message}` }], isError: true };
+      return err(e);
     }
   }
 );
