@@ -205,5 +205,15 @@
     "inboxing_tags": [
       "clinintell"
     ]
+  },
+  {
+    "name": "Abra",
+    "sequencer": "eb_send",
+    "eb_ws_id": 50,
+    "mi_ws_id": 393,
+    "mi_key_env": "MI_KEY_ABRA",
+    "inboxing_tags": [
+      "Abra"
+    ]
   }
 ]
