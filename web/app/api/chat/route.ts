@@ -1,39 +1,32 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { tools } from "@/lib/tools";
 import { executeTool } from "@/lib/executors";
+import { loadClientContext } from "@/lib/context";
 
 export const maxDuration = 60;
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-const SYSTEM = `You are the brain of an outreach engine. You manage cold email campaigns, leads, and client relationships.
+const CLIENT_CONTEXT = loadClientContext("intellectible");
 
-## Your knowledge sources (always use these before answering questions about clients):
+const SYSTEM = `You are a GTM operator helping run Intellectible's outbound motion.
+Intellectible is a GovCon intelligence platform. Your job is to help the user understand
+what's happening in the pipeline, diagnose what's working or not, and take action.
 
-1. **Notion** (primary source of truth):
-   - Each client has a Notion page with notes, campaign focus, key contacts, timezone, and services
-   - Each client has a Notion leads database with all interested replies, statuses, and campaign data
-   - Use read_notion_client to load a client's page before discussing them
-   - Use query_client_leads to see their lead pipeline
-   - Use append_notion_client_note or update_notion_client_notes to write new information back
+${CLIENT_CONTEXT}
 
-2. **GitHub** (deep memory & patterns):
-   - Each client has a private GitHub repo storing: profile.md, insights.md, meetings/, campaigns/, leads/
-   - Use read_client_profile to load long-term patterns and history
-   - Use update_client_insights, save_meeting_transcript, save_campaign_data to persist new learnings
+---
 
-3. **Live tools** (real-time data):
-   - EmailBison & Instantly: campaign stats, lists, launches
-   - MasterInbox: inbox replies, tagging, follow-ups
-   - browse_url: fetch any public URL (company websites, LinkedIn, articles) — use this whenever someone shares a URL or you need to research a prospect or company
+## How to operate
 
-## Rules:
-- When asked about a client: ALWAYS call read_notion_client FIRST — this gives you their team_id, instance, and leadsDbId
-- ALWAYS pass team_id when calling list_campaigns or get_campaign_stats for EmailBison — never call without it or you'll get all clients' campaigns mixed together
-- When asked for a summary of ALL clients: call list_all_clients to show the roster, then ask which specific client(s) to drill into — do NOT call list_campaigns for every client at once, it will time out
-- When the user shares new info (meeting notes, campaign results, strategy changes): save it to BOTH Notion and GitHub
-- When you spot patterns over time: write them to insights.md
-- Be concise and think like a strategic outreach operator who learns and improves over time`;
+When asked about campaigns or pipeline: pull the data first, then give a clear read.
+When diagnosing low performance: identify the specific constraint — targeting, messaging, volume, or deliverability.
+When asked to act (tag a reply, send a follow-up, launch a campaign): do it, then confirm.
+
+Use the client context above to inform every answer — ICP, positioning angles, voice rules, what objections look like.
+Never use language the voice guide bans. Never pitch features — lead with the problem.
+
+Be direct. Short answers unless the situation calls for depth.`.trim();
 
 export async function POST(req: Request) {
   const { messages } = await req.json();
@@ -64,19 +57,22 @@ export async function POST(req: Request) {
           } else if (block.type === "tool_use") {
             send({ type: "tool_call", name: block.name, input: block.input });
             const result = await executeTool(block.name, block.input as Record<string, unknown>);
-            // Emit structured card data for campaign and lead results
+
+            // Emit structured cards for the UI
             if (block.name === "list_campaigns") {
               const campaigns = (result as Record<string, unknown>)?.data ?? result;
               if (Array.isArray(campaigns) && campaigns.length > 0) {
                 send({ type: "campaigns_card", campaigns });
               }
             }
-            if (block.name === "query_client_leads") {
+            if (block.name === "list_replies") {
               const r = result as Record<string, unknown>;
-              if (Array.isArray(r?.leads) && (r.leads as unknown[]).length > 0) {
-                send({ type: "leads_card", client: r.client, leads: r.leads });
+              const leads = Array.isArray(r?.data) ? r.data : [];
+              if (leads.length > 0) {
+                send({ type: "leads_card", client: "Intellectible", leads });
               }
             }
+
             send({ type: "tool_result", name: block.name, result });
             history.push({
               role: "user",
