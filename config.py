@@ -23,6 +23,8 @@ INSTANTLY_SIMPLEXITY_API_KEY    = os.getenv("INSTANTLY_SIMPLEXITY_API_KEY")
 INSTANTLY_KEYS = {
     "simplexity":    os.getenv("INSTANTLY_SIMPLEXITY_API_KEY"),
     "supply_wisdom": os.getenv("INSTANTLY_SUPPLY_WISDOM_API_KEY"),
+    "lend_home":     os.getenv("INSTANTLY_LEND_HOME_API_KEY"),
+    "surety_now":    os.getenv("INSTANTLY_SURETY_NOW_API_KEY"),
 }
 
 # ── MasterInbox ────────────────────────────────────────────────────────────

@@ -12,7 +12,6 @@ def set_client(config: dict) -> None:
 
 # ── Provider config ───────────────────────────────────────────────────────────
 # Wire APOLLO_API_KEY in .env to enable live enrichment.
-# Apollo is already in use across the client stack (visible in HubSpot call logs).
 
 APOLLO_API_KEY = os.getenv("APOLLO_API_KEY")
 APOLLO_BASE    = "https://api.apollo.io/api/v1"
@@ -136,7 +135,7 @@ def _enrich_contact(params: dict):
                 "organization_name":   params.get("company"),
                 "domain":              params.get("domain"),
                 "linkedin_url":        params.get("linkedin_url"),
-                "reveal_personal_emails": True,
+                "reveal_personal_emails": params.get("reveal_personal_emails", False),
             },
             timeout=15,
         )

@@ -1,37 +1,20 @@
----
-last_updated: 2026-05-19
-status: bootstrapped from prtcl-intellectible repo — validate with Intellectible team
----
+# Intellectible — Overview
+> Last updated: 2026-05-26 · Auto-generated from sequencer data
 
-# Intellectible
+## What They Do
+Intellectible is a government contracting intelligence platform — a competitor to GovTribe. It provides federal contractors with actionable data on contracts, task orders, and award histories to help BD and capture teams find and win more business.
 
-GovCon BD/capture platform for companies pursuing US federal government contracts. Helps BD and capture teams source, qualify, and pursue federal opportunities.
+## Sequencer
+EmailBison Send · 1 active campaign
 
-**Headline outcome**: Oceus doubled qualified federal opportunities reviewed each month, adding ~$520M in qualified pipeline.
+## Funnel Summary
+| Metric | Value |
+|---|---|
+| Total emails sent | 109,379 |
+| Overall reply rate | 0.16% |
+| Total campaigns | 11 |
+| Positive replies (90 days) | 9 |
+| Last positive reply | none in 90 days |
 
-## Product (inferred)
-- Federal opportunity discovery / sourcing (SAM.gov, FPDS, GSA, etc.)
-- Qualification and scoring of opportunities against company capabilities
-- Pipeline / pursuit tracking for BD teams
-- AI-assisted qualification
-
-## Pricing
-ACV ~$44K (consistent across recent HubSpot pipeline — confirm with team).
-
-## Reference customers
-- Oceus (case study — doubled qualified pipeline, +$520M)
-- Others TBD
-
-## Team
-- Jesse Lozano — Sales / AE, runs discovery calls
-- Joe — Co-founder or senior leadership
-- Zak — Team member (role TBD)
-- Armistead Whitney — Board member / investor
-
-## Tooling stack (visible)
-- **HubSpot** — CRM
-- **Calendly** — scheduling; discovery call forms push company/title/agenda into HubSpot meetings
-- **Apollo** — outbound cold calling; recordings in HubSpot calls
-- **Google Workspace / Meet** — Calendly-booked discovery calls
-- **Zoom** — board calls and longer internal meetings
-- **Fathom** — call recording; per-user OAuth to HubSpot (not org-level — confirm each rep has connected)
+## Health
+🔴 Needs Attention — Reply rate 0.16% is critically low

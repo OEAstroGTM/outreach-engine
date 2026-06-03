@@ -1,29 +1,26 @@
-# ICP — Intellectible
+# Intellectible — ICP
+> Last updated: 2026-05-26 · Auto-generated from sequencer data
 
-## Primary persona
-**VP of BD / Capture Director** at a federal contractor actively pursuing US government contracts.
+## Who's Responding
+Business Development Managers, Capture Managers, VP of BD at government contracting firms. Companies in FY25/FY26 contracting cycles. (inferred)
 
-Also seen: VP of Operations, Director of Federal Sales.
+### Industries / verticals
+Federal government contracting (GovCon), defense, IT, professional services for federal agencies (inferred)
 
-## Company profile
-- **Industry**: Defense, aerospace, IT services, energy, federal health — any company with a federal contracting practice
-- **Stage**: Companies actively in pursuit mode — they have a BD team and are going after contracts, but feel their qualified pipeline is too thin relative to what's being published on SAM.gov
-- **Size**: TBD — recent pipeline spans small to mid-size contractors
+### Company size signal
+$100K–$750K contract-focused GovCon firms (inferred)
 
-## Trigger signals
-- Company has an active federal contracting division
-- BD team is manually tracking SAM.gov / FPDS
-- They're reviewing too many unqualified opportunities and missing the right ones
-- Growth goal tied to federal contract wins
+### Positive engagement labels seen in MasterInbox
+Not Interested (8), Information Request (1)
 
-## Recent pipeline examples (May 2026)
-- BCF Solutions — defense / government services
-- INVOCON Inc. — aerospace / defense
-- Monmouth Solutions — services
-- haag-streit group — medical devices / federal health
-- 11 Series Energy — energy services
+## Best-performing campaigns (by reply rate)
+| Campaign | Status | Sent | Replies | Reply Rate |
+|---|---|---|---|---|
+| COMPETITOR F - May - Intellectible - GovDash | completed | 1,484 | 5 | 0.34% |
+| Mar FL/NY 100k-750k / FY25 FY26 | paused | 9,763 | 22 | 0.23% |
+| GovTribe Comp campaign | paused | 13,690 | 30 | 0.22% |
+| Mar TX/CA / 100k-750k / FY25 FY26 | paused | 9,294 | 20 | 0.22% |
+| Feb / 100k-750k / FY25 FY26 | paused | 22,268 | 46 | 0.21% |
 
-## Open questions
-- Ideal company size (headcount / revenue)?
-- Federal-pure vs commercial-mix companies — which converts better?
-- Does ICP shift by contract vehicle (SBIR, IDIQ, GWAC)?
+## Segments NOT converting
+Companies not actively pursuing federal contracts (inferred)

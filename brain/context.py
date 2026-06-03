@@ -22,7 +22,8 @@ def load_client_context(client_name: str) -> str:
     for filename in _CONTEXT_FILES:
         filepath = os.path.join(client_dir, filename)
         if os.path.exists(filepath):
-            content = open(filepath).read().strip()
+            with open(filepath) as f:
+                content = f.read().strip()
             if content:
                 sections.append(f"### {filename}\n{content}")
 
