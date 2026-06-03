@@ -111,9 +111,11 @@ def execute_inbox_tool(tool_name: str, tool_input: dict):
 # ── Implementations ───────────────────────────────────────────────────────────
 
 def _list_replies(params: dict):
+    # /get-messages requires a prospect_id (thread lookup only).
+    # /get-prospects is the correct endpoint for listing all replies in a workspace.
     try:
         return requests.post(
-            f"{_MI_BASE}/get-messages",
+            f"{_MI_BASE}/get-prospects",
             headers=_headers(),
             json={
                 "workspace_id": _ws_id(),
