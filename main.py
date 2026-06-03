@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 from rich.console import Console
 from rich.prompt import Prompt
 from brain.agent import run_agent
@@ -7,47 +8,44 @@ from brain.agent import run_agent
 console = Console()
 
 _CLIENTS_PATH = os.path.join(os.path.dirname(__file__), "clients.json")
+_DEFAULT_CLIENT = "Intellectible"
 
 
-def _load_client_names() -> list[str]:
+def _load_clients() -> list[dict]:
     with open(_CLIENTS_PATH) as f:
-        return [c["name"] for c in json.load(f)]
+        return json.load(f)
 
 
-def _select_client() -> str | None:
-    names = _load_client_names()
-    console.print("\n[bold]Available clients:[/bold]")
-    for i, name in enumerate(names, 1):
-        console.print(f"  [dim]{i}.[/dim] {name}")
-    console.print(f"  [dim]{len(names) + 1}.[/dim] No client (general mode)\n")
-
-    choice = Prompt.ask("Select a client", default=str(len(names) + 1))
-    try:
-        idx = int(choice) - 1
-        if 0 <= idx < len(names):
-            return names[idx]
-    except ValueError:
-        # Allow typing the name directly
-        if choice in names:
-            return choice
-    return None
+def _select_client(clients: list[dict]) -> str:
+    """Default to Intellectible. Pass --client=Name to override."""
+    for arg in sys.argv[1:]:
+        if arg.startswith("--client="):
+            name = arg.split("=", 1)[1]
+            if any(c["name"] == name for c in clients):
+                return name
+            console.print(f"[yellow]Unknown client '{name}', defaulting to {_DEFAULT_CLIENT}[/yellow]")
+    return _DEFAULT_CLIENT
 
 
 def main():
-    console.print("\n[bold green]Outreach Engine[/bold green]")
+    clients = _load_clients()
+    client_name = _select_client(clients)
 
-    client_name = _select_client()
-    if client_name:
-        console.print(f"\n[bold]Client:[/bold] {client_name}")
-    else:
-        console.print("\n[dim]Running in general mode — no client context loaded.[/dim]")
-
-    console.print("Type your goal or command. Type [bold]exit[/bold] to quit.\n")
+    console.print(f"\n[bold green]Outreach Engine[/bold green]  [dim]·[/dim]  [bold]{client_name}[/bold]")
+    console.print("[dim]Ask anything about the GTM — campaigns, replies, pipeline, strategy.[/dim]")
+    console.print("[dim]Commands: /status · /client <name> · exit[/dim]\n")
 
     history = []
 
     while True:
-        user_input = Prompt.ask("[bold blue]You[/bold blue]")
+        try:
+            user_input = Prompt.ask("[bold blue]>[/bold blue]")
+        except (KeyboardInterrupt, EOFError):
+            console.print("\n[dim]Shutting down.[/dim]")
+            break
+
+        if not user_input.strip():
+            continue
 
         if user_input.lower() in ("exit", "quit"):
             console.print("[dim]Shutting down.[/dim]")
@@ -56,6 +54,17 @@ def main():
         if user_input.strip() == "/status":
             from workflows.client_status import run as show_status
             show_status()
+            continue
+
+        if user_input.strip().startswith("/client "):
+            new_name = user_input.strip()[8:].strip()
+            if any(c["name"] == new_name for c in clients):
+                client_name = new_name
+                history = []
+                console.print(f"[bold]Switched to {client_name}[/bold] — history cleared.\n")
+            else:
+                names = [c["name"] for c in clients]
+                console.print(f"[yellow]Unknown client. Available: {', '.join(names)}[/yellow]")
             continue
 
         history = run_agent(user_input, history, client_name=client_name)

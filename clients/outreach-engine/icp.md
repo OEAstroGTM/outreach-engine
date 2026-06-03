@@ -1,26 +1,37 @@
-# Outreach Engine — ICP
-> Last updated: 2026-05-26 · Auto-generated from sequencer data
+# ICP
 
-## Who's Responding
-B2B founders, sales leaders, and marketing directors who need consistent pipeline without building an in-house SDR team. (inferred)
+## Target personas
 
-### Industries / verticals
-B2B SaaS, technology, professional services, agencies (inferred)
+Two primary personas, run as separate sequences:
 
-### Company size signal
-Startups to mid-market (10–500 employees) with an ACV above $5K (inferred)
+### VP / Director of Sales
+- Title signals: VP Sales, Director of Sales, Head of Sales, Chief Revenue Officer
+- Pain: reps are solid closers but spend too much time prospecting instead of closing
+- Secondary pain: pipeline is rep-sourced (70-80%), making revenue inconsistent
+- What they care about: qualified calendar time, rep efficiency, predictable pipeline
+- Proof angle: sales leaders at companies like UKG and OR Trax booking 10-20 qualified meetings/month
 
-### Positive engagement labels seen in MasterInbox
-Not Interested (17), Information Request (3), Meeting Request (3), Interested (2), 3rd call completed (1)
+### VP / Director of Marketing
+- Title signals: VP Marketing, Director of Marketing, Head of Demand Gen, CMO, Growth Lead
+- Pain: pipeline too dependent on ad spend -- when spend drops, pipeline drops
+- Secondary pain: marketing blamed for lead quality, sales distrust of MQL pipeline
+- What they care about: owning a predictable outbound channel, TOFU activity, pipeline marketing can take credit for
+- Proof angle: Braintracks and UKG booking 10-20 qualified meetings/month through outbound
 
-## Best-performing campaigns (by reply rate)
-| Campaign | Status | Sent | Replies | Reply Rate |
-|---|---|---|---|---|
-| NET NEW - May - b2b Sales | active | 504 | 10 | 1.98% |
-| NET NEW - May - b2b Marketing | active | 585 | 8 | 1.37% |
-| ONE YEAR OLDS - May - OE - CEO - B2B SaaS | archived | 5,287 | 33 | 0.62% |
-| RAPID GROWTH - May - Outreach Engine - B2B Sales | completed | 5,740 | 30 | 0.52% |
-| ONE YEAR OLDS - Apr - Outreach Engine - B2B Sales List  | completed | 7,644 | 28 | 0.37% |
+## Company profile
 
-## Segments NOT converting
-Companies without a defined ICP or sales process (inferred)
+- Industry: B2B SaaS (primary), tech-adjacent
+- Size: 20-200 employees (sweet spot: Series A to Series C)
+- Stage: past product-market fit, trying to scale revenue
+- Geography: North America primary
+
+## Intent signals
+
+- ONE YEAR OLDS: companies approximately 1 year old -- they have budget, urgency to grow, and have not yet built outbound infrastructure
+- Recently funded: companies with fresh capital that need to deploy it into pipeline
+- Hiring sales reps: companies building out a sales team that will need pipeline to work
+
+## Sequence targeting
+
+- Net New contacts: Apollo searches for new contacts matching ICP, never contacted before
+- Saved contacts: Apollo saved lists of contacts that have been contacted before but did not reply
