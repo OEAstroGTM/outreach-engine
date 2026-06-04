@@ -86,6 +86,8 @@
     "eb_personal_key_env": "EB_PERSONAL_KEY_LEND_HOME_IMPROVEMENTS",
     "mi_ws_id": 1074,
     "mi_key_env": "MI_KEY_LEND_HOME_IMPROVEMENTS",
+    "status": "churned",
+    "churned_at": "2026-06-01",
     "inboxing_tags": ["Lend Home Improvements"]
   },
   {
@@ -167,6 +169,7 @@
     "eb_send_key_env": "EB_SEND_KEY_WESTLINK",
     "mi_ws_id": 1049,
     "mi_key_env": "MI_KEY_WESTLINK",
+    "status": "churned",
     "inboxing_tags": ["Westlink"]
   },
   {
