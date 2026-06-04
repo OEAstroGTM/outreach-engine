@@ -192,8 +192,17 @@
     "sequencer": "eb_send",
     "eb_ws_id": 50,
     "eb_send_key_env": "EB_SEND_KEY_ABRA",
-    "mi_ws_id": null,
-    "mi_key_env": null,
+    "mi_ws_id": 393,
+    "mi_key_env": "MI_KEY_ABRA",
     "inboxing_tags": ["Abra"]
+  },
+  {
+    "name": "Revo.ai",
+    "sequencer": "eb_send",
+    "eb_ws_id": 129,
+    "eb_send_key_env": "EB_SEND_KEY_REVO",
+    "mi_ws_id": 392,
+    "mi_key_env": "MI_KEY_REVO",
+    "inboxing_tags": ["Revo.ai"]
   }
 ]
