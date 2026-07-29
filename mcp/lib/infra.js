@@ -145,7 +145,12 @@ export const getRegistrarBalance = ()     => registrar().getBalance();
 // ── Inboxing (mailbox provisioning — Inboxing API v2) ────────────────────────
 // Auth: X-API-Key header. Base includes /api/v2. Set INBOXING_API_BASE_URL to
 // your account's API base (dashboard host + /api/v2).
-const INBOXING_BASE = (process.env.INBOXING_API_BASE_URL || "https://app.inboxing.com/api/v2").replace(/\/$/, "");
+//
+// NOTE: the default must be the live dashboard host, v2.inboxing.com. The old
+// app.inboxing.com default accepts the TCP connection but never responds, so
+// Cloudflare eventually answers HTTP 522 — which reads like an Inboxing outage
+// rather than a misconfigured base URL. Don't "fix" a 522 by waiting it out.
+const INBOXING_BASE = (process.env.INBOXING_API_BASE_URL || "https://v2.inboxing.com/api/v2").replace(/\/$/, "");
 
 async function inboxing(method, path, body) {
   const key = process.env.INBOXING_API_KEY;
