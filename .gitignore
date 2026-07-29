@@ -219,3 +219,6 @@ __marimo__/
 
 # Keep web TypeScript lib
 !web/lib/
+
+# Keep MCP agent lib (JS, not the Python lib/ this rule targets)
+!mcp/lib/

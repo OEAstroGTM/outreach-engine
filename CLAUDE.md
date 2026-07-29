@@ -52,7 +52,41 @@ Select a client (or general mode), then type your goal. The agent will research,
 2. Create `clients/{slug}/` folder with context files (copy the structure from an existing client)
 3. Fill in `overview.md` and `icp.md` at minimum before running any campaigns
 
-## Tools available
+## MCP server — operator agents
+
+The MCP (`mcp/`) exposes Outreach Engine as a small **collection of delegating
+agents** rather than a flat tool list. The operator hands an agent a goal in
+plain language; the agent runs its own tool-use loop and reports back.
+
+Surface (see `mcp/index.js`):
+
+| Tool | What it delegates |
+|---|---|
+| `run_research_agent` | Find/enrich companies & people, build target lists (Apollo) |
+| `run_campaign_agent` | Create/launch/pause/monitor campaigns, push leads (EmailBison + Instantly) |
+| `run_inbox_agent` | Triage/read/tag replies (MasterInbox) |
+| `run_infra_agent` | Buy domains + provision Inboxing mailboxes, point nameservers |
+| `list_clients`, `get_client` | Cheap read helpers (non-delegating) |
+
+Architecture:
+
+```
+mcp/index.js      — server: read helpers + registerAgents()
+mcp/agents.js     — the 4 agent definitions (prompt + toolset)
+mcp/lib/agent.js  — generic Anthropic tool-use runner (runAgent)
+mcp/lib/tools.js  — operation functions (business logic, one source of truth)
+mcp/lib/core.js   — config, client resolution, fetch helpers
+mcp/lib/leadgen.js— proxy to the lead-gen MCP for the Infra agent
+```
+
+- Client routing is derived from `clients.json` (single source of truth); adding
+  a client is a `clients.json` + `.env` edit only — no code change.
+- The Infra agent **reuses the lead-gen MCP** (`namesilo_*`/`porkbun_*`/`inboxing_*`)
+  via `lib/leadgen.js`; set `LEADGEN_MCP_COMMAND`/`LEADGEN_MCP_ARGS` and
+  `INFRA_REGISTRAR` in `.env` to enable it.
+- Running the agents requires `ANTHROPIC_API_KEY` (they each run a Claude loop).
+
+## Tools available (Python brain — `tools/`)
 
 - **Research**: `find_company`, `find_contacts`, `enrich_contact` (Apollo via `APOLLO_API_KEY`)
 - **Campaigns**: `list_campaigns`, `create_campaign`, `add_leads_to_campaign`, `launch_campaign`, `pause_campaign`, `get_campaign_stats`, `create_lead` (EmailBison + Instantly; auto-detected from client sequencer)
@@ -60,4 +94,5 @@ Select a client (or general mode), then type your goal. The agent will research,
 
 ## Environment
 
-Copy `.env.example` to `.env` and fill in your API keys before running.
+Copy `.env.example` to `.env` and fill in your API keys before running. For the
+MCP agents, install deps once: `cd mcp && npm install`.

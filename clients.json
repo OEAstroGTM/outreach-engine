@@ -202,10 +202,46 @@
   {
     "name": "Revo.ai",
     "sequencer": "eb_send",
-    "eb_ws_id": 129,
+    "eb_ws_id": 49,
     "eb_send_key_env": "EB_SEND_KEY_REVO",
     "mi_ws_id": 392,
     "mi_key_env": "MI_KEY_REVO",
     "inboxing_tags": ["Revo.ai"]
+  },
+  {
+    "name": "Private Pargo",
+    "sequencer": "eb_send",
+    "eb_ws_id": 45,
+    "eb_send_key_env": "EB_SEND_KEY_PRIVATE_PARGO",
+    "mi_ws_id": null,
+    "mi_key_env": null,
+    "inboxing_tags": ["Private Pargo"]
+  },
+  {
+    "name": "Arnon River Partners",
+    "sequencer": "eb_send",
+    "eb_ws_id": 59,
+    "eb_send_key_env": "EB_SEND_KEY_ARNON_RIVER_PARTNERS",
+    "mi_ws_id": 2020,
+    "mi_key_env": "MI_KEY_ARNON_RIVER_PARTNERS",
+    "inboxing_tags": ["Arnon River Partners", "Arnon Rivers Partners", "ARP"]
+  },
+  {
+    "name": "Campaygn",
+    "sequencer": "eb_send",
+    "eb_ws_id": 55,
+    "eb_send_key_env": "EB_SEND_KEY_CAMPAYGN",
+    "mi_ws_id": 1469,
+    "mi_key_env": "MI_KEY_CAMPAYGN",
+    "inboxing_tags": ["Campaygn", "CMP"]
+  },
+  {
+    "name": "Union Omaha",
+    "sequencer": "eb_send",
+    "eb_ws_id": 54,
+    "eb_send_key_env": "EB_SEND_KEY_UNION_OMAHA",
+    "mi_ws_id": 1470,
+    "mi_key_env": "MI_KEY_UNION_OMAHA",
+    "inboxing_tags": ["Union Omaha", "union"]
   }
 ]
