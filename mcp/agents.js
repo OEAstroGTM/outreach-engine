@@ -4,8 +4,8 @@
 // run_<name>_agent MCP tools on the server.
 import { z } from "zod";
 import * as ops from "./lib/tools.js";
+import * as infra from "./lib/infra.js";
 import { runAgent } from "./lib/agent.js";
-import { listInfraTools, callInfraTool, leadgenConfigured, INFRA_REGISTRAR } from "./lib/leadgen.js";
 
 // Small helper to declare a tool the agent can call.
 const tool = (name, description, input_schema, handler) => ({ name, description, input_schema, handler });
@@ -90,26 +90,43 @@ const inboxAgent = {
   ],
 };
 
-// ── Infra / Provisioning agent (proxies the lead-gen MCP) ────────────────────
-// Tools are discovered at run time from the configured lead-gen MCP server.
-async function buildInfraAgent() {
-  const infraTools = await listInfraTools();
-  return {
-    name: "infra",
-    systemPrompt:
-      "You are the Infra agent for Outreach Engine. You buy and provision cold-email sending " +
-      `infrastructure using the ${INFRA_REGISTRAR} registrar + Inboxing (aerosend). Standard flow: ` +
-      "1) check domain variation availability; 2) confirm picks and funds before registering; " +
-      "3) register throwaway lookalike domains (default .digital); 4) provision each on Inboxing " +
-      "at 49 mailboxes with the client's tag; 5) when a domain reaches UPDATE_NAMESERVERS, point " +
-      "the registrar nameservers to the assigned Cloudflare pair PROMPTLY (missing the window " +
-      "fails with 'Nameserver update not detected'); 6) verify at the registrar and let it " +
-      "propagate to active. 1 domain = 1 Inboxing slot. Do not renew .digital throwaways. Never " +
-      "register domains without an explicit go. Report exactly what you bought and provisioned.",
-    tools: infraTools.map(t => tool(t.name, t.description, t.input_schema,
-      (args) => callInfraTool(t.name, args))),
-  };
-}
+// ── Infra / Provisioning agent (self-sufficient — native registrar + Inboxing) ─
+const nameObj = { type: "object", properties: { first_name: S.str, last_name: S.str } };
+const infraAgent = {
+  name: "infra",
+  systemPrompt:
+    "You are the Infra agent for Outreach Engine. You buy and provision cold-email sending " +
+    `infrastructure directly via the ${infra.INFRA_REGISTRAR} registrar + Inboxing. Standard flow: ` +
+    "1) check_domain_availability on variations; 2) confirm picks and check get_registrar_balance " +
+    "before registering; 3) register_domain for throwaway lookalike domains (default .digital); " +
+    "4) inboxing_submit_domain for each at 49 mailboxes with the client's tag and 49 sender names; " +
+    "5) when inboxing_check_status shows UPDATE_NAMESERVERS, call update_nameservers to point the " +
+    "registrar NS to the assigned Cloudflare pair PROMPTLY (missing the window fails with " +
+    "'Nameserver update not detected'); 6) verify with get_domain and let it propagate to active. " +
+    "1 domain = 1 Inboxing slot. Do not renew .digital throwaways. NEVER register domains without " +
+    "an explicit go. Report exactly what you bought and provisioned.",
+  tools: [
+    tool("check_domain_availability", "Check if domains are available + pricing (via the configured registrar).",
+      obj({ domains: S.arrStr }, ["domains"]), infra.checkAvailability),
+    tool("get_registrar_balance", "Get the registrar account balance before spending.",
+      obj({}), infra.getRegistrarBalance),
+    tool("register_domain", "Register a domain via the configured registrar (spends funds).",
+      obj({ domain: S.str, years: S.num }, ["domain"]), infra.registerDomain),
+    tool("update_nameservers", "Point a domain's registrar nameservers to the given pair.",
+      obj({ domain: S.str, nameservers: S.arrStr }, ["domain", "nameservers"]), infra.updateNameservers),
+    tool("get_domain", "Get a domain's registrar status + current nameservers.",
+      obj({ domain: S.str }, ["domain"]), infra.getDomain),
+    tool("inboxing_submit_domain", "Provision mailboxes for a domain on Inboxing (user_count 25/49/99).",
+      obj({ domain: S.str, user_count: S.num, tags: S.arrStr, names: { type: "array", items: nameObj } }, ["domain"]),
+      infra.inboxingSubmitDomain),
+    tool("inboxing_check_status", "Check an Inboxing domain job's status (pass the domain job id).",
+      obj({ domain_id: S.str }, ["domain_id"]), infra.inboxingCheckStatus),
+    tool("inboxing_list_domains", "List domains/jobs on Inboxing.", obj({}), infra.inboxingListDomains),
+    tool("inboxing_get_slots", "Check available Inboxing mailbox/domain slots.", obj({}), infra.inboxingGetSlots),
+    tool("inboxing_download_csv", "Download the mailbox credentials CSV for a domain once it's active.",
+      obj({ domain_id: S.str }, ["domain_id"]), infra.inboxingDownloadCsv),
+  ],
+};
 
 // ── Orchestrator agent ───────────────────────────────────────────────────────
 // Takes a rough / underspecified operator prompt, resolves context, rewrites it
@@ -119,7 +136,7 @@ const SPECIALISTS = {
   research: researchAgent,
   campaign: campaignAgent,
   inbox: inboxAgent,
-  infra: buildInfraAgent, // async factory
+  infra: infraAgent,
 };
 
 async function resolveSpecialist(name) {
@@ -201,7 +218,6 @@ export function registerAgents(server) {
     "Delegate a campaign goal (create/launch/pause/monitor, push leads).");
   registerAgentTool(server, "inbox", inboxAgent,
     "Delegate an inbox goal (triage/read/tag replies in MasterInbox).");
-  registerAgentTool(server, "infra", buildInfraAgent,
-    "Delegate an infra goal (buy domains + provision Inboxing mailboxes)." +
-    (leadgenConfigured() ? "" : " [requires LEADGEN_MCP_COMMAND in .env]"));
+  registerAgentTool(server, "infra", infraAgent,
+    `Delegate an infra goal (buy domains + provision Inboxing mailboxes; registrar: ${infra.INFRA_REGISTRAR}).`);
 }

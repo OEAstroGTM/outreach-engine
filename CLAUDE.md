@@ -77,14 +77,14 @@ mcp/agents.js     — the 4 agent definitions (prompt + toolset)
 mcp/lib/agent.js  — generic Anthropic tool-use runner (runAgent)
 mcp/lib/tools.js  — operation functions (business logic, one source of truth)
 mcp/lib/core.js   — config, client resolution, fetch helpers
-mcp/lib/leadgen.js— proxy to the lead-gen MCP for the Infra agent
+mcp/lib/infra.js  — self-sufficient registrar (NameSilo/Porkbun) + Inboxing calls
 ```
 
 - Client routing is derived from `clients.json` (single source of truth); adding
   a client is a `clients.json` + `.env` edit only — no code change.
-- The Infra agent **reuses the lead-gen MCP** (`namesilo_*`/`porkbun_*`/`inboxing_*`)
-  via `lib/leadgen.js`; set `LEADGEN_MCP_COMMAND`/`LEADGEN_MCP_ARGS` and
-  `INFRA_REGISTRAR` in `.env` to enable it.
+- The Infra agent is **self-sufficient** — it calls the registrar (NameSilo or
+  Porkbun, `INFRA_REGISTRAR`) and Inboxing directly from `lib/infra.js` using the
+  keys in `.env`. No external lead-gen MCP required.
 - Running the agents requires `ANTHROPIC_API_KEY` (they each run a Claude loop).
 
 ## Tools available (Python brain — `tools/`)

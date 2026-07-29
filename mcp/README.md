@@ -45,7 +45,7 @@ gate individual agents:
 | research | `APOLLO_API_KEY` |
 | campaign | `EMAILBISON_SEND_API_KEY` / `EMAILBISON_PERSONAL_API_KEY`, or `INSTANTLY_*` |
 | inbox | `MASTERINBOX_API_KEY` + per-client `MI_KEY_*` |
-| infra | `LEADGEN_MCP_COMMAND` + `LEADGEN_MCP_ARGS`, `INFRA_REGISTRAR`, registrar/inboxing keys |
+| infra | `INFRA_REGISTRAR` + registrar keys (`NAMESILO_API_KEY` or `PORKBUN_API_KEY`/`PORKBUN_SECRET_API_KEY`) + `INBOXING_API_KEY` |
 
 Optional agent tuning: `AGENT_MODEL` (default `claude-sonnet-4-6`),
 `AGENT_MAX_TURNS` (25), `AGENT_MAX_TOKENS` (4096).
@@ -78,30 +78,35 @@ mcp/agents.js      the 4 agent definitions (system prompt + toolset)
 mcp/lib/agent.js   generic Anthropic tool-use runner (runAgent)
 mcp/lib/tools.js   operation functions — business logic, one source of truth
 mcp/lib/core.js    config, client resolution, fetch helpers
-mcp/lib/leadgen.js proxy to the lead-gen MCP for the Infra agent
+mcp/lib/infra.js   self-sufficient registrar (NameSilo/Porkbun) + Inboxing calls
 ```
 
 Client routing derives from `../clients.json` (single source of truth). Adding a
 client is a `clients.json` + `.env` edit — no code change.
 
-## The Infra agent
+## The Infra agent (self-sufficient)
 
-Rather than re-implementing registrar/mailbox APIs, the Infra agent proxies the
-existing lead-gen MCP (`namesilo_*` / `porkbun_*` / `inboxing_*`). Point it at
-that server:
+The Infra agent talks **directly** to the registrar and Inboxing — no external
+lead-gen MCP to configure. Pick the registrar and provide its keys:
 
 ```bash
-LEADGEN_MCP_COMMAND=npx
-LEADGEN_MCP_ARGS=["-y","@your/lead-gen-mcp"]
-INFRA_REGISTRAR=namesilo   # or porkbun
+INFRA_REGISTRAR=namesilo          # namesilo (default) | porkbun
+NAMESILO_API_KEY=...              # if namesilo
+PORKBUN_API_KEY=... ; PORKBUN_SECRET_API_KEY=...   # if porkbun
+INBOXING_API_KEY=...
+INBOXING_API_BASE_URL=https://app.inboxing.com/api/v2
 ```
 
-Leave `LEADGEN_MCP_COMMAND` unset to disable the Infra agent (the other three
-still work).
+Both registrars are implemented natively against their public APIs (NameSilo's
+`?type=json` GET API; Porkbun v3 REST — register requires the exact price in
+pennies, handled for you). Inboxing uses its API v2 (`X-API-Key` auth, base
+`.../api/v2`): `POST /domains`, `GET /domains/{id}/status`, `GET /slots`,
+`GET /domains/{id}/csv`. Set `INBOXING_API_BASE_URL` to your dashboard host + `/api/v2`.
 
 ## Smoke test
 
-With `ANTHROPIC_API_KEY` set, `node index.js` should boot and expose the six
-tools. A minimal end-to-end check is to call `run_research_agent` with a goal
-that only needs `list_clients` (no Apollo credits spent).
+With `ANTHROPIC_API_KEY` set, `node index.js` should boot and expose seven tools
+(`run_orchestrator_agent` + four specialists + `list_clients`/`get_client`). A
+minimal end-to-end check is to call `run_research_agent` with a goal that only
+needs `list_clients` (no Apollo credits spent).
 ```
