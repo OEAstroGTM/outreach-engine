@@ -4,8 +4,13 @@
 import { readFileSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
+import dotenv from "dotenv";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+
+// Load the repo-root .env BEFORE reading any process.env below, regardless of
+// the process's cwd (the MCP client may launch us from mcp/ or the repo root).
+dotenv.config({ path: join(__dirname, "../../.env") });
 
 // clients.json is the source of truth for client routing + which env var holds
 // each client's keys.

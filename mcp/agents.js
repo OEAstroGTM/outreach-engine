@@ -111,6 +111,68 @@ async function buildInfraAgent() {
   };
 }
 
+// ── Orchestrator agent ───────────────────────────────────────────────────────
+// Takes a rough / underspecified operator prompt, resolves context, rewrites it
+// into a precise goal, and dispatches to the right specialist. Its "tools" are
+// the other agents — it never does the work itself.
+const SPECIALISTS = {
+  research: researchAgent,
+  campaign: campaignAgent,
+  inbox: inboxAgent,
+  infra: buildInfraAgent, // async factory
+};
+
+async function resolveSpecialist(name) {
+  const a = SPECIALISTS[name];
+  if (!a) throw new Error(`Unknown specialist: ${name}`);
+  return typeof a === "function" ? await a() : a;
+}
+
+function dispatchTool(name, blurb) {
+  return tool(
+    `dispatch_to_${name}`,
+    `${blurb} Pass a fully-specified, well-scoped goal: resolve the client, be explicit about ` +
+    `targets/filters/IDs/constraints. The specialist runs its own loop and returns its result.`,
+    obj({ goal: S.str, context: S.str }, ["goal"]),
+    async ({ goal, context }) => runAgent(await resolveSpecialist(name), goal, { context })
+  );
+}
+
+function buildOrchestratorAgent() {
+  return {
+    name: "orchestrator",
+    systemPrompt:
+      "You are the Orchestrator for Outreach Engine. Operators often hand you vague, " +
+      "underspecified, or sloppy requests. Your ONLY job is to turn a rough request into the " +
+      "right, precisely-scoped work — never to do the work yourself.\n\n" +
+      "For every request:\n" +
+      "1. Infer intent and target domain: research (find/enrich leads), campaign " +
+      "(create/launch/monitor/push leads), inbox (triage/tag replies), or infra (buy domains + " +
+      "provision mailboxes).\n" +
+      "2. Resolve context FIRST — use list_clients / get_client to pin the exact client and its " +
+      "routing whenever the request names or implies one.\n" +
+      "3. Rewrite the request into a clear, complete goal for the specialist: explicit client, " +
+      "concrete targets/filters/IDs, and constraints. This is the pre-audit — state the refined " +
+      "goal you are about to dispatch.\n" +
+      "4. Dispatch to exactly the right specialist via dispatch_to_<agent>. Chain multiple only " +
+      "when the request truly spans domains (e.g. research then campaign).\n" +
+      "5. Return a short summary: which agent(s) you routed to, the refined goal you sent, and " +
+      "the specialist's result.\n\n" +
+      "Guardrails: if the request is too ambiguous to route safely, or would trigger an " +
+      "irreversible / money-spending action (registering domains, launching a campaign, sending " +
+      "mail) without a clear go, DO NOT dispatch — ask one focused clarifying question instead.",
+    tools: [
+      list_clients_tool,
+      tool("get_client", "Get a client's full routing config to resolve context before dispatching.",
+        obj({ client_name: S.str }, ["client_name"]), ops.getClientInfo),
+      dispatchTool("research", "Dispatch a lead-research goal to the Research agent."),
+      dispatchTool("campaign", "Dispatch a campaign goal to the Campaign agent."),
+      dispatchTool("inbox", "Dispatch an inbox/reply goal to the Inbox agent."),
+      dispatchTool("infra", "Dispatch a domain/mailbox provisioning goal to the Infra agent."),
+    ],
+  };
+}
+
 // ── Registration ─────────────────────────────────────────────────────────────
 const AGENT_INPUT = {
   goal: z.string().describe("What you want the agent to accomplish, in plain language."),
@@ -130,6 +192,9 @@ function registerAgentTool(server, agentName, agentOrFactory, blurb) {
 }
 
 export function registerAgents(server) {
+  registerAgentTool(server, "orchestrator", buildOrchestratorAgent,
+    "Give a rough/vague goal; the orchestrator resolves context, rewrites it into a precise " +
+    "prompt, and dispatches to the right specialist agent(s). Start here when unsure.");
   registerAgentTool(server, "research", researchAgent,
     "Delegate a lead-research goal (find/enrich/build target lists via Apollo).");
   registerAgentTool(server, "campaign", campaignAgent,

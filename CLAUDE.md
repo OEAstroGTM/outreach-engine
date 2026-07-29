@@ -62,6 +62,7 @@ Surface (see `mcp/index.js`):
 
 | Tool | What it delegates |
 |---|---|
+| `run_orchestrator_agent` | **Start here.** Takes a rough/vague prompt, resolves context, rewrites it, and routes to the right specialist(s) |
 | `run_research_agent` | Find/enrich companies & people, build target lists (Apollo) |
 | `run_campaign_agent` | Create/launch/pause/monitor campaigns, push leads (EmailBison + Instantly) |
 | `run_inbox_agent` | Triage/read/tag replies (MasterInbox) |

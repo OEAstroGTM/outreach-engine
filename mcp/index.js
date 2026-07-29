@@ -7,8 +7,8 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-import "dotenv/config";
-
+// core.js loads the repo-root .env (regardless of cwd) at import time, before
+// any env var is read — keep it the first local import.
 import { CLIENTS, ok, err } from "./lib/core.js";
 import * as ops from "./lib/tools.js";
 import { registerAgents } from "./agents.js";
