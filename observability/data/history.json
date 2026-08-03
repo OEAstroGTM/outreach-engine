@@ -702,31 +702,36 @@
             "ujetcloud.digital",
             4,
             0,
-            0
+            0,
+            4
           ],
           [
             "ujetglobal.digital",
             4,
             0,
-            0
+            0,
+            4
           ],
           [
             "ujetoutreach.digital",
             4,
             0,
-            0
+            0,
+            3
           ],
           [
             "useujet.digital",
             3,
             0,
-            0
+            0,
+            3
           ],
           [
             "13 others",
             16,
             0,
-            0
+            0,
+            14
           ]
         ],
         "queue": []
@@ -747,55 +752,64 @@
             "builtrighthq.digital",
             17,
             2,
-            0
+            0,
+            8
           ],
           [
             "builtrightco.digital",
             14,
             2,
-            0
+            0,
+            7
           ],
           [
             "builtrightgroup.digital",
             11,
             1,
-            1
+            1,
+            5
           ],
           [
             "getbuiltright.digital",
             7,
             0,
-            0
+            0,
+            5
           ],
           [
             "visitbuiltright.xyz",
             6,
             0,
-            0
+            0,
+            5
           ],
           [
             "trybuiltright.digital",
             5,
             1,
-            0
+            0,
+            2
           ],
           [
             "joinbuiltright.xyz",
             3,
             1,
+            0,
             0
           ],
           [
             "hibuiltright.xyz",
             2,
             1,
-            0
+            0,
+            1
           ],
           [
             "15 others",
             25,
             0,
-            0
+            0,
+            9
           ]
         ],
         "queue": [
@@ -852,35 +866,41 @@
             "lendhomefast.info",
             12,
             2,
-            1
+            1,
+            8
           ],
           [
             "lendhomedirect.info",
             11,
             1,
-            1
+            1,
+            2
           ],
           [
             "lendhomepro.info",
             9,
             0,
-            0
+            0,
+            5
           ],
           [
             "lendhomepros.info",
             7,
             2,
-            1
+            1,
+            6
           ],
           [
             "lendhomefirst.info",
             7,
             1,
-            0
+            0,
+            3
           ],
           [
             "lendhomereno.info",
             3,
+            1,
             1,
             1
           ],
@@ -888,31 +908,36 @@
             "lendhomeprojects.info",
             3,
             2,
-            0
+            0,
+            3
           ],
           [
             "lendhomeboost.info",
             1,
             1,
+            0,
             0
           ],
           [
             "lendhomecontractors.info",
             1,
             1,
-            0
+            0,
+            1
           ],
           [
             "lendhomefixes.info",
             1,
             1,
-            0
+            0,
+            1
           ],
           [
             "11 others",
             35,
             0,
-            0
+            0,
+            22
           ]
         ],
         "queue": [
@@ -997,31 +1022,36 @@
             "goarnonriverpartners.digital",
             28,
             6,
-            4
+            4,
+            9
           ],
           [
             "getarnonriverpartners.digital",
             28,
             11,
-            3
+            3,
+            7
           ],
           [
             "joinarnonriverpartners.digital",
             23,
             6,
-            2
+            2,
+            9
           ],
           [
             "tryarnonriverpartners.digital",
             23,
             5,
-            2
+            2,
+            7
           ],
           [
             "arnonriverpartnersco.digital",
             17,
             3,
-            0
+            0,
+            5
           ]
         ],
         "queue": [
@@ -1183,79 +1213,92 @@
             "heyreach_208012 (LinkedIn)",
             49,
             3,
-            0
+            0,
+            1
           ],
           [
             "heyreach_206423 (LinkedIn)",
             42,
             0,
-            0
+            0,
+            1
           ],
           [
             "heyreach_217256 (LinkedIn)",
             34,
             1,
+            0,
             0
           ],
           [
             "useclinintell.digital",
             16,
             1,
-            1
+            1,
+            12
           ],
           [
             "clinintellhq.digital",
             10,
             0,
-            0
+            0,
+            10
           ],
           [
             "clinintellpro.digital",
             10,
             0,
-            0
+            0,
+            8
           ],
           [
             "myclinintell.digital",
             9,
             0,
-            0
+            0,
+            9
           ],
           [
             "clinintellapp.digital",
             9,
             0,
-            0
+            0,
+            6
           ],
           [
             "withclinintell.digital",
             8,
             0,
-            0
+            0,
+            7
           ],
           [
             "goclinintell.digital",
             6,
             2,
-            2
+            2,
+            4
           ],
           [
             "clinintell.digital",
             6,
             0,
-            0
+            0,
+            6
           ],
           [
             "getclinintell.digital",
             6,
             0,
-            0
+            0,
+            4
           ],
           [
             "clinintellai.digital",
             3,
             0,
-            0
+            0,
+            2
           ]
         ],
         "queue": [
@@ -1296,6 +1339,8 @@
           ]
         ]
       }
-    }
+    },
+    "_domain_tuple": "[domain, threads, interest, booked, noise]",
+    "_no_age_data": "Domain registration dates are NOT yet collected, so triage cannot use age and the mortality curve is unavailable. 'warming' is decided on thread count alone. Needs a registrar getDomain pull."
   }
 }

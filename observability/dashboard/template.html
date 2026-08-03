@@ -2,459 +2,534 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Pipeline Snapshot</title>
+<title>Outreach Engine — Observability</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
 <style>
 :root { color-scheme: light; }
 * { box-sizing: border-box; }
-body { margin:0; padding:20px; background:#fbfbfa; color:#1c1b1a;
+body { margin:0; padding:18px; background:#fbfbfa; color:#1c1b1a;
   font:14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
-h1 { font-size:20px; margin:0 0 2px; letter-spacing:-0.01em; }
-h2 { font-size:12.5px; text-transform:uppercase; letter-spacing:.06em; color:#6b6a68;
-  margin:24px 0 10px; font-weight:600; }
+h1 { font-size:19px; margin:0 0 2px; letter-spacing:-.01em; }
+h2 { font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:#6b6a68; margin:22px 0 9px; font-weight:600; }
 .sub { color:#6b6a68; font-size:12.5px; }
 .panel { background:#fff; border:1px solid #e6e4e1; border-radius:8px; padding:14px; }
 .panel h3 { margin:0 0 10px; font-size:13px; font-weight:600; }
-.cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(148px,1fr)); gap:10px; margin-top:14px; }
-.card { background:#fff; border:1px solid #e6e4e1; border-radius:8px; padding:13px 14px; }
-.card .n { font-size:24px; font-weight:650; letter-spacing:-.02em; }
+.cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(142px,1fr)); gap:9px; margin-top:14px; }
+.card { background:#fff; border:1px solid #e6e4e1; border-radius:8px; padding:12px 13px; }
+.card .n { font-size:23px; font-weight:650; letter-spacing:-.02em; }
 .card .l { font-size:11.5px; color:#6b6a68; margin-top:3px; line-height:1.35; }
-.card.good { background:#f2faf4; border-color:#c3e6cd; } .card.good .n { color:#1c6b38; }
-.card.warn { background:#fffaf0; border-color:#f0dcb4; } .card.warn .n { color:#96650b; }
-.card.info { background:#f1f6fd; border-color:#c3d6f0; } .card.info .n { color:#2f5fa8; }
-.card.alarm { background:#fdeeea; border-color:#f3c9c0; } .card.alarm .n { color:#b4341c; }
+.card.good{background:#f2faf4;border-color:#c3e6cd}   .card.good .n{color:#1c6b38}
+.card.warn{background:#fffaf0;border-color:#f0dcb4}   .card.warn .n{color:#96650b}
+.card.info{background:#f1f6fd;border-color:#c3d6f0}   .card.info .n{color:#2f5fa8}
+.card.alarm{background:#fdeeea;border-color:#f3c9c0}  .card.alarm .n{color:#b4341c}
 table { width:100%; border-collapse:collapse; font-size:12.5px; }
 th { text-align:left; font-weight:600; color:#6b6a68; border-bottom:1px solid #e6e4e1;
   padding:7px 8px; font-size:11px; text-transform:uppercase; letter-spacing:.04em; white-space:nowrap; }
-td { padding:6px 8px; border-bottom:1px solid #f0eeec; }
-tbody tr { cursor:pointer; }
-tbody tr:hover td { background:#f1f6fd; }
+td { padding:6px 8px; border-bottom:1px solid #f0eeec; vertical-align:top; }
 .num { text-align:right; font-variant-numeric:tabular-nums; }
-.up { color:#1c6b38; font-weight:600; } .flat { color:#a3a09c; } .down { color:#b4341c; font-weight:600; }
-.chartbox { height:250px; position:relative; }
-.chartbox.short { height:190px; }
-.note { font-size:11.5px; color:#85837f; margin-top:10px; line-height:1.55; }
-.banner { background:#fdf6e6; border:1px solid #f0dcb4; border-left:3px solid #96650b;
-  border-radius:6px; padding:11px 13px; font-size:12.5px; line-height:1.55; margin-top:14px; }
-.banner.red { background:#fdeeea; border-color:#f3c9c0; border-left-color:#b4341c; }
-.banner.grey { background:#f6f5f4; border-color:#e0dedb; border-left-color:#9a9793; }
-.pill { display:inline-block; font-size:10.5px; font-weight:600; padding:1px 7px;
-  border-radius:20px; background:#ece9e6; color:#55534f; }
-.grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-@media (max-width:760px){ .grid2 { grid-template-columns:1fr; } }
-.bar { display:flex; align-items:center; gap:10px; margin-bottom:6px; font-size:12.5px; }
-.bar .bl { width:118px; color:#55534f; flex-shrink:0; }
-.bar .bt { flex:1; height:18px; background:#f0eeec; border-radius:3px; overflow:hidden; }
-.bar .bt i { display:block; height:100%; background:#4a7fd4; }
-.bar .bv { width:44px; text-align:right; font-variant-numeric:tabular-nums; font-weight:600; }
-.bar .bn { width:110px; font-size:11px; color:#85837f; }
-.toolbar { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:14px;
-  padding:11px 13px; background:#fff; border:1px solid #e6e4e1; border-radius:8px; }
-label.lbl { font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:#6b6a68; font-weight:600; }
-select { font:inherit; font-size:13.5px; padding:6px 10px; border-radius:6px;
-  border:1px solid #d9d6d2; background:#fff; color:#1c1b1a; min-width:230px; }
-button { font:inherit; font-size:12.5px; padding:5px 11px; border-radius:6px;
-  border:1px solid #d9d6d2; background:#fff; color:#3a3835; cursor:pointer; }
-button:hover { background:#f5f3f1; }
-.hide { display:none; }
+.up{color:#1c6b38;font-weight:600} .flat{color:#a3a09c} .down{color:#b4341c;font-weight:600}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;color:#55534f}
+.lbl{color:#6b6a68;font-size:11.5px}
+.chartbox{height:230px;position:relative} .chartbox.short{height:180px}
+.note{font-size:11.5px;color:#85837f;margin-top:9px;line-height:1.55}
+.banner{background:#fdf6e6;border:1px solid #f0dcb4;border-left:3px solid #96650b;
+  border-radius:6px;padding:11px 13px;font-size:12.5px;line-height:1.55;margin-top:13px}
+.banner.red{background:#fdeeea;border-color:#f3c9c0;border-left-color:#b4341c}
+.banner.grey{background:#f6f5f4;border-color:#e0dedb;border-left-color:#9a9793}
+.pill{display:inline-block;font-size:10.5px;font-weight:600;padding:1px 7px;border-radius:20px;background:#ece9e6;color:#55534f}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+@media (max-width:820px){.grid2{grid-template-columns:1fr}}
+.bar{display:flex;align-items:center;gap:9px;margin-bottom:6px;font-size:12.5px}
+.bar .bl{width:112px;color:#55534f;flex-shrink:0}
+.bar .bt{flex:1;height:17px;background:#f0eeec;border-radius:3px;overflow:hidden}
+.bar .bt i{display:block;height:100%;background:#4a7fd4}
+.bar .bv{width:44px;text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.bar .bn{width:108px;font-size:11px;color:#85837f}
+/* tabs */
+.tabs{display:flex;gap:2px;margin-top:14px;border-bottom:1px solid #e6e4e1}
+.tab{font:inherit;font-size:13px;font-weight:600;padding:9px 16px;border:none;background:none;
+  color:#6b6a68;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab:hover{color:#1c1b1a}
+.tab.on{color:#1c1b1a;border-bottom-color:#2f5fa8}
+.toolbar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:13px;
+  padding:10px 12px;background:#fff;border:1px solid #e6e4e1;border-radius:8px}
+label.tl{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#6b6a68;font-weight:600}
+select{font:inherit;font-size:13px;padding:5px 9px;border-radius:6px;border:1px solid #d9d6d2;background:#fff;min-width:210px}
+button.f{font:inherit;font-size:12px;padding:4px 10px;border-radius:6px;border:1px solid #d9d6d2;background:#fff;color:#3a3835;cursor:pointer}
+button.f:hover{background:#f5f3f1} button.f.on{background:#1c1b1a;color:#fff;border-color:#1c1b1a}
+.hide{display:none}
+/* triage states */
+.st{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap;text-transform:uppercase;letter-spacing:.03em}
+.st.critical{background:#fdeeea;color:#b4341c} .st.dead{background:#efeceb;color:#55534f}
+.st.watch{background:#fdf2dc;color:#8a5e0a}   .st.healthy{background:#e7f6ec;color:#1c6b38}
+.st.warming{background:#eef2f9;color:#3c5f96}
+.snap{border-left:2px solid #e6e4e1;padding:0 0 14px 14px;margin-left:5px;position:relative}
+.snap:before{content:"";position:absolute;left:-5px;top:4px;width:8px;height:8px;border-radius:50%;background:#4a7fd4}
+.snap .st1{font-size:12px;font-weight:600}
+.snap .st2{font-size:11.5px;color:#85837f}
+.snap ul{margin:6px 0 0;padding-left:16px;font-size:11.5px;color:#55534f;line-height:1.5}
 </style>
 </head>
 <body>
 
-<h1 id="title">Pipeline Snapshot</h1>
+<h1 id="title">Outreach Engine — Observability</h1>
 <div class="sub" id="hdr">Loading…</div>
 
-<div class="toolbar">
-  <label class="lbl" for="client">Client</label>
-  <select id="client"></select>
-  <button id="prev">‹ Prev</button>
-  <button id="next">Next ›</button>
-  <span class="sub" id="rank"></span>
+<div class="tabs">
+  <button class="tab on" id="t-perf">Performance</button>
+  <button class="tab" id="t-infra">Infrastructure</button>
 </div>
 
-<div id="stage" class="banner">
-  <b>Collecting baseline.</b> Forecasting needs a time series, and this is snapshot one. Day-over-day
-  deltas appear tomorrow; trend lines become meaningful after about ten weekdays.
-</div>
-
-<div class="cards" id="cards"></div>
-
-<!-- ALL-CLIENTS VIEW -->
-<div id="viewAll">
-  <h2>Reply volume by client</h2>
-  <div class="panel">
-    <table>
-      <thead><tr>
-        <th>Client</th><th class="num">Threads</th><th class="num">Δ since last</th><th class="num">Share</th><th>Scan</th>
-      </tr></thead>
-      <tbody id="rows"></tbody>
-    </table>
-    <div class="note" id="tablenote">Thread count is total replies ever received in that workspace. The daily
-    delta is new inbound replies — the top of the funnel. Click any row to open that client.</div>
+<!-- ══════════════ SCREEN 1: PERFORMANCE ══════════════ -->
+<div id="screenPerf">
+  <div class="toolbar">
+    <label class="tl" for="client">Client</label>
+    <select id="client"></select>
+    <button class="f" id="prev">‹</button>
+    <button class="f" id="next">›</button>
+    <span class="sub" id="rank"></span>
   </div>
-</div>
 
-<!-- SINGLE-CLIENT VIEW -->
-<div id="viewOne" class="hide">
-  <div class="grid2">
-    <div class="panel">
-      <h3>Reply volume over time</h3>
-      <div class="chartbox short"><canvas id="trend"></canvas></div>
-      <div class="note" id="trendnote"></div>
-    </div>
-    <div class="panel">
-      <h3 id="funnelTitle">Funnel</h3>
-      <div id="funnelBody"></div>
-    </div>
-  </div>
-</div>
+  <div class="cards" id="cards"></div>
 
-<!-- SCANNED-CLIENT PANELS -->
-<div id="scanPanels" class="hide" style="margin-top:14px">
-  <div class="grid2">
+  <div id="viewAll">
+    <h2>Reply volume by client</h2>
     <div class="panel">
-      <h3>Sending domains <span class="pill">which domains produce positives</span></h3>
       <table>
-        <thead><tr><th>Domain / sender</th><th class="num">Threads</th><th class="num">Interest</th><th class="num">Booked</th></tr></thead>
-        <tbody id="domRows"></tbody>
+        <thead><tr><th>Client</th><th class="num">Threads</th><th class="num">Δ</th><th class="num">Share</th><th>Scan</th></tr></thead>
+        <tbody id="rows"></tbody>
       </table>
-      <div class="note" id="domNote"></div>
+      <div class="note" id="tablenote">Thread count is total replies ever received. Click a row to open that client.</div>
+    </div>
+
+    <h2>Snapshot history</h2>
+    <div class="panel">
+      <div id="snaps" style="max-height:330px;overflow:auto"></div>
+      <div class="note">Every recorded reading, newest first. The daily collector appends one each weekday
+      morning; corrections and model changes are recorded here too so past numbers stay explainable.</div>
+    </div>
+  </div>
+
+  <div id="viewOne" class="hide">
+    <div class="grid2">
+      <div class="panel">
+        <h3>Reply volume over time</h3>
+        <div class="chartbox short"><canvas id="trend"></canvas></div>
+        <div class="note" id="trendnote"></div>
+      </div>
+      <div class="panel">
+        <h3 id="funnelTitle">Funnel</h3>
+        <div id="funnelBody"></div>
+      </div>
+    </div>
+    <div id="scanPanels" class="hide" style="margin-top:13px">
+      <div class="grid2">
+        <div class="panel">
+          <h3>Sending domains <span class="pill">which produce positives</span></h3>
+          <table>
+            <thead><tr><th>Domain / sender</th><th class="num">Threads</th><th class="num">Int</th><th class="num">Booked</th><th class="num">Noise</th></tr></thead>
+            <tbody id="domRows"></tbody>
+          </table>
+          <div class="note" id="domNote"></div>
+        </div>
+        <div class="panel">
+          <h3>Awaiting our reply <span class="pill" id="qCount"></span></h3>
+          <div style="max-height:320px;overflow:auto">
+            <table><thead><tr><th>Contact</th><th>Signal</th><th class="num">Days</th></tr></thead>
+            <tbody id="qRows"></tbody></table>
+          </div>
+          <div class="note" id="qNote"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="flowPanel" class="hide" style="margin-top:13px">
+    <div class="panel">
+      <h3>Label movement, two most recent readings</h3>
+      <table><thead><tr><th>Label</th><th class="num">Was</th><th class="num">Now</th><th class="num">Δ</th></tr></thead>
+      <tbody id="flow"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ SCREEN 2: INFRASTRUCTURE ══════════════ -->
+<div id="screenInfra" class="hide">
+  <div class="cards" id="iCards"></div>
+
+  <h2>Ward round — domain triage</h2>
+  <div class="panel">
+    <div class="toolbar" style="margin-top:0;padding:0 0 10px;border:none;background:none">
+      <button class="f on" data-st="all">All</button>
+      <button class="f" data-st="critical">Critical</button>
+      <button class="f" data-st="watch">Watch</button>
+      <button class="f" data-st="healthy">Healthy</button>
+      <button class="f" data-st="warming">Warming</button>
+      <span class="sub" id="wardCount"></span>
+    </div>
+    <table>
+      <thead><tr><th>State</th><th>Domain / sender</th><th>Client</th><th class="num">Threads</th>
+      <th class="num">Int</th><th class="num">Booked</th><th class="num">Noise</th><th>Diagnosis</th></tr></thead>
+      <tbody id="wardRows"></tbody>
+    </table>
+    <div class="note">Diagnosis is at <b>domain</b> level because reputation damage is domain-wide and the fleet
+    is far too large for per-mailbox reporting. Thresholds are deliberately conservative — this flags a patient
+    for a human, it does not sentence one.</div>
+  </div>
+
+  <div class="grid2" style="margin-top:13px">
+    <div class="panel">
+      <h3>Disconnected mailboxes <span class="pill">silently sending zero</span></h3>
+      <table><thead><tr><th>Workspace</th><th>Platform</th><th class="num">Disconnected</th></tr></thead>
+      <tbody id="discRows"></tbody></table>
+      <div class="note" id="discNote"></div>
     </div>
     <div class="panel">
-      <h3>Awaiting our reply <span class="pill" id="qCount"></span></h3>
-      <div style="max-height:340px;overflow:auto">
-        <table>
-          <thead><tr><th>Contact</th><th>Signal</th><th class="num">Days</th></tr></thead>
-          <tbody id="qRows"></tbody>
-        </table>
-      </div>
-      <div class="note" id="qNote"></div>
+      <h3>Concentration risk</h3>
+      <div class="chartbox short"><canvas id="conc"></canvas></div>
+      <div class="note" id="concNote"></div>
     </div>
   </div>
-</div>
 
-<!-- OE-ONLY FLOW PANEL -->
-<div id="flowPanel" class="hide" style="margin-top:14px">
-  <div class="panel">
-    <h3>Label movement between the two most recent readings</h3>
-    <table>
-      <thead><tr><th>Label</th><th class="num">Was</th><th class="num">Now</th><th class="num">Δ</th></tr></thead>
-      <tbody id="flow"></tbody>
-    </table>
-    <div class="note">Recorded daily, this becomes the basis for predicting bookings from reply volume.</div>
+  <div class="grid2" style="margin-top:13px">
+    <div class="panel">
+      <h3>Sending platforms <span class="pill">four, not one</span></h3>
+      <table><thead><tr><th>Platform</th><th class="num">Workspaces</th><th>Note</th></tr></thead>
+      <tbody id="platRows"></tbody></table>
+      <div class="note">Abra and Intellectible appear on two platforms — never sum across platforms without
+      deduplicating.</div>
+    </div>
+    <div class="panel">
+      <h3>What this screen cannot yet tell you</h3>
+      <div id="gaps"></div>
+    </div>
   </div>
-</div>
-
-<div class="banner red" style="margin-top:14px">
-  <b>Known defects that soften every number here.</b>
-  Calendly and Google Calendar mail from our own mailboxes is filed against the wrong prospect record and
-  counted as an inbound reply — it faked 16 of 29 apparent misses in the OutreachEngine review. Pricing is
-  inconsistent across reps ($3,495/mo vs $4,995/mo vs deal-based). And <code>get_label_stats</code> ignores
-  its <code>label_id</code> argument, always returning workspace 1013 — which is why only one client has
-  funnel data. Adding a workspace parameter to that one endpoint gives every client the full funnel below,
-  for 28 cheap calls a day.
 </div>
 
 <script>
 const H = __HISTORY__;
 
-const CHURN = H.churned || {};
-const INTERNAL = H.internal || {};
-const names = H.workspaces;
-const snaps = H.snapshots.filter(s => s.totals || s.labels);
-const volSnaps = H.snapshots.filter(s => s.totals);
-
-// Churned clients and internal infrastructure workspaces are excluded from every current figure.
+/* ── shared ─────────────────────────────────────────────────────────────── */
+const CHURN = H.churned || {}, INTERNAL = H.internal || {};
 const EXCL = Object.assign({}, CHURN, INTERNAL);
+const names = H.workspaces;
 const active = o => Object.fromEntries(Object.entries(o || {}).filter(([k]) => !EXCL[k]));
-
+const volSnaps = H.snapshots.filter(s => s.totals);
 const last = volSnaps.length ? volSnaps[volSnaps.length - 1] : null;
 const prev = volSnaps.length > 1 ? volSnaps[volSnaps.length - 2] : null;
 const totals = active(last ? last.totals : {});
 const prevTotals = prev ? active(prev.totals) : null;
 const grand = Object.values(totals).reduce((a, b) => a + b, 0);
-const volOf = k => (last && last.totals && last.totals[k]) || 0;
-const churnVol = Object.keys(CHURN).reduce((a, k) => a + volOf(k), 0);
-const internalVol = Object.keys(INTERNAL).reduce((a, k) => a + volOf(k), 0);
-
 const ranked = Object.entries(totals).sort((a, b) => b[1] - a[1]);
-const options = [['all', 'All active clients']].concat(ranked.map(([id]) => [id, names[id] || id]));
-
-const labelSnaps = id => H.snapshots.filter(s => s.labels && s.labels[id]);
-// Per-client scan results (group funnel + domain attribution + awaiting-reply queue).
 const OBS = (H.observed && H.observed.clients) || {};
-
-// Taxonomy comes from the history file so the dashboard and the collector never disagree.
 const T = H.taxonomy || {};
-const INTEREST = T.interest || ['Interested', 'Information Request', 'Meeting Request'];
-const SUCCESS  = (T.success || ['Meeting Booked'])[0];
-const DEFER    = T.deferral || ['Not Right Now'];
-const DIALS    = T.setter_activity || [];
-const NEG      = T.negative || [];
-const NOISE    = T.noise || [];
-const sum = (L, keys) => keys.reduce((a, k) => a + (L[k] || 0), 0);
+const INTEREST = T.interest || [], SUCCESS = (T.success || ['Meeting Booked'])[0];
+const DEFER = T.deferral || [], DIALS = T.setter_activity || [];
+const NEG = T.negative || [], NOISE = T.noise || [];
+const sum = (L, k) => k.reduce((a, x) => a + (L[x] || 0), 0);
+const labelSnaps = id => H.snapshots.filter(s => s.labels && s.labels[id]);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmtTs = ts => new Date(ts).toLocaleDateString(undefined,{month:'short',day:'numeric'}) + ' ' +
+  new Date(ts).toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
 
+/* ── triage (ported from observability/lib/infra-health.js) ─────────────── */
+const TH = { min_threads_to_judge:15, noise_critical:80, noise_watch:65 };
+function diagnose(d) {
+  const noisePct = d.threads ? +(d.noise / d.threads * 100).toFixed(1) : null;
+  const r = [];
+  // Domain age is not collected yet, so 'warming' rests on volume alone.
+  if (d.threads < TH.min_threads_to_judge) {
+    r.push(`only ${d.threads} threads — too few to judge`);
+    return { ...d, noisePct, state:'warming', reasons:r };
+  }
+  if (noisePct >= TH.noise_critical) { r.push(`${noisePct}% automated noise`); return {...d,noisePct,state:'critical',reasons:r}; }
+  if (!d.booked && !d.interest)      { r.push(`${d.threads} threads, zero interest, zero bookings`); return {...d,noisePct,state:'critical',reasons:r}; }
+  if (!d.booked && d.interest)       { r.push(`${d.interest} interested but zero bookings`); return {...d,noisePct,state:'watch',reasons:r}; }
+  if (noisePct >= TH.noise_watch)    { r.push(`noise at ${noisePct}%`); return {...d,noisePct,state:'watch',reasons:r}; }
+  r.push(`${d.booked} booked from ${d.interest} interested`);
+  return { ...d, noisePct, state:'healthy', reasons:r };
+}
+const ORDER = ['critical','dead','watch','healthy','warming'];
+const PATIENTS = Object.entries(OBS).flatMap(([wsId, o]) =>
+  (o.domains || []).map(([domain, threads, interest, booked, noise]) =>
+    diagnose({ domain, client: names[wsId] || wsId, threads, interest, booked, noise: noise || 0 })))
+  .sort((a,b) => ORDER.indexOf(a.state) - ORDER.indexOf(b.state) || b.threads - a.threads);
+
+/* ── tabs ───────────────────────────────────────────────────────────────── */
+let screen = localStorage.getItem('oe-screen') || 'perf';
+function setScreen(s) {
+  screen = s; localStorage.setItem('oe-screen', s);
+  document.getElementById('t-perf').classList.toggle('on', s === 'perf');
+  document.getElementById('t-infra').classList.toggle('on', s === 'infra');
+  document.getElementById('screenPerf').classList.toggle('hide', s !== 'perf');
+  document.getElementById('screenInfra').classList.toggle('hide', s !== 'infra');
+  if (s === 'infra') renderInfra();
+}
+document.getElementById('t-perf').onclick = () => setScreen('perf');
+document.getElementById('t-infra').onclick = () => setScreen('infra');
+
+/* ══ SCREEN 1 ══ */
 let sel = localStorage.getItem('oe-client') || 'all';
 if (sel !== 'all' && !totals[sel]) sel = 'all';
-
+const options = [['all','All active clients']].concat(ranked.map(([id]) => [id, names[id] || id]));
 const selEl = document.getElementById('client');
-selEl.innerHTML = options.map(([v, t]) =>
-  `<option value="${v}">${t}</option>`).join('');
-selEl.value = sel;
-
-let trendChart = null, funnelChart = null;
-
-function fmtTs(ts) {
-  return new Date(ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) +
-    ' ' + new Date(ts).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
-}
+selEl.innerHTML = options.map(([v,t]) => `<option value="${v}">${esc(t)}</option>`).join('');
+let trendChart = null, concChart = null;
 
 function render() {
-  localStorage.setItem('oe-client', sel);
-  selEl.value = sel;
+  localStorage.setItem('oe-client', sel); selEl.value = sel;
   const isAll = sel === 'all';
   document.getElementById('viewAll').classList.toggle('hide', !isAll);
   document.getElementById('viewOne').classList.toggle('hide', isAll);
-
   const idx = ranked.findIndex(([id]) => id === sel);
   document.getElementById('rank').textContent = isAll
-    ? `${ranked.length} active clients · ${Object.keys(CHURN).length} churned, ` +
-      `${Object.keys(INTERNAL).length} internal — all excluded`
-    : `#${idx + 1} of ${ranked.length} by volume`;
-
-  if (isAll) renderAll(); else renderOne(sel);
+    ? `${ranked.length} active · ${Object.keys(CHURN).length} churned, ${Object.keys(INTERNAL).length} internal excluded`
+    : `#${idx+1} of ${ranked.length} by volume`;
+  isAll ? renderAll() : renderOne(sel);
 }
 
 function renderAll() {
-  document.getElementById('title').textContent = 'Pipeline Snapshot — all clients';
-  const L = last && last.labels && last.labels['1013'] ? last.labels['1013'] : {};
+  const L = (last && last.labels && last.labels['1013']) || {};
   const ip = sum(L, INTEREST);
   document.getElementById('cards').innerHTML = [
     ['info', grand.toLocaleString(), `Client replies across ${ranked.length} clients`],
-    ['info', snaps.length, 'Snapshots recorded'],
+    ['info', H.snapshots.length, 'Snapshots recorded'],
     ['warn', ip, 'Interest pool (OutreachEngine)'],
-    ['good', L[SUCCESS] || 0, 'Meetings booked — terminal success'],
-    ['alarm', '13', 'Verified awaiting a reply (3 Aug)']
-  ].map(([c, n, l]) => `<div class="card ${c}"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('');
+    ['good', L[SUCCESS] || 0, 'Meetings booked — terminal'],
+    ['alarm', Object.values(OBS).reduce((a,o)=>a+o.queue.length,0), 'Awaiting reply (scanned clients)']
+  ].map(([c,n,l]) => `<div class="card ${c}"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('');
 
-  document.getElementById('rows').innerHTML = ranked.map(([id, v]) => {
+  document.getElementById('rows').innerHTML = ranked.map(([id,v]) => {
     let d = '<span class="flat">—</span>';
     if (prevTotals && prevTotals[id] != null) {
       const diff = v - prevTotals[id];
-      d = diff > 0 ? `<span class="up">+${diff}</span>`
-        : diff < 0 ? `<span class="down">${diff}</span>` : '<span class="flat">0</span>';
+      d = diff > 0 ? `<span class="up">+${diff}</span>` : diff < 0 ? `<span class="down">${diff}</span>` : '<span class="flat">0</span>';
     }
     const o = OBS[id];
-    const scan = o
-      ? `<span class="up">${o.funnel.booked} booked</span> · ${o.queue.length} waiting`
+    const scan = o ? `<span class="up">${o.funnel.booked} booked</span> · ${o.queue.length} waiting`
       : (id === '1013' ? '<span class="lbl">label data</span>' : '<span class="flat">not scanned</span>');
-    return `<tr data-id="${id}"><td>${names[id] || id}</td>
+    return `<tr data-id="${id}" style="cursor:pointer"><td>${esc(names[id]||id)}</td>
       <td class="num">${v.toLocaleString()}</td><td class="num">${d}</td>
-      <td class="num">${(v / grand * 100).toFixed(1)}%</td><td>${scan}</td></tr>`;
+      <td class="num">${(v/grand*100).toFixed(1)}%</td><td>${scan}</td></tr>`;
   }).join('');
-  document.querySelectorAll('#rows tr').forEach(tr => {
-    tr.onclick = () => { sel = tr.dataset.id; render(); };
-  });
+  document.querySelectorAll('#rows tr').forEach(tr => tr.onclick = () => { sel = tr.dataset.id; render(); });
 
+  document.getElementById('snaps').innerHTML = [...H.snapshots].reverse().map(s =>
+    `<div class="snap"><div class="st1">${fmtTs(s.ts)}</div>
+     <div class="st2">${esc(s.source||'')}${s.totals?` · ${Object.keys(s.totals).length} clients sized`:''}${s.labels?' · label data':''}</div>
+     ${(s.notes||[]).length ? `<ul>${s.notes.map(n=>`<li>${esc(n)}</li>`).join('')}</ul>` : ''}</div>`).join('');
   renderFlow('1013');
 }
 
 function renderOne(id) {
-  const nm = names[id] || id;
-  document.getElementById('title').textContent = `Pipeline Snapshot — ${nm}`;
-  const v = totals[id] || 0;
+  const nm = names[id] || id, v = totals[id] || 0;
   const diff = prevTotals && prevTotals[id] != null ? v - prevTotals[id] : null;
   const ls = labelSnaps(id);
-  const L = ls.length ? ls[ls.length - 1].labels[id] : null;
-
+  const L = ls.length ? ls[ls.length-1].labels[id] : null;
+  const o = OBS[id];
   const cards = [
     ['info', v.toLocaleString(), 'Total replies received'],
-    ['info', diff === null ? '—' : (diff > 0 ? '+' + diff : diff), 'New since last snapshot'],
-    ['info', (v / grand * 100).toFixed(1) + '%', 'Share of active book']
+    ['info', diff === null ? '—' : (diff > 0 ? '+'+diff : diff), 'New since last snapshot'],
+    ['info', (v/grand*100).toFixed(1)+'%', 'Share of active book']
   ];
-  if (L) {
-    const ip = sum(L, INTEREST), bk = L[SUCCESS] || 0;
-    cards.push(['warn', ip, 'Interest pool — interested, info request, meeting request']);
-    cards.push(['good', bk, 'Meetings booked — terminal success']);
-    cards.push([bk / Math.max(ip, 1) >= 0.4 ? 'good' : 'alarm',
-                ip ? (bk / ip * 100).toFixed(1) + '%' : '—', 'Interest converted to a booked meeting']);
+  const f = L ? {interest:sum(L,INTEREST), booked:L[SUCCESS]||0} : (o ? o.funnel : null);
+  if (f) {
+    cards.push(['warn', f.interest, 'Interest pool']);
+    cards.push(['good', f.booked, 'Meetings booked — terminal']);
+    cards.push([f.booked/Math.max(f.interest,1) >= 0.4 ? 'good':'alarm',
+      f.interest ? (f.booked/f.interest*100).toFixed(1)+'%' : '—', 'Interest converted']);
   }
   document.getElementById('cards').innerHTML = cards
-    .map(([c, n, l]) => `<div class="card ${c}"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('');
+    .map(([c,n,l]) => `<div class="card ${c}"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('');
 
-  // volume trend
-  const pts = volSnaps.filter(s => s.totals[id] != null).map(s => ({ x: fmtTs(s.ts), y: s.totals[id] }));
+  const pts = volSnaps.filter(s => s.totals[id] != null).map(s => ({x:fmtTs(s.ts), y:s.totals[id]}));
   if (trendChart) trendChart.destroy();
   trendChart = new Chart(document.getElementById('trend'), {
-    type: 'line',
-    data: {
-      labels: pts.map(p => p.x),
-      datasets: [{ data: pts.map(p => p.y), borderColor: '#2f5fa8', backgroundColor: '#dbe7f8',
-                   fill: true, tension: .25, pointRadius: 4 }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: { y: { grid: { color: '#f0eeec' } }, x: { grid: { display: false } } }
-    }
+    type:'line',
+    data:{labels:pts.map(p=>p.x), datasets:[{data:pts.map(p=>p.y), borderColor:'#2f5fa8',
+      backgroundColor:'#dbe7f8', fill:true, tension:.25, pointRadius:4}]},
+    options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+      scales:{y:{grid:{color:'#f0eeec'}}, x:{grid:{display:false}}}}
   });
   document.getElementById('trendnote').textContent = pts.length < 2
-    ? 'Only one reading so far — the line becomes a trend once the morning task has run a few times.'
+    ? 'One reading so far — this becomes a trend after a few collector runs.'
     : `${pts.length} readings. The slope is this client's inbound reply rate.`;
 
-  // funnel
-  const ft = document.getElementById('funnelTitle');
-  const fb = document.getElementById('funnelBody');
-  if (L) {
-    ft.innerHTML = 'Funnel <span class="pill">label data available</span>';
-    const ip = sum(L, INTEREST), bk = L[SUCCESS] || 0;
-    const noise = sum(L, NOISE), human = v - noise;
-
-    // Funnel: all replies -> human replies -> interest pool -> booked (terminal).
-    const steps = [
-      ['All replies', v, ''],
-      ['Human replies', human, v ? `${(human / v * 100).toFixed(0)}% of all` : ''],
-      ['Interest pool', ip, human ? `${(ip / human * 100).toFixed(1)}% of human` : ''],
-      ['Meeting booked', bk, ip ? `${(bk / ip * 100).toFixed(0)}% of interest` : '']
-    ];
-    const fmax = Math.max(v, 1);
-    const bars = steps.map(([k, n, note], i) =>
-      `<div class="bar"><div class="bl"${i === 3 ? ' style="font-weight:600"' : ''}>${k}</div>
-       <div class="bt"><i style="width:${n / fmax * 100}%${i === 3 ? ';background:#1c6b38' : ''}"></i></div>
-       <div class="bv">${n.toLocaleString()}</div><div class="bn">${note}</div></div>`).join('');
-
-    // Interest pool breakdown — three equivalent expressions of interest.
-    const imax = Math.max(...INTEREST.map(k => L[k] || 0), 1);
-    const breakdown = INTEREST.map(k =>
-      `<div class="bar"><div class="bl" style="padding-left:12px;color:#85837f">${k}</div>
-       <div class="bt"><i style="width:${(L[k] || 0) / imax * 100}%;background:#96650b"></i></div>
-       <div class="bv">${L[k] || 0}</div><div class="bn"></div></div>`).join('');
-
-    const dials = sum(L, DIALS);
-    fb.innerHTML = bars +
-      `<div class="note" style="margin-bottom:8px"><b>Meeting booked is terminal</b> — the thread ends there.
-       ${ip ? `<b>${(bk / ip * 100).toFixed(1)}%</b> of interest converts.` : ''}</div>
-       <div style="border-top:1px solid #f0eeec;padding-top:9px;margin-top:4px">
-       <div class="note" style="margin:0 0 6px"><b>Interest pool breakdown</b> — all three are equivalent
-       entry signals</div>${breakdown}</div>
-       <div style="border-top:1px solid #f0eeec;padding-top:9px;margin-top:9px">
-       <div class="note" style="margin:0">
-       <b>Setter activity:</b> ${dials} logged call attempts across 1st–6th dial.
-       These are effort markers, not funnel stages — they do not follow a booking.<br><br>
-       <b>Quality mix:</b> ${ip} interest · ${sum(L, DEFER)} deferred · ${sum(L, NEG)} negative ·
-       ${noise.toLocaleString()} automated noise. Labels overlap on the same prospect.</div></div>`;
-  } else if (OBS[id]) {
-    // Scanned client: group-level funnel measured by paging every record.
-    const f = OBS[id].funnel;
-    const human = f.records - f.noise;
-    ft.innerHTML = 'Funnel <span class="pill">measured by scan</span>';
-    const steps = [
-      ['All replies', f.records, ''],
-      ['Human replies', human, f.records ? `${(human / f.records * 100).toFixed(0)}% of all` : ''],
-      ['Interest pool', f.interest, human ? `${(f.interest / human * 100).toFixed(1)}% of human` : ''],
-      ['Meeting booked', f.booked, f.interest ? `${(f.booked / f.interest * 100).toFixed(0)}% of interest` : '—']
-    ];
-    const mx = Math.max(f.records, 1);
-    fb.innerHTML = steps.map(([k, n, note], i) =>
-      `<div class="bar"><div class="bl"${i === 3 ? ' style="font-weight:600"' : ''}>${k}</div>
-       <div class="bt"><i style="width:${n / mx * 100}%${i === 3 ? ';background:#1c6b38' : ''}"></i></div>
+  const ft = document.getElementById('funnelTitle'), fb = document.getElementById('funnelBody');
+  const drawFunnel = (recs, interest, booked, noise, extra) => {
+    const human = recs - noise;
+    const steps = [['All replies',recs,''],
+      ['Human replies',human, recs?`${(human/recs*100).toFixed(0)}% of all`:''],
+      ['Interest pool',interest, human?`${(interest/human*100).toFixed(1)}% of human`:''],
+      ['Meeting booked',booked, interest?`${(booked/interest*100).toFixed(0)}% of interest`:'—']];
+    const mx = Math.max(recs,1);
+    return steps.map(([k,n,note],i) =>
+      `<div class="bar"><div class="bl"${i===3?' style="font-weight:600"':''}>${k}</div>
+       <div class="bt"><i style="width:${n/mx*100}%${i===3?';background:#1c6b38':''}"></i></div>
        <div class="bv">${n.toLocaleString()}</div><div class="bn">${note}</div></div>`).join('') +
-      `<div class="note"><b>Meeting booked is terminal.</b>
-       ${f.interest ? `<b>${(f.booked / f.interest * 100).toFixed(1)}%</b> of interest converts.` : 'No interest recorded.'}
-       <br><br>Mix: ${f.interest} interest · ${f.deferral} deferred · ${f.negative} negative ·
-       ${f.noise} noise · ${f.unlabelled} unlabelled. Setter dials: ${f.dials} (effort, not a stage).
-       <br><br>Group totals only — a per-label breakdown needs <code>get_label_stats</code> to accept a
-       workspace parameter.</div>`;
+      `<div class="note"><b>Meeting booked is terminal.</b> ${interest?`<b>${(booked/interest*100).toFixed(1)}%</b> of interest converts.`:''}${extra}</div>`;
+  };
+  if (L) {
+    ft.innerHTML = 'Funnel <span class="pill">label data</span>';
+    fb.innerHTML = drawFunnel(v, sum(L,INTEREST), L[SUCCESS]||0, sum(L,NOISE),
+      `<br><br>Mix: ${sum(L,INTEREST)} interest · ${sum(L,DEFER)} deferred · ${sum(L,NEG)} negative ·
+       ${sum(L,NOISE).toLocaleString()} noise. Setter dials: ${sum(L,DIALS)} (effort, not a stage).`);
+  } else if (o) {
+    const q = o.funnel;
+    ft.innerHTML = 'Funnel <span class="pill">measured by scan</span>';
+    fb.innerHTML = drawFunnel(q.records, q.interest, q.booked, q.noise,
+      `<br><br>Mix: ${q.interest} interest · ${q.deferral} deferred · ${q.negative} negative · ${q.noise} noise ·
+       ${q.unlabelled} unlabelled. Setter dials: ${q.dials}.<br><br>Group totals only — a per-label split needs
+       <code>get_label_stats</code> to accept a workspace parameter.`);
   } else {
     ft.innerHTML = 'Funnel <span class="pill">not yet scanned</span>';
-    fb.innerHTML = `<div class="banner grey" style="margin-top:0">
-      ${nm} has not been scanned yet. Volume above is real and collected daily for every client, but the funnel
-      requires paging the workspace — this client is ${(v / 100 | 0) + 1} pages. Five clients have been scanned
-      so far; the rest join on the weekly rotation. <code>get_label_stats</code> ignores its
-      <code>label_id</code> and always returns workspace 1013, which is why the cheap path only covers
-      OutreachEngine.</div>`;
+    fb.innerHTML = `<div class="banner grey" style="margin-top:0">${esc(nm)} has not been scanned. Volume above is
+      real and collected daily for every client, but the funnel needs a full page-through — this one is about
+      ${Math.ceil(v/100)} pages. Five clients are done; the rest join the weekly rotation.</div>`;
   }
-
-  renderScan(id);
-  renderFlow(id);
+  renderScan(id); renderFlow(id);
 }
 
 function renderScan(id) {
-  const p = document.getElementById('scanPanels');
-  const o = OBS[id];
+  const p = document.getElementById('scanPanels'), o = OBS[id];
   if (!o) { p.classList.add('hide'); return; }
   p.classList.remove('hide');
-
-  const dz = o.domains.filter(d => d[2] === 0 && d[1] > 0).length;
-  document.getElementById('domRows').innerHTML = o.domains.map(([d, n, i, b]) =>
-    `<tr><td>${d}</td><td class="num">${n}</td>
-     <td class="num${i ? ' up' : ' flat'}">${i}</td>
-     <td class="num${b ? ' up' : ' flat'}">${b}</td></tr>`).join('');
+  document.getElementById('domRows').innerHTML = o.domains.map(([d,n,i,b,ns]) => {
+    const np = n ? Math.round(ns/n*100) : 0;
+    return `<tr><td>${esc(d)}</td><td class="num">${n}</td>
+      <td class="num${i?' up':' flat'}">${i}</td><td class="num${b?' up':' flat'}">${b}</td>
+      <td class="num${np>=65?' down':''}">${np}%</td></tr>`;
+  }).join('');
+  const burn = o.domains.filter(d => d[3] === 0 && d[2] > 0).length;
   document.getElementById('domNote').innerHTML =
-    `${o.domains.length} senders. <b>${dz}</b> produced interest but <b>zero bookings</b> — the burn signal. ` +
-    `Domains matter more than individual mailboxes because reputation damage is domain-wide.`;
-
+    `${o.domains.length} senders. <b>${burn}</b> produced interest but <b>zero bookings</b> — the burn signal.
+     Full triage on the Infrastructure screen.`;
   const q = o.queue;
-  document.getElementById('qCount').textContent = `${q.length} thread${q.length === 1 ? '' : 's'}`;
-  document.getElementById('qRows').innerHTML = q.length
-    ? q.map(([n, e, l, d, days]) =>
-        `<tr><td><b>${n}</b><br><span class="mono">${e}</span></td>
-         <td class="lbl">${l}</td>
-         <td class="num age ${days >= 30 ? 'bad' : ''}">${days}d</td></tr>`).join('')
+  document.getElementById('qCount').textContent = `${q.length} thread${q.length===1?'':'s'}`;
+  document.getElementById('qRows').innerHTML = q.length ? q.map(([n,e,l,d,days]) =>
+    `<tr><td><b>${esc(n)}</b><br><span class="mono">${esc(e)}</span></td><td class="lbl">${esc(l)}</td>
+     <td class="num${days>=30?' down':''}">${days}d</td></tr>`).join('')
     : '<tr><td colspan="3" class="flat">Nothing awaiting a reply.</td></tr>';
   const stale = q.filter(r => r[4] >= 30).length;
   document.getElementById('qNote').innerHTML = q.length
-    ? `Prospect sent last and carries an interest label. ${stale ? `<b>${stale}</b> are over 30 days cold. ` : ''}` +
-      `Calendar artifacts excluded.`
+    ? `Prospect sent last and carries an interest label.${stale?` <b>${stale}</b> over 30 days cold.`:''} Calendar artifacts excluded.`
     : 'Nothing pending.';
 }
 
 function renderFlow(id) {
-  const ls = labelSnaps(id);
-  const panel = document.getElementById('flowPanel');
+  const ls = labelSnaps(id), panel = document.getElementById('flowPanel');
   if (ls.length < 2) { panel.classList.add('hide'); return; }
-  const A = ls[ls.length - 2].labels[id], B = ls[ls.length - 1].labels[id];
-  const moved = Object.keys(B).map(k => [k, A[k] || 0, B[k] || 0])
-    .filter(([, a, b]) => b !== a).sort((x, y) => (y[2] - y[1]) - (x[2] - x[1]));
+  const A = ls[ls.length-2].labels[id], B = ls[ls.length-1].labels[id];
+  const moved = Object.keys(B).map(k => [k, A[k]||0, B[k]||0]).filter(([,a,b]) => b !== a)
+    .sort((x,y) => (y[2]-y[1]) - (x[2]-x[1]));
   if (!moved.length) { panel.classList.add('hide'); return; }
   panel.classList.remove('hide');
-  document.getElementById('flow').innerHTML = moved.map(([k, a, b]) => {
+  document.getElementById('flow').innerHTML = moved.map(([k,a,b]) => {
     const d = b - a;
-    return `<tr><td>${k}</td><td class="num">${a}</td><td class="num">${b}</td>
-      <td class="num ${d > 0 ? 'up' : 'down'}">${d > 0 ? '+' : ''}${d}</td></tr>`;
+    return `<tr><td>${esc(k)}</td><td class="num">${a}</td><td class="num">${b}</td>
+      <td class="num ${d>0?'up':'down'}">${d>0?'+':''}${d}</td></tr>`;
   }).join('');
 }
 
 selEl.onchange = () => { sel = selEl.value; render(); };
-document.getElementById('prev').onclick = () => {
-  const i = options.findIndex(([v]) => v === sel);
-  sel = options[(i - 1 + options.length) % options.length][0]; render();
-};
-document.getElementById('next').onclick = () => {
-  const i = options.findIndex(([v]) => v === sel);
-  sel = options[(i + 1) % options.length][0]; render();
-};
+document.getElementById('prev').onclick = () => { const i = options.findIndex(([v])=>v===sel); sel = options[(i-1+options.length)%options.length][0]; render(); };
+document.getElementById('next').onclick = () => { const i = options.findIndex(([v])=>v===sel); sel = options[(i+1)%options.length][0]; render(); };
 
-const tn = document.getElementById('tablenote');
-if (Object.keys(CHURN).length) {
-  const list = Object.values(CHURN).map(c => c.name).sort().join(', ');
-  tn.insertAdjacentHTML('beforeend',
-    `<br><br><b>Excluded as churned:</b> ${list} — ${churnVol.toLocaleString()} threads removed from all ` +
-    `current figures. Their history is retained in earlier snapshots, so past totals stay truthful.`);
-}
-if (Object.keys(INTERNAL).length) {
-  const list = Object.values(INTERNAL).map(c => `${c.name} (${c.reason})`).join(', ');
-  tn.insertAdjacentHTML('beforeend',
-    `<br><br><b>Excluded as internal:</b> ${list} — ${internalVol.toLocaleString()} threads. ` +
-    `Not a client account, so it is kept out of client counts and the selector.`);
+/* ══ SCREEN 2 ══ */
+let wardFilter = 'all';
+function renderInfra() {
+  const ib = H.infrastructure_baseline || {};
+  const disc = ib.disconnected_mailboxes || {};
+  const counts = {};
+  PATIENTS.forEach(p => counts[p.state] = (counts[p.state]||0) + 1);
+  const totalDisc = disc.total_observed ?? 0;
+  const booked = PATIENTS.reduce((a,p)=>a+p.booked,0);
+
+  document.getElementById('iCards').innerHTML = [
+    ['alarm', counts.critical||0, 'Domains critical — burned or producing nothing'],
+    ['warn', counts.watch||0, 'On watch — interest but no bookings'],
+    ['good', counts.healthy||0, 'Healthy — booking meetings'],
+    ['alarm', totalDisc, 'Disconnected mailboxes (floor — API page-capped)'],
+    ['info', PATIENTS.length, 'Domains under observation']
+  ].map(([c,n,l]) => `<div class="card ${c}"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('');
+
+  const shown = PATIENTS.filter(p => wardFilter === 'all' || p.state === wardFilter);
+  document.getElementById('wardCount').textContent = `showing ${shown.length} of ${PATIENTS.length}`;
+  document.getElementById('wardRows').innerHTML = shown.map(p =>
+    `<tr><td><span class="st ${p.state}">${p.state}</span></td>
+     <td>${esc(p.domain)}</td><td class="lbl">${esc(p.client)}</td>
+     <td class="num">${p.threads}</td><td class="num${p.interest?' up':' flat'}">${p.interest}</td>
+     <td class="num${p.booked?' up':' flat'}">${p.booked}</td>
+     <td class="num${p.noisePct>=65?' down':''}">${p.noisePct==null?'—':p.noisePct+'%'}</td>
+     <td class="lbl">${esc(p.reasons.join('; '))}</td></tr>`).join('');
+  document.querySelectorAll('[data-st]').forEach(b => b.onclick = () => {
+    wardFilter = b.dataset.st;
+    document.querySelectorAll('[data-st]').forEach(x => x.classList.toggle('on', x === b));
+    renderInfra();
+  });
+
+  const dr = [];
+  for (const [plat, ws] of Object.entries(disc)) {
+    if (typeof ws !== 'object') continue;
+    for (const [name, n] of Object.entries(ws)) {
+      if (typeof n === 'number' && n > 0) dr.push([name, plat, n]);
+    }
+  }
+  dr.sort((a,b) => b[2]-a[2]);
+  document.getElementById('discRows').innerHTML = dr.length ? dr.map(([n,p,c]) =>
+    `<tr><td>${esc(n)}</td><td class="lbl">${esc(p.replace('bison_','EmailBison '))}</td>
+     <td class="num down">${c}</td></tr>`).join('')
+    : '<tr><td colspan="3" class="flat">None recorded.</td></tr>';
+  document.getElementById('discNote').innerHTML =
+    `<b>${totalDisc}</b> total. A disconnected mailbox costs money and sends nothing.
+     Outreach Engine returned exactly 100, which is an API page cap — so that figure is a
+     <b>floor, not a count</b>. Dream It Reel's 20 are 1.6% of a 1,205-mailbox fleet, so it is not dark.`;
+
+  const top = [...PATIENTS].sort((a,b)=>b.booked-a.booked).filter(p=>p.booked>0).slice(0,6);
+  if (concChart) concChart.destroy();
+  concChart = new Chart(document.getElementById('conc'), {
+    type:'bar',
+    data:{labels: top.map(p=>p.domain.replace(/\.(digital|info|xyz)$/,'')),
+      datasets:[{data: top.map(p=>p.booked), backgroundColor:'#4a7fd4', borderRadius:3}]},
+    options:{responsive:true, maintainAspectRatio:false, indexAxis:'y',
+      plugins:{legend:{display:false}},
+      scales:{x:{beginAtZero:true, grid:{color:'#f0eeec'}, ticks:{precision:0}}, y:{grid:{display:false}}}}
+  });
+  const top3 = top.slice(0,3).reduce((a,p)=>a+p.booked,0);
+  document.getElementById('concNote').innerHTML = booked
+    ? `<b>${top3}</b> of <b>${booked}</b> bookings (<b>${(top3/booked*100).toFixed(0)}%</b>) come from just three
+       domains. A book concentrated like this is one blacklisting away from a bad quarter.`
+    : 'No bookings attributed yet.';
+
+  const plats = H.platforms || {};
+  document.getElementById('platRows').innerHTML = Object.entries(plats)
+    .filter(([k]) => !k.startsWith('_'))
+    .map(([k,v]) => `<tr><td>${esc((v.label||k).split('(')[0].trim())}</td>
+      <td class="num">${v.workspaces?Object.keys(v.workspaces).length:'—'}</td>
+      <td class="lbl">${k==='heyreach'?'LinkedIn · cannot be domain-attributed':esc((v.label||'').match(/\(([^)]+)\)/)?.[1]||'')}</td></tr>`).join('');
+
+  document.getElementById('gaps').innerHTML = `
+    <div class="banner grey" style="margin-top:0">
+      <b>No domain age yet.</b> Registration dates are not collected, so triage cannot use age and the
+      <b>mortality curve is unavailable</b> — that is the metric that would tell you how long a domain earns
+      before it decays, and therefore your true cost per meeting. Needs a registrar pull.
+    </div>
+    <div class="banner grey">
+      <b>Only ${Object.keys(OBS).length} of ${ranked.length} clients scanned.</b> The five largest are absent,
+      so these domains are a minority of the fleet. OutreachEngine alone is ~19 MB to page.
+    </div>
+    <div class="banner grey">
+      <b>HeyReach cannot be diagnosed.</b> LinkedIn records carry no sending domain, so the three HeyReach
+      senders shown are grouped by account, not domain, and noise/bounce logic does not apply to them.
+    </div>`;
 }
 
+/* ── boot ───────────────────────────────────────────────────────────────── */
 document.getElementById('hdr').textContent =
-  `${snaps.length} snapshot${snaps.length === 1 ? '' : 's'} · last recorded ` +
-  `${new Date(H.snapshots[H.snapshots.length - 1].ts).toLocaleString()} · updated each weekday morning`;
-if (volSnaps.length >= 10) document.getElementById('stage').style.display = 'none';
-
+  `${H.snapshots.length} snapshots · ${ranked.length} active clients · ${PATIENTS.length} domains observed · ` +
+  `last reading ${new Date(H.snapshots[H.snapshots.length-1].ts).toLocaleString()}`;
 render();
+setScreen(screen);
 </script>
 </body>
 </html>
