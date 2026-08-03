@@ -93,6 +93,20 @@ button.f:hover{background:#f5f3f1} button.f.on{background:#1c1b1a;color:#fff;bor
   <div class="cards" id="cards"></div>
 
   <div id="viewAll">
+    <h2>Where leads fall off</h2>
+    <div class="panel">
+      <div id="dropoff"></div>
+      <div style="border-top:1px solid #f0eeec;margin-top:12px;padding-top:11px">
+        <div class="note" style="margin:0 0 8px"><b>Conversion by client</b> — where each one leaks</div>
+        <table>
+          <thead><tr><th>Client</th><th class="num">Replies</th><th class="num">Human</th>
+          <th class="num">Interest</th><th class="num">Booked</th><th class="num">Int→Booked</th><th>Biggest loss</th></tr></thead>
+          <tbody id="convRows"></tbody>
+        </table>
+      </div>
+      <div class="note" id="dropNote"></div>
+    </div>
+
     <h2>Reply volume by client</h2>
     <div class="panel">
       <table>
@@ -244,6 +258,25 @@ const DEFER = T.deferral || [], DIALS = T.setter_activity || [];
 const NEG = T.negative || [], NOISE = T.noise || [];
 const sum = (L, k) => k.reduce((a, x) => a + (L[x] || 0), 0);
 const labelSnaps = id => H.snapshots.filter(s => s.labels && s.labels[id]);
+
+/* One uniform funnel shape per client, from whichever source exists.
+   'labels' (per-label, ws 1013 only) or 'observed' (group totals, scanned clients). */
+function funnelFor(id) {
+  const ls = labelSnaps(id);
+  if (ls.length) {
+    const L = ls[ls.length - 1].labels[id];
+    const recs = (totals[id] != null) ? totals[id] : 0;
+    return { src:'labels', records:recs, noise:sum(L,NOISE), negative:sum(L,NEG),
+             deferral:sum(L,DEFER), interest:sum(L,INTEREST), booked:L[SUCCESS]||0, unlabelled:0 };
+  }
+  const o = OBS[id];
+  if (o) {
+    const f = o.funnel;
+    return { src:'scan', records:f.records, noise:f.noise, negative:f.negative,
+             deferral:f.deferral, interest:f.interest, booked:f.booked, unlabelled:f.unlabelled };
+  }
+  return null;
+}
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const fmtTs = ts => new Date(ts).toLocaleDateString(undefined,{month:'short',day:'numeric'}) + ' ' +
   new Date(ts).toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
@@ -344,11 +377,77 @@ function renderAll() {
   }).join('');
   document.querySelectorAll('#rows tr').forEach(tr => tr.onclick = () => { sel = tr.dataset.id; reselect(); });
 
+  renderDropoff();
+
   document.getElementById('snaps').innerHTML = [...H.snapshots].reverse().map(s =>
     `<div class="snap"><div class="st1">${fmtTs(s.ts)}</div>
      <div class="st2">${esc(s.source||'')}${s.totals?` · ${Object.keys(s.totals).length} clients sized`:''}${s.labels?' · label data':''}</div>
      ${(s.notes||[]).length ? `<ul>${s.notes.map(n=>`<li>${esc(n)}</li>`).join('')}</ul>` : ''}</div>`).join('');
   renderFlow('1013');
+}
+
+/* Aggregate drop-off across every client that has funnel data. */
+function renderDropoff() {
+  const rows = ranked.map(([id]) => [id, funnelFor(id)]).filter(([,f]) => f);
+  const agg = rows.reduce((a,[,f]) => ({
+    records:a.records+f.records, noise:a.noise+f.noise, negative:a.negative+f.negative,
+    deferral:a.deferral+f.deferral, interest:a.interest+f.interest, booked:a.booked+f.booked,
+    unlabelled:a.unlabelled+f.unlabelled
+  }), {records:0,noise:0,negative:0,deferral:0,interest:0,booked:0,unlabelled:0});
+
+  const human = agg.records - agg.noise;
+  const other = Math.max(human - agg.negative - agg.deferral - agg.interest, 0);
+  // Each step: label, remaining after the step, what was lost getting here.
+  const steps = [
+    ['All replies received', agg.records, null, null],
+    ['Reached a human', human, agg.noise, 'automated noise — OOO, auto-reply, wrong person'],
+    ['Still in play', agg.interest + agg.deferral, agg.negative, 'said no — not interested, blocklist, angry'],
+    ['Expressed interest', agg.interest, agg.deferral + other, 'deferred or uncategorised'],
+    ['Booked a meeting', agg.booked, agg.interest - agg.booked, 'interested but never booked']
+  ];
+  const mx = Math.max(agg.records, 1);
+  document.getElementById('dropoff').innerHTML = steps.map(([k,n,lost,why],i) => {
+    const pct = (n/mx*100);
+    const lostPct = lost != null && steps[i-1] ? (lost/steps[i-1][1]*100) : null;
+    return `<div class="bar" style="margin-bottom:2px">
+      <div class="bl" style="width:132px${i===4?';font-weight:600':''}">${k}</div>
+      <div class="bt"><i style="width:${pct}%${i===4?';background:#1c6b38':''}"></i></div>
+      <div class="bv">${n.toLocaleString()}</div>
+      <div class="bn">${pct<1?pct.toFixed(2):pct.toFixed(0)}% of all</div></div>` +
+      (lost ? `<div class="bar" style="margin:0 0 4px"><div class="bl" style="width:132px"></div>
+        <div style="flex:1;font-size:11px;color:#b4341c;padding-left:2px">
+        ▼ −${lost.toLocaleString()}${lostPct?` (${lostPct.toFixed(0)}%)`:''} ${why}</div>
+        <div class="bv"></div><div class="bn"></div></div>` : '');
+  }).join('');
+
+  document.getElementById('convRows').innerHTML = rows.map(([id,f]) => {
+    const hu = f.records - f.noise;
+    const conv = f.interest ? f.booked/f.interest*100 : null;
+    // Name the single largest leak for this client.
+    const losses = [['noise', f.noise], ['said no', f.negative],
+                    ['interested, never booked', f.interest - f.booked]];
+    losses.sort((a,b)=>b[1]-a[1]);
+    const worst = losses[0];
+    return `<tr data-id="${id}" style="cursor:pointer"><td>${esc(names[id]||id)}
+      <span class="pill">${f.src==='labels'?'labels':'scan'}</span></td>
+      <td class="num">${f.records.toLocaleString()}</td>
+      <td class="num">${hu.toLocaleString()}</td>
+      <td class="num${f.interest?' up':' flat'}">${f.interest}</td>
+      <td class="num${f.booked?' up':' flat'}">${f.booked}</td>
+      <td class="num${conv==null?' flat':conv>=40?' up':' down'}">${conv==null?'—':conv.toFixed(0)+'%'}</td>
+      <td class="lbl">${worst[1]>0?`${worst[0]} (−${worst[1].toLocaleString()})`:'—'}</td></tr>`;
+  }).join('');
+  document.querySelectorAll('#convRows tr').forEach(tr =>
+    tr.onclick = () => { sel = tr.dataset.id; reselect(); });
+
+  const noisePct = agg.records ? (agg.noise/agg.records*100).toFixed(0) : 0;
+  const convPct = agg.interest ? (agg.booked/agg.interest*100).toFixed(1) : '—';
+  document.getElementById('dropNote').innerHTML =
+    `Covers <b>${rows.length}</b> of ${ranked.length} clients — the ones with funnel data.
+     <b>${noisePct}%</b> of everything received never reached a human, and of those who did express interest,
+     <b>${convPct}%</b> booked. The two biggest leaks are the top of the funnel (noise) and the last step
+     (interested but never booked) — the second is the only one you control directly.
+     Click a row to open that client. Figures are not deduplicated for calendar artifacts or repeated threads.`;
 }
 
 function renderOne(id) {
