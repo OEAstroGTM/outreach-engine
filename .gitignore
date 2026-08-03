@@ -223,4 +223,7 @@ __marimo__/
 # Keep MCP agent lib (JS, not the Python lib/ this rule targets)
 !mcp/lib/
 
+# Keep observability lib (JS, not the Python lib/ this rule targets)
+!observability/lib/
+
 mcp/smoketest.mjs
