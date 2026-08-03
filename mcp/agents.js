@@ -50,11 +50,16 @@ const campaignAgent = {
     "You are the Campaign agent for Outreach Engine. You create, launch, pause, and monitor " +
     "outbound campaigns and push leads, routing automatically to the client's sequencer " +
     "(EmailBison send/personal or Instantly). Always resolve the client first. Confirm the " +
-    "campaign_id via list_campaigns before mutating. Report what you changed and current stats.",
+    "campaign_id via list_campaigns before mutating. A campaign cannot send until sender " +
+    "emails are attached: use list_inboxes to see the client's workspace inboxes (prefer " +
+    "status 'connected') and attach_inboxes_to_campaign to assign them. Never launch a " +
+    "campaign with zero attached inboxes — check first and say so instead. Report what you " +
+    "changed and current stats.",
   tools: [
     list_clients_tool,
-    tool("list_campaigns", "List a client's campaigns (routes to EmailBison or Instantly).",
-      obj({ client_name: S.str }, ["client_name"]), ops.listCampaigns),
+    tool("list_campaigns", "List a client's campaigns (routes to EmailBison or Instantly). EmailBison paginates 15/page — pass all=true for the full list, or the count will be truncated. Filter with status.",
+      obj({ client_name: S.str, page: S.num, all: S.bool, max_pages: S.num, status: S.str }, ["client_name"]),
+      ops.listCampaigns),
     tool("get_campaign_stats", "Get open/reply/bounce stats for a campaign.",
       obj({ client_name: S.str, campaign_id: S.str }, ["client_name", "campaign_id"]), ops.getCampaignStats),
     tool("create_campaign", "Create a new campaign for a client.",
@@ -63,6 +68,15 @@ const campaignAgent = {
       obj({ client_name: S.str, campaign_id: S.str }, ["client_name", "campaign_id"]), ops.launchCampaign),
     tool("pause_campaign", "Pause an active campaign.",
       obj({ client_name: S.str, campaign_id: S.str }, ["client_name", "campaign_id"]), ops.pauseCampaign),
+    tool("list_inboxes", "List the sender emails (inboxes) in a client's EmailBison workspace. Paginated 15/page; pass all=true to walk pages. Filter with status, e.g. 'connected'.",
+      obj({ client_name: S.str, page: S.num, all: S.bool, max_pages: S.num, status: S.str }, ["client_name"]),
+      ops.listInboxes),
+    tool("attach_inboxes_to_campaign", "Attach sender emails (inboxes) to a campaign so it can send. IDs come from list_inboxes.",
+      obj({ client_name: S.str, campaign_id: S.str, sender_email_ids: { type: "array", items: S.num } }, ["client_name", "campaign_id", "sender_email_ids"]),
+      ops.attachInboxesToCampaign),
+    tool("remove_inboxes_from_campaign", "Detach sender emails (inboxes) from a campaign.",
+      obj({ client_name: S.str, campaign_id: S.str, sender_email_ids: { type: "array", items: S.num } }, ["client_name", "campaign_id", "sender_email_ids"]),
+      ops.removeInboxesFromCampaign),
     tool("bulk_push_to_campaign", "Create contacts as leads and attach them to a campaign in one pass.",
       obj({ client_name: S.str, campaign_id: S.str, contacts: { type: "array", items: obj({ email: S.str, first_name: S.str, last_name: S.str, company: S.str, title: S.str, website: S.str }, ["email"]) } }, ["client_name", "campaign_id", "contacts"]),
       ops.bulkPushToCampaign),

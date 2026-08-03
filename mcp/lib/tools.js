@@ -4,19 +4,26 @@
 // delegating agents (agents.js), so business logic lives in exactly one place.
 import {
   CLIENTS, MI_KEYS, INSTANTLY_KEYS, APOLLO_THROTTLE_MS,
-  getClient, ebConfig, ebFetch, ebSenderFetch, apolloFetch, miFetch,
+  getClient, ebConfig, ebFetch, ebPaginate, ebSwitchWorkspace, ebSenderFetch, apolloFetch, miFetch,
 } from "./core.js";
 
 // ── Clients ──────────────────────────────────────────────────────────────────
 export function listClients() {
-  return CLIENTS.map(c => ({
-    name: c.name,
-    sequencer: c.sequencer,
-    eb_ws_id: c.eb_ws_id ?? null,
-    mi_ws_id: c.mi_ws_id ?? null,
-    has_mi_key: !!MI_KEYS[c.name],
-    inboxing_tags: c.inboxing_tags,
-  }));
+  return CLIENTS.map(c => {
+    const ebEnv = c.eb_send_key_env || c.eb_personal_key_env || null;
+    return {
+      name: c.name,
+      sequencer: c.sequencer,
+      eb_ws_id: c.eb_ws_id ?? null,
+      mi_ws_id: c.mi_ws_id ?? null,
+      has_mi_key: !!MI_KEYS[c.name],
+      // Whether the workspace-scoped EmailBison token named in clients.json is
+      // actually present in .env. false means calls fall back to the
+      // account-level key, which may not reach this client's workspace.
+      has_eb_key: ebEnv ? !!process.env[ebEnv] : null,
+      inboxing_tags: c.inboxing_tags,
+    };
+  });
 }
 
 export function getClientInfo({ client_name }) {
@@ -124,7 +131,9 @@ export async function bulkPullContacts(f) {
 }
 
 // ── Campaigns (EmailBison / Instantly) ───────────────────────────────────────
-export async function listCampaigns({ client_name }) {
+// EmailBison paginates index routes at 15 per page. Without `all: true` you get
+// page 1 only — which silently looks like "this client has 15 campaigns".
+export async function listCampaigns({ client_name, page, all, max_pages, status }) {
   const client = getClient(client_name);
   if (client.sequencer === "instantly") {
     const key = INSTANTLY_KEYS[client.instantly_ws];
@@ -132,7 +141,23 @@ export async function listCampaigns({ client_name }) {
     const res = await fetch(`https://api.instantly.ai/api/v1/campaign/list?api_key=${key}`);
     return res.json();
   }
-  return ebFetch("GET", "/campaigns", client);
+
+  const r = await ebPaginate(client, "/campaigns", { page, all, maxPages: max_pages });
+  let data = r.rows;
+  if (status) data = data.filter(c => c.status === status);
+
+  // Preserve the raw response shape (data/links/meta) so existing callers keep
+  // working; add provenance so a truncated list is visible rather than implied.
+  return {
+    ...r.raw,
+    data,
+    meta: {
+      ...(r.raw?.meta ?? {}),
+      pages_fetched: r.pages_fetched,
+      returned: data.length,
+      truncated: r.truncated,
+    },
+  };
 }
 
 export async function getCampaignStats({ client_name, campaign_id }) {
@@ -153,12 +178,11 @@ export async function pauseCampaign({ client_name, campaign_id }) {
 
 export async function bulkPushToCampaign({ client_name, campaign_id, contacts }) {
   const client = getClient(client_name);
-  const { base, key, ws_id } = ebConfig(client);
-  await fetch(`${base}/workspaces/v1.1/switch-workspace`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ team_id: ws_id }),
-  });
+  const cfg = ebConfig(client);
+  const { base, key } = cfg;
+  // Shared, verified switch — throws rather than writing leads into whatever
+  // workspace the token was last pointed at.
+  await ebSwitchWorkspace(cfg, client);
   const created = [];
   const failed  = [];
   for (const contact of contacts) {
@@ -200,7 +224,71 @@ export async function bulkPushToCampaign({ client_name, campaign_id, contacts })
   };
 }
 
-// ── Sender emails (EmailBison) ───────────────────────────────────────────────
+// ── Inboxes / sender emails per client (EmailBison) ──────────────────────────
+// Inbox assignment lives at the workspace level, so these all route through
+// ebFetch and therefore through the verified workspace switch.
+
+const shapeInbox = s => ({
+  id: s.id,
+  email: s.email,
+  name: s.name,
+  status: s.status ?? s.connection_status ?? null,
+  daily_limit: s.daily_limit ?? null,
+  type: s.type ?? null,
+});
+
+// EmailBison paginates at 15 per page. `all: true` walks every page (one
+// workspace switch for the whole walk), guarded by max_pages.
+export async function listInboxes({ client_name, page, all, max_pages, status }) {
+  const client = getClient(client_name);
+  const r = await ebPaginate(client, "/sender-emails", { page, all, maxPages: max_pages });
+
+  let inboxes = r.rows.map(shapeInbox);
+  const fetched = inboxes.length;
+  if (status) inboxes = inboxes.filter(i => i.status === status);
+
+  return {
+    client: client.name,
+    workspace_id: client.eb_ws_id,
+    total_in_workspace: r.total,
+    last_page: r.last_page,
+    pages_fetched: r.pages_fetched,
+    fetched,
+    returned: inboxes.length,
+    truncated: r.truncated,
+    ...(r.truncated && { note: `Stopped at max_pages — ${fetched} of ${r.total}. Raise max_pages for the full list.` }),
+    ...(status && { filtered_by_status: status }),
+    inboxes,
+  };
+}
+
+export async function attachInboxesToCampaign({ client_name, campaign_id, sender_email_ids }) {
+  if (!Array.isArray(sender_email_ids) || !sender_email_ids.length) {
+    throw new Error("sender_email_ids must be a non-empty array of sender email IDs (see list_inboxes).");
+  }
+  const res = await ebFetch(
+    "POST",
+    `/campaigns/${campaign_id}/attach-sender-emails`,
+    getClient(client_name),
+    { sender_email_ids }
+  );
+  return { campaign_id, attached: sender_email_ids, response: res };
+}
+
+export async function removeInboxesFromCampaign({ client_name, campaign_id, sender_email_ids }) {
+  if (!Array.isArray(sender_email_ids) || !sender_email_ids.length) {
+    throw new Error("sender_email_ids must be a non-empty array of sender email IDs.");
+  }
+  const res = await ebFetch(
+    "DELETE",
+    `/campaigns/${campaign_id}/remove-sender-emails`,
+    getClient(client_name),
+    { sender_email_ids }
+  );
+  return { campaign_id, removed: sender_email_ids, response: res };
+}
+
+// ── Sender emails, account-level by ID (EmailBison) ──────────────────────────
 export async function getSenderEmail({ instance, sender_email_id }) {
   return ebSenderFetch("GET", sender_email_id, instance);
 }

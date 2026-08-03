@@ -243,5 +243,14 @@
     "mi_ws_id": 1470,
     "mi_key_env": "MI_KEY_UNION_OMAHA",
     "inboxing_tags": ["Union Omaha", "union"]
+  },
+  {
+    "name": "Ujet",
+    "sequencer": "eb_send",
+    "eb_ws_id": 78,
+    "eb_send_key_env": "EB_SEND_KEY_UJET",
+    "mi_ws_id": 2096,
+    "mi_key_env": "MI_KEY_UJET",
+    "inboxing_tags": ["Ujet"]
   }
 ]
