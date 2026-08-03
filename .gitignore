@@ -226,4 +226,8 @@ __marimo__/
 # Keep observability lib (JS, not the Python lib/ this rule targets)
 !observability/lib/
 
+# Observability: the live time series is machine-appended every weekday and would
+# churn the repo daily. Only the seed config is tracked.
+observability/data/history.json
+
 mcp/smoketest.mjs

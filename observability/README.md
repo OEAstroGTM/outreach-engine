@@ -20,15 +20,37 @@ report it in text. Do not fix it.
 
 ```
 observability/
-  data/history.json          time series + registries. SOURCE OF TRUTH.
+  data/history.seed.json     TRACKED. Durable config only: clients, taxonomy, fleet.
+  data/history.json          GITIGNORED. Live time series. Machine-appended daily.
   dashboard/template.html    dashboard, contains the literal __HISTORY__ placeholder
   lib/taxonomy.js            canonical label groups
   lib/infra-health.js        the hospital: domain diagnosis + triage
   collect/SNAPSHOT_TASK.md   the scheduled collector prompt
 ```
 
-`history.json` is regenerated into the dashboard by substituting `__HISTORY__`.
-Never hand-edit `history.json` except to correct an error.
+### Seed vs live — why they are separate
+
+The collector appends a snapshot every weekday morning. Committing that file
+would mean a diff every day, guaranteed merge conflicts, and hundreds of commits
+of JSON noise. So the two concerns are split:
+
+| | `history.seed.json` | `history.json` |
+|---|---|---|
+| In git | yes | **no** |
+| Contains | configuration you decide | measurements the collector takes |
+| Changes when | a client churns, a label appears, the fleet is re-inventoried | every weekday |
+| Keys | `workspaces`, `churned`, `internal`, `taxonomy`, `platforms`, `client_registry`, `inboxing_tag_map`, `domain_ages`, `infrastructure_baseline` | the above plus `snapshots`, `observed`, `pilot_a1`, `registrar_pull` |
+
+**Bootstrapping:** if `history.json` is absent, copy the seed to it and carry on.
+The dashboard renders an explicit "no data collected yet" state rather than a wall
+of zeros, so a fresh clone is obviously empty rather than subtly wrong.
+
+**Editing:** config changes go in the seed *and* the live file — the live file is
+what the dashboard reads, and the seed is what a fresh clone starts from. Never put
+snapshots or scan results in the seed. Never hand-edit the live file except to
+correct an error.
+
+`history.json` is rendered into the dashboard by substituting `__HISTORY__`.
 
 ## The funnel model
 

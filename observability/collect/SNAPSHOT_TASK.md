@@ -6,10 +6,23 @@ taxonomy it depends on. The live copy is at
 `~/Documents/Claude/Scheduled/pipeline-snapshot/SKILL.md` — **edit both together or
 they drift.**
 
+## Bootstrapping
+
+`data/history.json` is gitignored — it is the live time series and does not exist
+in a fresh clone. **If it is missing, copy `data/history.seed.json` to it and
+proceed.** Do not start an empty file from scratch: the seed carries the client
+registry, taxonomy and fleet inventory that every metric depends on.
+
+If both are missing, stop and report it — that means the folder is not mounted and
+appending would destroy history.
+
 ## Contract
 
 - **Read-only.** See the prohibited-tools list in `../README.md`. Never write to a
   source system, even when the fix is obvious.
+- **Config changes go in both files.** If a client churns or a new label appears,
+  update `history.seed.json` as well as the live file, or the next fresh clone
+  loses the change.
 - **Cheap.** One `get_prospects` call per client with `limit: 1` (for
   `metadata.total`) plus one `get_label_stats`. Roughly 23 calls, under a minute.
 - **Appends, never rewrites.** Historical snapshots stay truthful even when a client

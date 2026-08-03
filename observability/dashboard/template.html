@@ -750,11 +750,23 @@ function renderInfra() {
 }
 
 /* ── boot ───────────────────────────────────────────────────────────────── */
-document.getElementById('hdr').textContent =
-  `${H.snapshots.length} snapshots · ${ranked.length} active clients · ${PATIENTS.length} domains observed · ` +
-  `last reading ${new Date(H.snapshots[H.snapshots.length-1].ts).toLocaleString()}`;
-render();
-setScreen(screen);
+// A fresh clone starts from the seed with no measured data. Say so plainly
+// rather than rendering a wall of zeros.
+if (!H.snapshots.length) {
+  document.getElementById('hdr').textContent = 'No readings yet';
+  document.getElementById('stage').innerHTML =
+    '<b>No data collected yet.</b> This is the seed configuration — clients, taxonomy and fleet inventory are ' +
+    'loaded, but no snapshots exist. Run the <code>pipeline-snapshot</code> task once and this fills in.';
+  document.querySelectorAll('.cards, .tabs, .toolbar').forEach(el => el.classList.add('hide'));
+  document.getElementById('screenPerf').classList.add('hide');
+  document.getElementById('screenInfra').classList.add('hide');
+} else {
+  document.getElementById('hdr').textContent =
+    `${H.snapshots.length} snapshots · ${ranked.length} active clients · ${PATIENTS.length} domains observed · ` +
+    `last reading ${new Date(H.snapshots[H.snapshots.length-1].ts).toLocaleString()}`;
+  render();
+  setScreen(screen);
+}
 </script>
 </body>
 </html>
