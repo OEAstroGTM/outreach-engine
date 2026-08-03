@@ -14,7 +14,8 @@
     "pilot_a1": "Results of the first per-client scan pilot. Validates the four-outputs-per-scan design and bounds its cost.",
     "observed": "Per-client scan output: group funnel, domain attribution, awaiting-reply queue. Distinct from 'labels', which is per-label and only available for ws 1013.",
     "registrar_pull": "Domain age data from registrars. Partial: NameSilo key is dead, so .digital/.xyz sending domains are unaged.",
-    "domain_ages": "full domain -> age in days. Consumed by infra triage; absent domains show age unknown."
+    "domain_ages": "full domain -> age in days. Consumed by infra triage; absent domains show age unknown.",
+    "inboxing_tag_map": "workspace_id -> Inboxing tag, for joining reply outcomes to the sending fleet."
   },
   "workspaces": {
     "1013": "OutreachEngine",
@@ -1717,6 +1718,42 @@
       "ujetglobal.digital": 5,
       "ujetoutreach.digital": 5,
       "useujet.digital": 5
+    }
+  },
+  "inboxing_tag_map": {
+    "_note": "MasterInbox workspace_id -> Inboxing client tag. Joins reply outcomes to the sending fleet. null = no Inboxing fleet found for that client.",
+    "map": {
+      "1013": "outreachengine",
+      "1058": "intellectible",
+      "1059": "supplywisdom",
+      "1077": "dreamitreel",
+      "664": "bravura",
+      "1076": "hubengage",
+      "1073": "braintracks",
+      "355": "chalktalk",
+      "1057": "ortrax",
+      "552": "pargo",
+      "392": "revo",
+      "393": "abra",
+      "61": "clinintell",
+      "2020": "arnonriver",
+      "1579": "builtright",
+      "2096": "ujet",
+      "121": "savanti",
+      "58": "coffeeandcontracts",
+      "56": "truedial",
+      "1469": null,
+      "1470": null,
+      "1074": null
+    },
+    "unmatched_clients": {
+      "Campaygn": "no Inboxing fleet",
+      "Union Omaha": "no Inboxing fleet",
+      "Lend Home Improvements": "no Inboxing fleet — its .info senders are in Porkbun only"
+    },
+    "non_client_tags": {
+      "carengen": "churned client, still provisioned",
+      "aunalytics": "not a live client (sequencer: none)"
     }
   }
 }

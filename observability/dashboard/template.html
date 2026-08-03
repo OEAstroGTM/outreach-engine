@@ -75,6 +75,14 @@ button.f:hover{background:#f5f3f1} button.f.on{background:#1c1b1a;color:#fff;bor
 <h1 id="title">Outreach Engine — Observability</h1>
 <div class="sub" id="hdr">Loading…</div>
 
+<div class="toolbar">
+  <label class="tl" for="client">Client</label>
+  <select id="client"></select>
+  <button class="f" id="prev">‹</button>
+  <button class="f" id="next">›</button>
+  <span class="sub" id="rank"></span>
+</div>
+
 <div class="tabs">
   <button class="tab on" id="t-perf">Performance</button>
   <button class="tab" id="t-infra">Infrastructure</button>
@@ -82,14 +90,6 @@ button.f:hover{background:#f5f3f1} button.f.on{background:#1c1b1a;color:#fff;bor
 
 <!-- ══════════════ SCREEN 1: PERFORMANCE ══════════════ -->
 <div id="screenPerf">
-  <div class="toolbar">
-    <label class="tl" for="client">Client</label>
-    <select id="client"></select>
-    <button class="f" id="prev">‹</button>
-    <button class="f" id="next">›</button>
-    <span class="sub" id="rank"></span>
-  </div>
-
   <div class="cards" id="cards"></div>
 
   <div id="viewAll">
@@ -157,10 +157,11 @@ button.f:hover{background:#f5f3f1} button.f.on{background:#1c1b1a;color:#fff;bor
 <div id="screenInfra" class="hide">
   <div class="cards" id="iCards"></div>
 
-  <h2>Ward round — domain triage</h2>
+  <h2 id="wardTitle">Needs attention</h2>
   <div class="panel">
     <div class="toolbar" style="margin-top:0;padding:0 0 10px;border:none;background:none">
-      <button class="f on" data-st="all">All</button>
+      <button class="f" data-st="all">All</button>
+      <button class="f on" data-st="attention">Needs attention</button>
       <button class="f" data-st="critical">Critical</button>
       <button class="f" data-st="watch">Watch</button>
       <button class="f" data-st="healthy">Healthy</button>
@@ -199,8 +200,8 @@ button.f:hover{background:#f5f3f1} button.f.on{background:#1c1b1a;color:#fff;bor
       <div class="note">Abra and Intellectible appear on two platforms — never sum across platforms without
       deduplicating.</div>
     </div>
-    <div class="panel">
-      <h3>Fleet by client <span class="pill">Inboxing provisioning</span></h3>
+    <div class="panel" id="fleetPanel">
+      <h3>Fleet by client <span class="pill">click to drill in</span></h3>
       <div style="max-height:300px;overflow:auto">
         <table><thead><tr><th>Client tag</th><th class="num">Domains</th><th class="num">Mailboxes</th><th class="num">Age</th></tr></thead>
         <tbody id="fleetRows"></tbody></table>
@@ -214,7 +215,7 @@ button.f:hover{background:#f5f3f1} button.f.on{background:#1c1b1a;color:#fff;bor
       <h3>What this screen cannot yet tell you</h3>
       <div id="gaps"></div>
     </div>
-    <div class="panel">
+    <div class="panel" id="provPanel">
       <h3>Provisioning health</h3>
       <div id="provHealth"></div>
     </div>
@@ -341,7 +342,7 @@ function renderAll() {
       <td class="num">${v.toLocaleString()}</td><td class="num">${d}</td>
       <td class="num">${(v/grand*100).toFixed(1)}%</td><td>${scan}</td></tr>`;
   }).join('');
-  document.querySelectorAll('#rows tr').forEach(tr => tr.onclick = () => { sel = tr.dataset.id; render(); });
+  document.querySelectorAll('#rows tr').forEach(tr => tr.onclick = () => { sel = tr.dataset.id; reselect(); });
 
   document.getElementById('snaps').innerHTML = [...H.snapshots].reverse().map(s =>
     `<div class="snap"><div class="st1">${fmtTs(s.ts)}</div>
@@ -460,43 +461,91 @@ function renderFlow(id) {
   }).join('');
 }
 
-selEl.onchange = () => { sel = selEl.value; render(); };
-document.getElementById('prev').onclick = () => { const i = options.findIndex(([v])=>v===sel); sel = options[(i-1+options.length)%options.length][0]; render(); };
-document.getElementById('next').onclick = () => { const i = options.findIndex(([v])=>v===sel); sel = options[(i+1)%options.length][0]; render(); };
+// The selector drives both screens.
+function reselect() { render(); if (screen === 'infra') renderInfra(); }
+selEl.onchange = () => { sel = selEl.value; reselect(); };
+document.getElementById('prev').onclick = () => { const i = options.findIndex(([v])=>v===sel); sel = options[(i-1+options.length)%options.length][0]; reselect(); };
+document.getElementById('next').onclick = () => { const i = options.findIndex(([v])=>v===sel); sel = options[(i+1)%options.length][0]; reselect(); };
 
 /* ══ SCREEN 2 ══ */
-let wardFilter = 'all';
+let wardFilter = localStorage.getItem('oe-ward') || 'attention';
+const TAGMAP = (H.inboxing_tag_map && H.inboxing_tag_map.map) || {};
+
 function renderInfra() {
   const ib = H.infrastructure_baseline || {};
   const disc = ib.disconnected_mailboxes || {};
-  const counts = {};
-  PATIENTS.forEach(p => counts[p.state] = (counts[p.state]||0) + 1);
-  const totalDisc = disc.total_observed ?? 0;
-  const booked = PATIENTS.reduce((a,p)=>a+p.booked,0);
-
   const fl = ib.inboxing_fleet || {};
-  const nonClient = (fl.spend_on_non_clients||{}).total_mailboxes || 0;
-  document.getElementById('iCards').innerHTML = [
-    ['info', (fl.total_domains||0), `Domains in fleet · ${(fl.total_mailboxes||0).toLocaleString()} mailboxes`],
-    ['alarm', counts.critical||0, 'Critical — old enough to judge, and failing'],
-    ['warn', counts.watch||0, 'On watch — interest but no bookings'],
-    ['good', counts.healthy||0, 'Healthy — booking meetings'],
-    ['alarm', nonClient, 'Mailboxes provisioned for non-clients'],
-    ['alarm', totalDisc, 'Disconnected mailboxes (floor — page-capped)']
-  ].map(([c,n,l]) => `<div class="card ${c}"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('');
+  const byTag = fl.by_tag || {};
+  const isAll = sel === 'all';
+  const tag = isAll ? null : TAGMAP[sel];
+  const nm = isAll ? null : (names[sel] || sel);
 
-  const shown = PATIENTS.filter(p => wardFilter === 'all' || p.state === wardFilter);
-  document.getElementById('wardCount').textContent = `showing ${shown.length} of ${PATIENTS.length}`;
-  document.getElementById('wardRows').innerHTML = shown.map(p =>
+  // Scope patients to the selected client.
+  const pool = isAll ? PATIENTS : PATIENTS.filter(p => p.client === nm);
+  const counts = {};
+  pool.forEach(p => counts[p.state] = (counts[p.state]||0) + 1);
+  const booked = pool.reduce((a,p)=>a+p.booked,0);
+  const nonClient = (fl.spend_on_non_clients||{}).total_mailboxes || 0;
+  const totalDisc = disc.total_observed ?? 0;
+
+  // Fleet-wide panels only make sense on the all-clients view.
+  ['fleetPanel','provPanel'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.classList.toggle('hide', !isAll);
+  });
+
+  let cards;
+  if (isAll) {
+    cards = [
+      ['info', (fl.total_domains||0), `Domains in fleet · ${(fl.total_mailboxes||0).toLocaleString()} mailboxes`],
+      ['alarm', counts.critical||0, 'Critical — old enough to judge, and failing'],
+      ['warn', counts.watch||0, 'On watch — interest but no bookings'],
+      ['good', counts.healthy||0, 'Healthy — booking meetings'],
+      ['alarm', nonClient, 'Mailboxes provisioned for non-clients'],
+      ['alarm', totalDisc, 'Disconnected mailboxes (floor)']
+    ];
+  } else {
+    const f = tag ? byTag[tag] : null;
+    const ages = pool.map(p=>p.age).filter(a=>a!=null);
+    cards = [
+      ['info', f ? f.domains : (pool.length || '—'), f ? `Domains · ${f.mailboxes.toLocaleString()} mailboxes` : 'Domains observed'],
+      ['info', ages.length ? (Math.min(...ages)===Math.max(...ages) ? Math.min(...ages)+'d' : Math.min(...ages)+'–'+Math.max(...ages)+'d') : '—', 'Fleet age'],
+      ['good', booked, 'Bookings attributed to these domains'],
+      ['alarm', counts.critical||0, 'Critical'],
+      ['warn', counts.watch||0, 'On watch'],
+      ['info', counts.warming||0, 'Warming — no verdict yet']
+    ];
+  }
+  document.getElementById('iCards').innerHTML = cards
+    .map(([c,n,l]) => `<div class="card ${c}"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('');
+
+  const ATT = new Set(['critical','watch']);
+  const shown = pool.filter(p =>
+    wardFilter === 'all' ? true : wardFilter === 'attention' ? ATT.has(p.state) : p.state === wardFilter);
+  document.getElementById('wardTitle').textContent = isAll
+    ? 'Ward round — all clients' : `Ward round — ${nm}`;
+  document.getElementById('wardCount').textContent = `showing ${shown.length} of ${pool.length}`;
+  document.getElementById('wardRows').innerHTML = (shown.length ? shown.map(p =>
     `<tr><td><span class="st ${p.state}">${p.state}</span></td>
      <td>${esc(p.domain)}</td><td class="lbl">${esc(p.client)}</td>
      <td class="num${p.age==null?' flat':''}">${p.age==null?'—':p.age+'d'}</td>
      <td class="num">${p.threads}</td><td class="num${p.interest?' up':' flat'}">${p.interest}</td>
      <td class="num${p.booked?' up':' flat'}">${p.booked}</td>
      <td class="num${p.noisePct>=65?' down':''}">${p.noisePct==null?'—':p.noisePct+'%'}</td>
-     <td class="lbl">${esc(p.reasons.join('; '))}</td></tr>`).join('');
+     <td class="lbl">${esc(p.reasons.join('; '))}</td></tr>`).join('')
+    : `<tr><td colspan="9" class="${pool.length ? 'up' : 'flat'}">${
+        pool.length
+          // Data exists, just nothing in this bucket — say so positively.
+          ? (wardFilter === 'attention'
+              ? `Nothing needs attention. All ${pool.length} domain${pool.length===1?'':'s'} are healthy or still warming.`
+              : 'No domains in this state.')
+          : isAll ? 'Nothing matches this filter.'
+          : !TAGMAP[sel]
+            ? esc(nm) + ' has no Inboxing fleet — nothing to diagnose.'
+            : esc(nm) + ' has not been scanned yet, so no domains carry outcome data.'
+      }</td></tr>`);
   document.querySelectorAll('[data-st]').forEach(b => b.onclick = () => {
     wardFilter = b.dataset.st;
+    localStorage.setItem('oe-ward', wardFilter);
     document.querySelectorAll('[data-st]').forEach(x => x.classList.toggle('on', x === b));
     renderInfra();
   });
@@ -541,17 +590,19 @@ function renderInfra() {
       <td class="num">${v.workspaces?Object.keys(v.workspaces).length:'—'}</td>
       <td class="lbl">${k==='heyreach'?'LinkedIn · cannot be domain-attributed':esc((v.label||'').match(/\(([^)]+)\)/)?.[1]||'')}</td></tr>`).join('');
 
-  const byTag = fl.by_tag || {};
   const CHURNED_TAGS = { carengen:'churned client', aunalytics:'not a live client (sequencer: none)' };
+  const tagToWs = Object.fromEntries(Object.entries(TAGMAP).filter(([,v])=>v).map(([k,v])=>[v,k]));
   document.getElementById('fleetRows').innerHTML = Object.entries(byTag)
     .sort((a,b) => b[1].mailboxes - a[1].mailboxes)
-    .map(([tag,v]) => {
-      const flag = CHURNED_TAGS[tag];
-      return `<tr><td>${esc(tag)}${flag?` <span class="st critical">${esc(flag)}</span>`:''}</td>
+    .map(([tg,v]) => {
+      const flag = CHURNED_TAGS[tg], ws = tagToWs[tg];
+      return `<tr${ws?` data-ws="${ws}" style="cursor:pointer"`:''}><td>${esc(tg)}${flag?` <span class="st critical">${esc(flag)}</span>`:''}</td>
         <td class="num">${v.domains}</td>
         <td class="num${flag?' down':''}">${v.mailboxes.toLocaleString()}</td>
         <td class="num lbl">${v.min_age===v.max_age?v.min_age+'d':v.min_age+'–'+v.max_age+'d'}</td></tr>`;
     }).join('');
+  document.querySelectorAll('#fleetRows tr[data-ws]').forEach(tr =>
+    tr.onclick = () => { sel = tr.dataset.ws; render(); renderInfra(); });
   document.getElementById('fleetNote').innerHTML =
     `<b>${(fl.total_mailboxes||0).toLocaleString()}</b> mailboxes across <b>${fl.total_domains||0}</b> domains.
      Age is the Inboxing provisioning date — when the domain began sending, which is the number that matters for
