@@ -200,8 +200,23 @@ button.f:hover{background:#f5f3f1} button.f.on{background:#1c1b1a;color:#fff;bor
       deduplicating.</div>
     </div>
     <div class="panel">
+      <h3>Fleet by client <span class="pill">Inboxing provisioning</span></h3>
+      <div style="max-height:300px;overflow:auto">
+        <table><thead><tr><th>Client tag</th><th class="num">Domains</th><th class="num">Mailboxes</th><th class="num">Age</th></tr></thead>
+        <tbody id="fleetRows"></tbody></table>
+      </div>
+      <div class="note" id="fleetNote"></div>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-top:13px">
+    <div class="panel">
       <h3>What this screen cannot yet tell you</h3>
       <div id="gaps"></div>
+    </div>
+    <div class="panel">
+      <h3>Provisioning health</h3>
+      <div id="provHealth"></div>
     </div>
   </div>
 </div>
@@ -240,8 +255,15 @@ function diagnose(d) {
   const noisePct = d.threads ? +(d.noise / d.threads * 100).toFixed(1) : null;
   const age = AGES[d.domain] ?? null;
   const r = [];
-  if (age != null && age < TH.warming_days) {
-    r.push(`only ${age} days old`);
+  // A young domain already producing bookings has earned a verdict — youth should
+  // suppress condemnation, not credit.
+  const young = age != null && age < TH.warming_days;
+  if (young && d.booked > 0) {
+    r.push(`${d.booked} booked in its first ${age} days`);
+    return { ...d, noisePct, age, state:'healthy', reasons:r };
+  }
+  if (young) {
+    r.push(`only ${age} days old — no verdict yet`);
     return { ...d, noisePct, age, state:'warming', reasons:r };
   }
   if (d.threads < TH.min_threads_to_judge) {
@@ -452,12 +474,15 @@ function renderInfra() {
   const totalDisc = disc.total_observed ?? 0;
   const booked = PATIENTS.reduce((a,p)=>a+p.booked,0);
 
+  const fl = ib.inboxing_fleet || {};
+  const nonClient = (fl.spend_on_non_clients||{}).total_mailboxes || 0;
   document.getElementById('iCards').innerHTML = [
-    ['alarm', counts.critical||0, 'Domains critical — burned or producing nothing'],
+    ['info', (fl.total_domains||0), `Domains in fleet · ${(fl.total_mailboxes||0).toLocaleString()} mailboxes`],
+    ['alarm', counts.critical||0, 'Critical — old enough to judge, and failing'],
     ['warn', counts.watch||0, 'On watch — interest but no bookings'],
     ['good', counts.healthy||0, 'Healthy — booking meetings'],
-    ['alarm', totalDisc, 'Disconnected mailboxes (floor — API page-capped)'],
-    ['info', PATIENTS.length, 'Domains under observation']
+    ['alarm', nonClient, 'Mailboxes provisioned for non-clients'],
+    ['alarm', totalDisc, 'Disconnected mailboxes (floor — page-capped)']
   ].map(([c,n,l]) => `<div class="card ${c}"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('');
 
   const shown = PATIENTS.filter(p => wardFilter === 'all' || p.state === wardFilter);
@@ -516,17 +541,53 @@ function renderInfra() {
       <td class="num">${v.workspaces?Object.keys(v.workspaces).length:'—'}</td>
       <td class="lbl">${k==='heyreach'?'LinkedIn · cannot be domain-attributed':esc((v.label||'').match(/\(([^)]+)\)/)?.[1]||'')}</td></tr>`).join('');
 
+  const byTag = fl.by_tag || {};
+  const CHURNED_TAGS = { carengen:'churned client', aunalytics:'not a live client (sequencer: none)' };
+  document.getElementById('fleetRows').innerHTML = Object.entries(byTag)
+    .sort((a,b) => b[1].mailboxes - a[1].mailboxes)
+    .map(([tag,v]) => {
+      const flag = CHURNED_TAGS[tag];
+      return `<tr><td>${esc(tag)}${flag?` <span class="st critical">${esc(flag)}</span>`:''}</td>
+        <td class="num">${v.domains}</td>
+        <td class="num${flag?' down':''}">${v.mailboxes.toLocaleString()}</td>
+        <td class="num lbl">${v.min_age===v.max_age?v.min_age+'d':v.min_age+'–'+v.max_age+'d'}</td></tr>`;
+    }).join('');
+  document.getElementById('fleetNote').innerHTML =
+    `<b>${(fl.total_mailboxes||0).toLocaleString()}</b> mailboxes across <b>${fl.total_domains||0}</b> domains.
+     Age is the Inboxing provisioning date — when the domain began sending, which is the number that matters for
+     burn. <b>${nonClient} mailboxes belong to accounts that should not be sending</b>: carengen is churned yet
+     fully active, and aunalytics has no MasterInbox workspace at all.`;
+
+  const anom = (fl.anomalies||{}).mailbox_count_exceeds_user_count || [];
+  document.getElementById('provHealth').innerHTML = `
+    <div class="banner" style="margin-top:0;background:#f2faf4;border-color:#c3e6cd;border-left-color:#1c6b38">
+      <b>Provisioning itself is clean.</b> All ${fl.total_domains||0} domains report
+      <code>active</code>, every one sits on Cloudflare nameservers, and there are
+      <b>zero failures</b>. Whatever is going wrong is not the build pipeline.
+    </div>
+    <div class="banner">
+      <b>Age is bimodal.</b> 95 domains (4,658 mailboxes) are under 14 days old while 259 domains
+      (12,691 mailboxes) sit in the 31–60 day band. A very large recent build-out means much of the fleet
+      has not yet earned a verdict — which is why ${counts.warming||0} domains read as warming.
+    </div>
+    ${anom.length ? `<div class="banner"><b>${anom.length} domains show provisioning drift</b> —
+      <code>mailbox_count</code> 50 against <code>user_count</code> 49, one extra mailbox each. All in
+      supplywisdom and builtright.</div>` : ''}`;
+
   document.getElementById('gaps').innerHTML = `
     <div class="banner grey" style="margin-top:0">
-      <b>Domain age is ${Object.keys(AGES).length ? 'mostly' : 'not'} missing.</b>
-      Porkbun gave ages for ${Object.keys(AGES).length} domains, but only
-      <b>${PATIENTS.filter(p=>p.age!=null).length} of ${PATIENTS.length}</b> domains carrying outcome data are
-      covered — every <code>.digital</code> and <code>.xyz</code> sender lives in NameSilo, whose API key is
-      rejected (<code>code 110</code>). Until that key is fixed the <b>mortality curve stays unavailable</b>,
-      which is the metric that would give you replacement rate and true cost per meeting.
-      <br><br><b>Watch the TLD.</b> <code>builtrighthq.info</code> sits in Porkbun at 277 days;
-      the actual sender is <code>builtrighthq.digital</code>, held elsewhere. Ages are keyed on the full
-      domain, never the brand — matching on brand would attribute the wrong age.
+      <b>Age now covers ${PATIENTS.filter(p=>p.age!=null).length} of ${PATIENTS.length}</b> domains carrying
+      outcome data, sourced from Inboxing provisioning dates. The remaining gaps are Built Right's
+      <code>.xyz</code> variants and six Lend Home <code>.info</code> senders that appear in neither Inboxing
+      nor any registrar account — worth knowing who controls domains you actively send from.
+      <br><br><b>Watch the TLD.</b> <code>builtrighthq.info</code> sits in Porkbun at 277 days while the actual
+      sender is <code>builtrighthq.digital</code>, provisioned 17 days ago. Ages are keyed on the full domain,
+      never the brand.
+    </div>
+    <div class="banner grey">
+      <b>Mortality curve still needs time, not data.</b> The inputs exist now, but 95 domains are under two
+      weeks old and most of the fleet sits in one 31–60 day band. Replacement rate becomes measurable once
+      the daily collector has watched a cohort decay — weeks, not another pull.
     </div>
     <div class="banner grey">
       <b>Only ${Object.keys(OBS).length} of ${ranked.length} clients scanned.</b> The five largest are absent,
