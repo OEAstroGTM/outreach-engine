@@ -168,7 +168,7 @@ button.f:hover{background:#f5f3f1} button.f.on{background:#1c1b1a;color:#fff;bor
       <span class="sub" id="wardCount"></span>
     </div>
     <table>
-      <thead><tr><th>State</th><th>Domain / sender</th><th>Client</th><th class="num">Threads</th>
+      <thead><tr><th>State</th><th>Domain / sender</th><th>Client</th><th class="num">Age</th><th class="num">Threads</th>
       <th class="num">Int</th><th class="num">Booked</th><th class="num">Noise</th><th>Diagnosis</th></tr></thead>
       <tbody id="wardRows"></tbody>
     </table>
@@ -233,15 +233,22 @@ const fmtTs = ts => new Date(ts).toLocaleDateString(undefined,{month:'short',day
   new Date(ts).toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
 
 /* ── triage (ported from observability/lib/infra-health.js) ─────────────── */
-const TH = { min_threads_to_judge:15, noise_critical:80, noise_watch:65 };
+const TH = { min_threads_to_judge:15, noise_critical:80, noise_watch:65, warming_days:30 };
+// Full-domain keyed. Keying on brand name would attribute the wrong domain's age.
+const AGES = (H.domain_ages && H.domain_ages.ages) || {};
 function diagnose(d) {
   const noisePct = d.threads ? +(d.noise / d.threads * 100).toFixed(1) : null;
+  const age = AGES[d.domain] ?? null;
   const r = [];
-  // Domain age is not collected yet, so 'warming' rests on volume alone.
+  if (age != null && age < TH.warming_days) {
+    r.push(`only ${age} days old`);
+    return { ...d, noisePct, age, state:'warming', reasons:r };
+  }
   if (d.threads < TH.min_threads_to_judge) {
     r.push(`only ${d.threads} threads — too few to judge`);
-    return { ...d, noisePct, state:'warming', reasons:r };
+    return { ...d, noisePct, age, state:'warming', reasons:r };
   }
+  d = { ...d, age };
   if (noisePct >= TH.noise_critical) { r.push(`${noisePct}% automated noise`); return {...d,noisePct,state:'critical',reasons:r}; }
   if (!d.booked && !d.interest)      { r.push(`${d.threads} threads, zero interest, zero bookings`); return {...d,noisePct,state:'critical',reasons:r}; }
   if (!d.booked && d.interest)       { r.push(`${d.interest} interested but zero bookings`); return {...d,noisePct,state:'watch',reasons:r}; }
@@ -458,6 +465,7 @@ function renderInfra() {
   document.getElementById('wardRows').innerHTML = shown.map(p =>
     `<tr><td><span class="st ${p.state}">${p.state}</span></td>
      <td>${esc(p.domain)}</td><td class="lbl">${esc(p.client)}</td>
+     <td class="num${p.age==null?' flat':''}">${p.age==null?'—':p.age+'d'}</td>
      <td class="num">${p.threads}</td><td class="num${p.interest?' up':' flat'}">${p.interest}</td>
      <td class="num${p.booked?' up':' flat'}">${p.booked}</td>
      <td class="num${p.noisePct>=65?' down':''}">${p.noisePct==null?'—':p.noisePct+'%'}</td>
@@ -510,9 +518,15 @@ function renderInfra() {
 
   document.getElementById('gaps').innerHTML = `
     <div class="banner grey" style="margin-top:0">
-      <b>No domain age yet.</b> Registration dates are not collected, so triage cannot use age and the
-      <b>mortality curve is unavailable</b> — that is the metric that would tell you how long a domain earns
-      before it decays, and therefore your true cost per meeting. Needs a registrar pull.
+      <b>Domain age is ${Object.keys(AGES).length ? 'mostly' : 'not'} missing.</b>
+      Porkbun gave ages for ${Object.keys(AGES).length} domains, but only
+      <b>${PATIENTS.filter(p=>p.age!=null).length} of ${PATIENTS.length}</b> domains carrying outcome data are
+      covered — every <code>.digital</code> and <code>.xyz</code> sender lives in NameSilo, whose API key is
+      rejected (<code>code 110</code>). Until that key is fixed the <b>mortality curve stays unavailable</b>,
+      which is the metric that would give you replacement rate and true cost per meeting.
+      <br><br><b>Watch the TLD.</b> <code>builtrighthq.info</code> sits in Porkbun at 277 days;
+      the actual sender is <code>builtrighthq.digital</code>, held elsewhere. Ages are keyed on the full
+      domain, never the brand — matching on brand would attribute the wrong age.
     </div>
     <div class="banner grey">
       <b>Only ${Object.keys(OBS).length} of ${ranked.length} clients scanned.</b> The five largest are absent,

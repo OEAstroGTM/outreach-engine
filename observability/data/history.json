@@ -12,7 +12,9 @@
     "infrastructure_baseline": "Input-side (mailbox/domain) observations. Separate from reply-side snapshots.",
     "client_registry": "Authoritative client map from the oe repo's clients.json: MasterInbox ws id, EmailBison ws id, sequencer, per-client MI key env var. Use this for all joins.",
     "pilot_a1": "Results of the first per-client scan pilot. Validates the four-outputs-per-scan design and bounds its cost.",
-    "observed": "Per-client scan output: group funnel, domain attribution, awaiting-reply queue. Distinct from 'labels', which is per-label and only available for ws 1013."
+    "observed": "Per-client scan output: group funnel, domain attribution, awaiting-reply queue. Distinct from 'labels', which is per-label and only available for ws 1013.",
+    "registrar_pull": "Domain age data from registrars. Partial: NameSilo key is dead, so .digital/.xyz sending domains are unaged.",
+    "domain_ages": "full domain -> age in days. Consumed by infra triage; absent domains show age unknown."
   },
   "workspaces": {
     "1013": "OutreachEngine",
@@ -224,6 +226,28 @@
         "Calendar contamination in real clients is 0.19% (1 of 413 testable), not the ~75% seen in OutreachEngine's booked sample. OE is an outlier — my earlier extrapolation would have been wrong.",
         "Thread counts drifted up since this morning's sizing (Ujet 25->31, Built Right 88->90, Arnon 118->119, Clinintell 205->208) — the flow signal is real and measurable.",
         "OutreachEngine at 92 pages is ~19 MB and cannot be scanned in one context. The label_id filter is now the confirmed bottleneck, not a nice-to-have."
+      ]
+    },
+    {
+      "ts": "2026-08-03T21:10:00Z",
+      "source": "registrar age pull — partial, blocked on NameSilo",
+      "notes": [
+        "BLOCKER: NameSilo API key returns code 110, Invalid API Key (Permission denied). INFRA_REGISTRAR defaults to namesilo, so the primary registrar is unusable.",
+        "Porkbun works and exposes createDate. Got ages for 17 domains, but only Lend Home's overlap with domains that actually carry outcome data.",
+        "27 of 37 outcome-bearing sending domains (Arnon 5, Clinintell 10, Built Right 8, Ujet 4) are all .digital or .xyz and are NOT in Porkbun. Mortality curve stays blocked for them.",
+        "TLD TRAP: builtrighthq.info (Porkbun, 277d) is a DIFFERENT domain from builtrighthq.digital (the actual sender). Brand-name matching would have silently attributed the wrong age.",
+        "KEY FINDING: OutreachEngine's failing fleet is only 94 days old (created 2026-05-01) yet already has 100+ disconnected mailboxes. That is not decay, that is something breaking.",
+        "Six Lend Home senders (lendhomepros, lendhomereno, lendhomeprojects, lendhomeboost, lendhomecontractors, lendhomefixes) are active in MasterInbox but in neither registrar account.",
+        "Porkbun returned exactly 1000 domains with no page parameter available — possibly truncated."
+      ]
+    },
+    {
+      "ts": "2026-08-03T21:30:00Z",
+      "source": "wired registrar ages into triage",
+      "notes": [
+        "Age data now available for 17 domains, but only 4 of the 43 domains carrying outcome data are covered: lendhomedirect.info, lendhomefast.info, lendhomefirst.info, lendhomepro.info.",
+        "All four are Lend Home senders at 95 days old. Triage is now age-aware where age is known and falls back to volume-only where it is not.",
+        "NameSilo key supplied by user but cannot be injected — the lead-gen MCP reads its env from ~/.claude/settings.json, which was deliberately not read to avoid spilling every credential into the session transcript. One-line edit handed to the user instead."
       ]
     }
   ],
@@ -1342,5 +1366,129 @@
     },
     "_domain_tuple": "[domain, threads, interest, booked, noise]",
     "_no_age_data": "Domain registration dates are NOT yet collected, so triage cannot use age and the mortality curve is unavailable. 'warming' is decided on thread count alone. Needs a registrar getDomain pull."
+  },
+  "registrar_pull": {
+    "ran_at": "2026-08-03T21:10:00Z",
+    "outcome": "PARTIAL — blocked. Ages obtained for 17 domains; the 27 that carry outcome signal are unreachable.",
+    "registrars": {
+      "porkbun": {
+        "status": "working",
+        "domains_returned": 1000,
+        "caveat": "Exactly 1000 returned — likely a page cap, and the tool exposes no page parameter. Treat as possibly truncated.",
+        "date_fields": [
+          "createDate",
+          "expireDate"
+        ]
+      },
+      "namesilo": {
+        "status": "BROKEN",
+        "error": "code 110 — Invalid API Key (Permission denied)",
+        "impact": "INFRA_REGISTRAR defaults to namesilo, so this is the primary registrar and it is unusable. Almost certainly holds the .digital and .xyz sending domains."
+      }
+    },
+    "ages_found": {
+      "outreachengineup.info": {
+        "created": "2026-05-01",
+        "age_days": 94
+      },
+      "outreachenginestep.info": {
+        "created": "2026-05-01",
+        "age_days": 94
+      },
+      "lendhomefirst.info": {
+        "created": "2026-04-30",
+        "age_days": 95
+      },
+      "lendhomedirect.info": {
+        "created": "2026-04-30",
+        "age_days": 95
+      },
+      "lendhomefast.info": {
+        "created": "2026-04-30",
+        "age_days": 95
+      },
+      "lendhomepro.info": {
+        "created": "2026-04-30",
+        "age_days": 95
+      },
+      "lendhomeeasy.info": {
+        "created": "2026-04-30",
+        "age_days": 95
+      },
+      "lendhomeplus.info": {
+        "created": "2026-04-30",
+        "age_days": 95
+      },
+      "lendhomenow.info": {
+        "created": "2026-04-30",
+        "age_days": 95
+      },
+      "lendhomemy.info": {
+        "created": "2026-04-30",
+        "age_days": 95
+      },
+      "lendhomego.info": {
+        "created": "2026-04-30",
+        "age_days": 95
+      },
+      "lendhomeget.info": {
+        "created": "2026-04-30",
+        "age_days": 95
+      },
+      "joinbuiltright.info": {
+        "created": "2025-10-30",
+        "age_days": 277
+      },
+      "builtrightgroup.info": {
+        "created": "2025-10-30",
+        "age_days": 277
+      },
+      "builtrighthq.info": {
+        "created": "2025-10-30",
+        "age_days": 277
+      },
+      "dreamitreelreport.info": {
+        "created": "2026-01-14",
+        "age_days": 201
+      },
+      "dreamitreelcore.info": {
+        "created": "2026-04-01",
+        "age_days": 124
+      }
+    },
+    "TLD_TRAP": "Brand names are reused across TLDs and registrars. builtrighthq.INFO sits in Porkbun (277 days old) while the actual sending domain is builtrighthq.DIGITAL, held elsewhere. Matching on brand name instead of the full domain would attribute the wrong age. Always join on the full domain including TLD.",
+    "unageable_but_carry_outcomes": {
+      "Arnon Rivers (5 .digital)": "not in Porkbun; goarnonriverpartners.digital confirmed DOMAIN_NOT_FOUND",
+      "Clinintell (10 .digital)": "not in Porkbun",
+      "Built Right (8 .digital/.xyz)": "not in Porkbun — only .info namesakes are",
+      "Ujet (4 .digital)": "not in Porkbun",
+      "note": "27 of the 37 outcome-bearing sending domains cannot be aged until the NameSilo key is fixed."
+    },
+    "also_missing": "lendhomepros.info, lendhomereno.info, lendhomeprojects.info, lendhomeboost.info, lendhomecontractors.info and lendhomefixes.info are active MasterInbox senders but absent from the Porkbun account — registered somewhere unmanaged, or transferred/expired.",
+    "key_finding": "OutreachEngine's disconnected fleet is YOUNG. outreachengineup.info and outreachenginestep.info were created 2026-05-01 — 94 days old — and already carry 100+ disconnected mailboxes. A three-month-old fleet failing at that rate is an operational problem, not natural decay."
+  },
+  "domain_ages": {
+    "_as_of": "2026-08-03",
+    "_source": "Porkbun createDate. NameSilo unreachable (invalid key), so all .digital/.xyz senders are absent.",
+    "_warning": "Key on the FULL domain including TLD. builtrighthq.info is NOT builtrighthq.digital.",
+    "ages": {
+      "outreachengineup.info": 94,
+      "outreachenginestep.info": 94,
+      "lendhomefirst.info": 95,
+      "lendhomedirect.info": 95,
+      "lendhomefast.info": 95,
+      "lendhomepro.info": 95,
+      "lendhomeeasy.info": 95,
+      "lendhomeplus.info": 95,
+      "lendhomenow.info": 95,
+      "lendhomemy.info": 95,
+      "lendhomego.info": 95,
+      "lendhomeget.info": 95,
+      "joinbuiltright.info": 277,
+      "builtrightgroup.info": 277,
+      "builtrighthq.info": 277,
+      "dreamitreelreport.info": 201,
+      "dreamitreelcore.info": 124
+    }
   }
 }
