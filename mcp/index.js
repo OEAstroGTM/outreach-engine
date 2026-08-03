@@ -14,6 +14,7 @@ import * as ops from "./lib/tools.js";
 import { registerAgents } from "./agents.js";
 
 const server = new McpServer({ name: "outreach-engine", version: "2.0.0" });
+// dev workflow check: ~/dev/oe -> push -> runtime mirror auto-sync (no functional change)
 
 // ── Read helpers (cheap, non-delegating — handy for the operator directly) ────
 server.tool("list_clients",
