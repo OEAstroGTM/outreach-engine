@@ -41,8 +41,19 @@ Three sources, no overlap. `build.mjs` merges them at render time — that is th
 | `config.json` | taxonomy, internal workspaces, platform map, Inboxing tag map, known join gaps | yes |
 | `data/series.json` | snapshots, scan results, domain ages, fleet inventory | **no** |
 
-Run `node observability/build.mjs` to render, or `--check` to validate without
-writing. The build **fails** rather than guesses if a value appears in two places:
+Run `node observability/build.mjs` to render, then
+`node observability/dashboard/verify.mjs` to check it actually works. Verify
+executes the built page headlessly and asserts every screen renders — including
+the two paths that only run in unusual states: an empty series (fresh clone) and
+sparse sampling.
+
+Its mock returns `null` for any element id the HTML does not define, which is the
+point. An earlier mock returned an object for every id and silently hid a
+`getElementById('stage')` against an element that had been deleted — a crash that
+only fired when there were zero readings, i.e. on a fresh clone.
+
+`build.mjs --check` validates without writing. The build **fails** rather than
+guesses if a value appears in two places:
 
 - a key present in both `config.json` and `series.json`
 - `churned` or `client_registry` stored anywhere (both are derived from `clients.json`)

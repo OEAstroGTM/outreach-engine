@@ -88,6 +88,8 @@ button.f:hover{background:#f5f3f1} button.f.on{background:#1c1b1a;color:#fff;bor
   <button class="tab" id="t-infra">Infrastructure</button>
 </div>
 
+<div id="stage" class="banner hide"></div>
+
 <!-- ══════════════ SCREEN 1: PERFORMANCE ══════════════ -->
 <div id="screenPerf">
   <div class="cards" id="cards"></div>
@@ -761,9 +763,33 @@ if (!H.snapshots.length) {
   document.getElementById('screenPerf').classList.add('hide');
   document.getElementById('screenInfra').classList.add('hide');
 } else {
+  // Readings = snapshots carrying totals. Config-only snapshots are not readings.
+  const readings = H.snapshots.filter(s => s.totals);
+  const dates = [...new Set(readings.map(s => s.ts.slice(0,10)))].sort();
+  const quotable = readings.length >= 5 && dates.length >= 5;
+
   document.getElementById('hdr').textContent =
-    `${H.snapshots.length} snapshots · ${ranked.length} active clients · ${PATIENTS.length} domains observed · ` +
-    `last reading ${new Date(H.snapshots[H.snapshots.length-1].ts).toLocaleString()}`;
+    `${readings.length} reading${readings.length===1?'':'s'} across ${dates.length} date${dates.length===1?'':'s'} · ` +
+    `${ranked.length} active clients · ${PATIENTS.length} domains observed · ` +
+    `last ${new Date(H.snapshots[H.snapshots.length-1].ts).toLocaleString()}`;
+
+  const stage = document.getElementById('stage');
+  if (!quotable) {
+    const span = readings.length > 1
+      ? Math.round((new Date(readings[readings.length-1].ts) - new Date(readings[0].ts)) / 3.6e6)
+      : 0;
+    stage.classList.remove('hide');
+    stage.innerHTML =
+      `<b>Sampling too sparse for a rate.</b> ${readings.length} reading${readings.length===1?'':'s'} with data ` +
+      `across ${dates.length} date${dates.length===1?'':'s'}` +
+      (readings.length > 1 ? `, spanning ${span} hours` : '') +
+      `. Counts and deltas below are real; any daily or weekly average would describe when the collector ` +
+      `happened to run rather than the business. Needs 5 readings across 5 dates — about a week of ` +
+      `scheduled runs. ${H.snapshots.length - readings.length} of ${H.snapshots.length} snapshots are ` +
+      `config corrections and are not readings.`;
+  } else {
+    stage.classList.add('hide');
+  }
   render();
   setScreen(screen);
 }
