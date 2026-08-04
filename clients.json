@@ -6,6 +6,7 @@
     "eb_send_key_env": "EB_SEND_KEY_ASKTURING",
     "mi_ws_id": 620,
     "mi_key_env": "MI_KEY_ASKTURING",
+    "status": "churned",
     "inboxing_tags": ["AskTuring"]
   },
   {
@@ -86,8 +87,6 @@
     "eb_personal_key_env": "EB_PERSONAL_KEY_LEND_HOME_IMPROVEMENTS",
     "mi_ws_id": 1074,
     "mi_key_env": "MI_KEY_LEND_HOME_IMPROVEMENTS",
-    "status": "churned",
-    "churned_at": "2026-06-01",
     "inboxing_tags": ["Lend Home Improvements"]
   },
   {
@@ -97,6 +96,7 @@
     "eb_personal_key_env": "EB_PERSONAL_KEY_NUVO_BATH",
     "mi_ws_id": 825,
     "mi_key_env": "MI_KEY_NUVO_BATH",
+    "status": "churned",
     "inboxing_tags": ["Nuvo Bath"]
   },
   {
@@ -142,6 +142,7 @@
     "mi_ws_id": 1061,
     "mi_key_env": "MI_KEY_SIMPLEXITY",
     "instantly_ws": "simplexity",
+    "status": "churned",
     "inboxing_tags": ["Simplexity"]
   },
   {
@@ -179,6 +180,7 @@
     "eb_send_key_env": "EB_SEND_KEY_CARENGEN",
     "mi_ws_id": 190,
     "mi_key_env": "MI_KEY_CARENGEN",
+    "status": "churned",
     "inboxing_tags": ["carengen"]
   },
   {
