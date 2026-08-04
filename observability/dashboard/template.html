@@ -95,19 +95,29 @@ button.f:hover{background:#f5f3f1} button.f.on{background:#1c1b1a;color:#fff;bor
   <div class="cards" id="cards"></div>
 
   <div id="viewAll">
-    <h2>Where leads fall off</h2>
+    <h2>Current state composition</h2>
     <div class="panel">
+      <div class="banner grey" style="margin-top:0;margin-bottom:12px">
+        <b>These are states, not stages.</b> A label is mutable and labels accumulate on a record — one record
+        can carry <code>Meeting Request</code>, <code>1st call completed</code> and <code>Meeting Booked</code>
+        at once. So these groups <b>overlap</b>, and subtracting one from another does not give you a loss.
+        This is a photograph of where records sit right now, not a journey.
+      </div>
       <div id="dropoff"></div>
       <div style="border-top:1px solid #f0eeec;margin-top:12px;padding-top:11px">
-        <div class="note" style="margin:0 0 8px"><b>Conversion by client</b> — where each one leaks</div>
+        <div class="note" style="margin:0 0 8px"><b>State mix by client</b></div>
         <table>
-          <thead><tr><th>Client</th><th class="num">Replies</th><th class="num">Human</th>
-          <th class="num">Interest</th><th class="num">Booked</th><th class="num">Int→Booked</th><th>Biggest loss</th></tr></thead>
+          <thead><tr><th>Client</th><th class="num">Records</th><th class="num">Human</th>
+          <th class="num">Interest</th><th class="num">Booked</th>
+          <th class="num">Booked ÷ Interest</th><th>Largest state</th></tr></thead>
           <tbody id="convRows"></tbody>
         </table>
       </div>
       <div class="note" id="dropNote"></div>
     </div>
+
+    <h2>Conversion</h2>
+    <div class="panel" id="convPanel"><div id="convGate"></div></div>
 
     <h2>Reply volume by client</h2>
     <div class="panel">
@@ -398,58 +408,91 @@ function renderDropoff() {
   }), {records:0,noise:0,negative:0,deferral:0,interest:0,booked:0,unlabelled:0});
 
   const human = agg.records - agg.noise;
-  const other = Math.max(human - agg.negative - agg.deferral - agg.interest, 0);
-  // Each step: label, remaining after the step, what was lost getting here.
-  const steps = [
-    ['All replies received', agg.records, null, null],
-    ['Reached a human', human, agg.noise, 'automated noise — OOO, auto-reply, wrong person'],
-    ['Still in play', agg.interest + agg.deferral, agg.negative, 'said no — not interested, blocklist, angry'],
-    ['Expressed interest', agg.interest, agg.deferral + other, 'deferred or uncategorised'],
-    ['Booked a meeting', agg.booked, agg.interest - agg.booked, 'interested but never booked']
+  // Independent state counts, largest first. No arrows, no subtraction: these
+  // overlap on the same record, so ordering them as a cascade would be a lie.
+  const states = [
+    ['All records', agg.records, 'every reply thread', '#9a9793'],
+    ['Automated noise', agg.noise, 'OOO, auto-reply, wrong person', '#9a9793'],
+    ['Human replies', human, 'records with no noise label', '#4a7fd4'],
+    ['Said no', agg.negative, 'not interested, blocklist, angry', '#b4341c'],
+    ['Deferred', agg.deferral, 'not right now, follow up', '#96650b'],
+    ['Interest', agg.interest, 'interested, info request, meeting request', '#96650b'],
+    ['Booked', agg.booked, 'meeting on the calendar', '#1c6b38']
   ];
   const mx = Math.max(agg.records, 1);
-  document.getElementById('dropoff').innerHTML = steps.map(([k,n,lost,why],i) => {
-    const pct = (n/mx*100);
-    const lostPct = lost != null && steps[i-1] ? (lost/steps[i-1][1]*100) : null;
-    return `<div class="bar" style="margin-bottom:2px">
-      <div class="bl" style="width:132px${i===4?';font-weight:600':''}">${k}</div>
-      <div class="bt"><i style="width:${pct}%${i===4?';background:#1c6b38':''}"></i></div>
+  document.getElementById('dropoff').innerHTML = states.map(([k,n,why,colour]) => {
+    const pct = n/mx*100;
+    return `<div class="bar" style="margin-bottom:3px">
+      <div class="bl" style="width:126px">${k}</div>
+      <div class="bt"><i style="width:${pct}%;background:${colour}"></i></div>
       <div class="bv">${n.toLocaleString()}</div>
-      <div class="bn">${pct<1?pct.toFixed(2):pct.toFixed(0)}% of all</div></div>` +
-      (lost ? `<div class="bar" style="margin:0 0 4px"><div class="bl" style="width:132px"></div>
-        <div style="flex:1;font-size:11px;color:#b4341c;padding-left:2px">
-        ▼ −${lost.toLocaleString()}${lostPct?` (${lostPct.toFixed(0)}%)`:''} ${why}</div>
-        <div class="bv"></div><div class="bn"></div></div>` : '');
+      <div class="bn">${pct<1?pct.toFixed(2):pct.toFixed(0)}% of records</div></div>
+      <div class="bar" style="margin:0 0 5px"><div class="bl" style="width:126px"></div>
+        <div style="flex:1;font-size:11px;color:#a3a09c;padding-left:2px">${why}</div>
+        <div class="bv"></div><div class="bn"></div></div>`;
   }).join('');
 
   document.getElementById('convRows').innerHTML = rows.map(([id,f]) => {
     const hu = f.records - f.noise;
-    const conv = f.interest ? f.booked/f.interest*100 : null;
-    // Name the single largest leak for this client.
-    const losses = [['noise', f.noise], ['said no', f.negative],
-                    ['interested, never booked', f.interest - f.booked]];
-    losses.sort((a,b)=>b[1]-a[1]);
-    const worst = losses[0];
+    const ratio = f.interest ? f.booked/f.interest*100 : null;
+    // Which state holds the most records — a fact, not a diagnosis.
+    const biggest = [['noise', f.noise], ['said no', f.negative], ['interest', f.interest],
+                     ['deferred', f.deferral]].sort((a,b)=>b[1]-a[1])[0];
     return `<tr data-id="${id}" style="cursor:pointer"><td>${esc(names[id]||id)}
       <span class="pill">${f.src==='labels'?'labels':'scan'}</span></td>
       <td class="num">${f.records.toLocaleString()}</td>
       <td class="num">${hu.toLocaleString()}</td>
       <td class="num${f.interest?' up':' flat'}">${f.interest}</td>
       <td class="num${f.booked?' up':' flat'}">${f.booked}</td>
-      <td class="num${conv==null?' flat':conv>=40?' up':' down'}">${conv==null?'—':conv.toFixed(0)+'%'}</td>
-      <td class="lbl">${worst[1]>0?`${worst[0]} (−${worst[1].toLocaleString()})`:'—'}</td></tr>`;
+      <td class="num lbl">${ratio==null?'—':ratio.toFixed(0)+'%'}</td>
+      <td class="lbl">${biggest[1]>0?`${biggest[0]} (${biggest[1].toLocaleString()})`:'—'}</td></tr>`;
   }).join('');
   document.querySelectorAll('#convRows tr').forEach(tr =>
     tr.onclick = () => { sel = tr.dataset.id; reselect(); });
 
   const noisePct = agg.records ? (agg.noise/agg.records*100).toFixed(0) : 0;
-  const convPct = agg.interest ? (agg.booked/agg.interest*100).toFixed(1) : '—';
+  const ratioPct = agg.interest ? (agg.booked/agg.interest*100).toFixed(1) : '—';
   document.getElementById('dropNote').innerHTML =
-    `Covers <b>${rows.length}</b> of ${ranked.length} clients — the ones with funnel data.
-     <b>${noisePct}%</b> of everything received never reached a human, and of those who did express interest,
-     <b>${convPct}%</b> booked. The two biggest leaks are the top of the funnel (noise) and the last step
-     (interested but never booked) — the second is the only one you control directly.
-     Click a row to open that client. Figures are not deduplicated for calendar artifacts or repeated threads.`;
+    `Covers <b>${rows.length}</b> of ${ranked.length} clients — those with label data.
+     <b>${noisePct}%</b> of records carry an automated-noise label.
+     <br><br><b>"Booked ÷ Interest" is a ratio between two current state counts, not a conversion rate.</b>
+     It reads <b>${ratioPct}%</b> across the book. It only approximates conversion if booked records always
+     retain their interest label, which is untested — and it can never tell you whether anyone converted
+     <i>this week</i>. For that, see Conversion below.
+     Click a row to open that client. Not deduplicated for calendar artifacts or repeated threads.`;
+
+  renderConversionGate();
+}
+
+/* True conversion needs the same records observed twice. Until per-record scans
+   accumulate, refuse to show a number rather than dress up a state ratio. */
+function renderConversionGate() {
+  const scans = (H.record_scans && H.record_scans.by_workspace) || {};
+  const withTwo = Object.entries(scans).filter(([,v]) => (v || []).length >= 2);
+  const el = document.getElementById('convGate');
+  if (!el) return;
+  if (!withTwo.length) {
+    const have = Object.keys(scans).length;
+    el.innerHTML = `<div class="banner grey" style="margin-top:0">
+      <b>No conversion rate available yet — by design.</b>
+      Conversion is a cohort question: of the leads that showed interest last week, how many have booked since.
+      Answering it needs the <i>same records</i> observed twice, so the scan now stores per-record label sets
+      and diffs them. ${have ? `<b>${have}</b> client${have===1?' has':'s have'} one scan stored; none has two yet.`
+        : 'No per-record scans stored yet.'}
+      <br><br>The first client to be scanned twice, at least 24 hours apart, produces the first real conversion
+      figure — cohort size, how many converted, and how many of those were already booked at the start.
+      Until then the state ratio above is the only thing on offer, and it is not the same measure.
+    </div>`;
+  } else {
+    el.innerHTML = withTwo.map(([ws, list]) => {
+      const s = [...list].sort((a,b)=>a.ts.localeCompare(b.ts));
+      const first = s[0], last = s[s.length-1];
+      const hrs = Math.round((new Date(last.ts) - new Date(first.ts))/3.6e6);
+      return `<div class="bar"><div class="bl" style="width:150px">${esc(names[ws]||ws)}</div>
+        <div style="flex:1;font-size:12px">${s.length} scans over ${hrs}h — cohort conversion computable</div></div>`;
+    }).join('') + `<div class="note">Computed by <code>lib/cohort.js</code> from stored per-record label sets.
+      Records that did not exist at the start of the window are excluded from the cohort.</div>`;
+  }
 }
 
 function renderOne(id) {

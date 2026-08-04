@@ -229,6 +229,7 @@ __marimo__/
 # Observability: measurements are machine-appended every weekday and would churn
 # the repo daily. Config is tracked (config.json); measurements are not.
 observability/data/series.json
+observability/data/baseline-scan.txt
 observability/dashboard/build/
 
 mcp/smoketest.mjs

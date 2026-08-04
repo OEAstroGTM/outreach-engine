@@ -5,11 +5,22 @@
 // CRITICAL: label IDs differ per workspace (Ujet's "Add to Blocklist" is 192287,
 // OutreachEngine's is 6279). Always key on the NAME, never the ID.
 
-// The funnel entry pool. All three are equivalent expressions of interest —
-// never treat "Meeting Request" alone as the top of funnel.
+// IMPORTANT: these are STATE groups, not funnel stages.
+//
+// A label is mutable state that changes as a lead moves, and labels accumulate on
+// a record rather than replacing each other — a single record can carry
+// "Meeting Request, 1st call completed, Meeting Booked" at once. So these groups
+// OVERLAP, and a count of one minus a count of another is not a loss.
+//
+// Ratios between these counts are not conversion rates. Conversion is a cohort
+// question and needs the same records observed twice — see cohort.js.
+
+// Any expression of interest. All three are equivalent; never treat
+// "Meeting Request" alone as the entry signal.
 export const INTEREST = ["Interested", "Information Request", "Meeting Request"];
 
-// TERMINAL success. A thread ends at Meeting Booked. Nothing is downstream of it.
+// Success. A record reaching this state has booked. Records generally retain
+// their interest labels alongside it, which is why the groups overlap.
 export const SUCCESS = ["Meeting Booked"];
 
 // Prospect is warm but not now. Nurture, not pipeline.
