@@ -1,0 +1,193 @@
+{
+  "_readme": "CONFIG — the single home for observability configuration. Tracked in git. Contains only what a human decides AND that has no other source of truth. Client identity and churn status are NOT here: they come from ../clients.json. Measurements are NOT here: they live in data/series.json (gitignored). build.mjs merges the three at render time. If a value appears in two of them, that is a bug.",
+  "workspaces": {
+    "1579": "Built Right",
+    "_note": "Only MasterInbox workspaces that ../clients.json does not describe. Client names and churn status always come from clients.json; anything listed here that also exists there would be silently overridden, so build.mjs rejects it."
+  },
+  "internal": {
+    "329": {
+      "name": "INBOXING UPLOADS",
+      "reason": "mailbox provisioning workspace, not a client account"
+    }
+  },
+  "taxonomy": {
+    "interest": [
+      "Interested",
+      "Information Request",
+      "Meeting Request"
+    ],
+    "success": [
+      "Meeting Booked"
+    ],
+    "deferral": [
+      "Not Right Now",
+      "Follow Up",
+      "Follow Up in 30 Days"
+    ],
+    "redirect": [
+      "Referral"
+    ],
+    "process": [
+      "Info sent",
+      "Ongoing Discussion"
+    ],
+    "setter_activity": [
+      "1st call completed",
+      "2nd call completed",
+      "3rd call completed",
+      "4th call complete",
+      "5th call complete",
+      "6th call complete"
+    ],
+    "negative": [
+      "Not Interested",
+      "Not Intrested",
+      "Add to Blocklist",
+      "Angry Response"
+    ],
+    "noise": [
+      "OOO Sequence",
+      "OOOO Sequence",
+      "Automated Response",
+      "Wrong Person",
+      "Unable to Categorise"
+    ],
+    "owner": [
+      "JP",
+      "Hannah"
+    ],
+    "interest_variants_unclassified": [
+      "Interest",
+      "Interest Request"
+    ],
+    "owner_tags": [
+      "Hannah",
+      "JP"
+    ]
+  },
+  "platforms": {
+    "_note": "Sending platforms feeding MasterInbox. THREE separate systems, not one. Some clients appear on more than one — never sum across platforms without deduplicating.",
+    "bison_send": {
+      "label": "EmailBison / ClawOE (send.outreachenginedashboard.co)",
+      "workspaces": {
+        "50": "Abra",
+        "11": "Braintracks",
+        "33": "Bravura Technologies",
+        "35": "CareNgen",
+        "26": "Chalktalk",
+        "48": "Clinintell",
+        "24": "Dream It Reel",
+        "20": "Hubengage",
+        "28": "Intellectible",
+        "23": "OR Trax",
+        "5": "Outreach Engine",
+        "32": "ParGo",
+        "45": "Private Pargo",
+        "49": "Revo.ai",
+        "7": "Savanti Travel",
+        "3": "True Dial"
+      }
+    },
+    "bison_personal": {
+      "label": "EmailBison personal (personal.outreachenginedashboard.co)",
+      "workspaces": {
+        "9": "Abra Personal",
+        "16": "Arnon River Partners",
+        "11": "Built Right",
+        "4": "Coffee & Contracts",
+        "17": "Union Omaha",
+        "3": "Felipe's Team (internal)",
+        "5": "INBOXING PERSONAL (internal)"
+      }
+    },
+    "instantly": {
+      "label": "Instantly",
+      "workspaces": {
+        "supply_wisdom": "Supply Wisdom",
+        "lend_home": "LendHome (inactive)",
+        "surety_now": "Surety Now",
+        "intellectible": "Intellectible",
+        "simplexity": "Simplexity"
+      }
+    },
+    "heyreach": {
+      "label": "HeyReach (LinkedIn) — DISCOVERED 2026-08-03, not in clients.json",
+      "detected_in": {
+        "61": "Clinintell — 125 of 208 records"
+      },
+      "channel_id_format": "heyreach_<accountId> (NOT base64, no domain)",
+      "missing_fields": [
+        "last_reply_address",
+        "website"
+      ],
+      "impact": "Domain attribution and calendar detection are undefined for these records. Must branch on the 'source' field."
+    }
+  },
+  "inboxing_tag_map": {
+    "_note": "MasterInbox workspace_id -> Inboxing client tag. Joins reply outcomes to the sending fleet. null = no Inboxing fleet found for that client.",
+    "map": {
+      "1013": "outreachengine",
+      "1058": "intellectible",
+      "1059": "supplywisdom",
+      "1077": "dreamitreel",
+      "664": "bravura",
+      "1076": "hubengage",
+      "1073": "braintracks",
+      "355": "chalktalk",
+      "1057": "ortrax",
+      "552": "pargo",
+      "392": "revo",
+      "393": "abra",
+      "61": "clinintell",
+      "2020": "arnonriver",
+      "1579": "builtright",
+      "2096": "ujet",
+      "121": "savanti",
+      "58": "coffeeandcontracts",
+      "56": "truedial",
+      "1469": null,
+      "1470": null,
+      "1074": null
+    },
+    "unmatched_clients": {
+      "Campaygn": "no Inboxing fleet",
+      "Union Omaha": "no Inboxing fleet",
+      "Lend Home Improvements": "no Inboxing fleet — its .info senders are in Porkbun only"
+    },
+    "non_client_tags": {
+      "carengen": "churned client, still provisioned",
+      "aunalytics": "not a live client (sequencer: none)"
+    }
+  },
+  "mapping_gaps": {
+    "no_sending_platform_found": {
+      "1469": "Campaygn",
+      "2096": "Ujet"
+    },
+    "platform_without_masterinbox_workspace": {
+      "surety_now": "Surety Now (Instantly)",
+      "45": "Private Pargo (bison_send)"
+    },
+    "churned_but_still_provisioned": {
+      "35": "CareNgen (bison_send)",
+      "simplexity": "Simplexity (Instantly)"
+    },
+    "dual_platform": {
+      "Intellectible": [
+        "bison_send:28",
+        "instantly:intellectible"
+      ],
+      "Abra": [
+        "bison_send:50",
+        "bison_personal:9"
+      ]
+    },
+    "name_mismatches": {
+      "Chalktallk": "Chalktalk",
+      "TrueDial": "True Dial",
+      "Arnon Rivers Partners": "Arnon River Partners",
+      "DreamItReel": "Dream It Reel",
+      "Lend Home Improvements": "LendHome"
+    }
+  }
+}

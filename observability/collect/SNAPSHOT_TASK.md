@@ -6,23 +6,27 @@ taxonomy it depends on. The live copy is at
 `~/Documents/Claude/Scheduled/pipeline-snapshot/SKILL.md` — **edit both together or
 they drift.**
 
-## Bootstrapping
+## Which file to write
 
-`data/history.json` is gitignored — it is the live time series and does not exist
-in a fresh clone. **If it is missing, copy `data/history.seed.json` to it and
-proceed.** Do not start an empty file from scratch: the seed carries the client
-registry, taxonomy and fleet inventory that every metric depends on.
+**You append to `data/series.json` and nothing else.** It holds measurements only:
+`snapshots`, `observed`, `domain_ages`, `infrastructure_baseline`. It is gitignored,
+so in a fresh clone it will not exist — create it with `{"snapshots": []}` and
+proceed. That is safe, because it contains no configuration.
 
-If both are missing, stop and report it — that means the folder is not mounted and
-appending would destroy history.
+**Never write configuration.** Client names and churn status live in
+`../clients.json`. Taxonomy, internal workspaces, the platform and Inboxing tag maps
+live in `config.json`. If one of those needs changing, say so in your report and let
+a human edit the one file that owns it. Writing it into `series.json` would create a
+second home for a value that already has one, and `build.mjs` will refuse to build.
+
+Read config with `node build.mjs --check`, or read `config.json` and `../clients.json`
+directly. Do not copy their contents into `series.json`.
 
 ## Contract
 
-- **Read-only.** See the prohibited-tools list in `../README.md`. Never write to a
-  source system, even when the fix is obvious.
-- **Config changes go in both files.** If a client churns or a new label appears,
-  update `history.seed.json` as well as the live file, or the next fresh clone
-  loses the change.
+- **Read-only against source systems.** See the prohibited-tools list in
+  `../README.md`. Never write to MasterInbox, EmailBison, Instantly, a registrar or
+  Inboxing, even when the fix is obvious.
 - **Cheap.** One `get_prospects` call per client with `limit: 1` (for
   `metadata.total`) plus one `get_label_stats`. Roughly 23 calls, under a minute.
 - **Appends, never rewrites.** Historical snapshots stay truthful even when a client

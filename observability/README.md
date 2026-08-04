@@ -20,37 +20,44 @@ report it in text. Do not fix it.
 
 ```
 observability/
-  data/history.seed.json     TRACKED. Durable config only: clients, taxonomy, fleet.
-  data/history.json          GITIGNORED. Live time series. Machine-appended daily.
+  build.mjs                  merges the three sources and renders the dashboard
+  config.json                TRACKED. Observability config. Nothing else.
+  data/series.json           GITIGNORED. Measurements. Machine-appended daily.
   dashboard/template.html    dashboard, contains the literal __HISTORY__ placeholder
+  dashboard/build/index.html generated. gitignored.
   lib/taxonomy.js            canonical label groups
   lib/infra-health.js        the hospital: domain diagnosis + triage
   collect/SNAPSHOT_TASK.md   the scheduled collector prompt
 ```
 
-### Seed vs live — why they are separate
+## Every value has exactly one home
 
-The collector appends a snapshot every weekday morning. Committing that file
-would mean a diff every day, guaranteed merge conflicts, and hundreds of commits
-of JSON noise. So the two concerns are split:
+Three sources, no overlap. `build.mjs` merges them at render time — that is the
+*only* place they are combined.
 
-| | `history.seed.json` | `history.json` |
+| Source | Owns | In git |
 |---|---|---|
-| In git | yes | **no** |
-| Contains | configuration you decide | measurements the collector takes |
-| Changes when | a client churns, a label appears, the fleet is re-inventoried | every weekday |
-| Keys | `workspaces`, `churned`, `internal`, `taxonomy`, `platforms`, `client_registry`, `inboxing_tag_map`, `domain_ages`, `infrastructure_baseline` | the above plus `snapshots`, `observed`, `pilot_a1`, `registrar_pull` |
+| `../clients.json` | client identity: name, `mi_ws_id`, `eb_ws_id`, sequencer, **churn status** | yes |
+| `config.json` | taxonomy, internal workspaces, platform map, Inboxing tag map, known join gaps | yes |
+| `data/series.json` | snapshots, scan results, domain ages, fleet inventory | **no** |
 
-**Bootstrapping:** if `history.json` is absent, copy the seed to it and carry on.
-The dashboard renders an explicit "no data collected yet" state rather than a wall
-of zeros, so a fresh clone is obviously empty rather than subtly wrong.
+Run `node observability/build.mjs` to render, or `--check` to validate without
+writing. The build **fails** rather than guesses if a value appears in two places:
 
-**Editing:** config changes go in the seed *and* the live file — the live file is
-what the dashboard reads, and the seed is what a fresh clone starts from. Never put
-snapshots or scan results in the seed. Never hand-edit the live file except to
-correct an error.
+- a key present in both `config.json` and `series.json`
+- `churned` or `client_registry` stored anywhere (both are derived from `clients.json`)
+- a `config.workspaces` entry that `clients.json` already describes — including one
+  spelled differently, which the merge would silently override
 
-`history.json` is rendered into the dashboard by substituting `__HISTORY__`.
+`config.workspaces` therefore holds only workspaces `clients.json` does not
+describe. Today that is one: **Built Right (1579)**, which is missing from
+`clients.json` and should be added there.
+
+Why `series.json` is not tracked: the collector appends to it every weekday, so
+committing it would mean a diff a day, guaranteed conflicts, and eventually
+hundreds of commits of JSON noise. A fresh clone has no `series.json` at all —
+the build handles that and the dashboard renders an explicit "no data collected
+yet" state rather than a wall of zeros.
 
 ## The funnel model
 
