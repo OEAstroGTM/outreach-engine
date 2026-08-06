@@ -176,8 +176,31 @@ export async function inboxingSubmitDomain({ domain, user_count = 49, names, tag
 export async function inboxingCheckStatus({ domain_id }) {
   return inboxing("GET", `/domains/${encodeURIComponent(domain_id)}/status`);
 }
-export async function inboxingListDomains() {
-  return inboxing("GET", "/domains");
+// Inboxing paginates /domains (per_page default 50). Pass page to fetch a
+// specific page, or all:true to walk every page (guarded by maxPages) and
+// return the combined list plus a truncated flag.
+export async function inboxingListDomains({ page, all, maxPages = 20 } = {}) {
+  if (!all) {
+    const qs = page ? `?page=${page}` : "";
+    return inboxing("GET", `/domains${qs}`);
+  }
+  const first = await inboxing("GET", `/domains?page=${page || 1}`);
+  const rows = [...(first?.data ?? [])];
+  const totalPages = first?.pagination?.pages ?? 1;
+  const startPage = page || 1;
+  const stopAt = Math.min(totalPages, startPage + maxPages - 1);
+  let pagesFetched = 1;
+  for (let p = startPage + 1; p <= stopAt; p++) {
+    const r = await inboxing("GET", `/domains?page=${p}`);
+    rows.push(...(r?.data ?? []));
+    pagesFetched++;
+  }
+  return {
+    data: rows,
+    pagination: first?.pagination ?? null,
+    pages_fetched: pagesFetched,
+    truncated: totalPages > stopAt,
+  };
 }
 // GET /slots — { slots:{total,used,remaining,...}, system:{can_provision}, subscription_status }
 export async function inboxingGetSlots() {

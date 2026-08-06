@@ -188,6 +188,21 @@ export async function ebPaginate(client, path, { page = 1, all = false, maxPages
   };
 }
 
+// List every workspace on an EmailBison instance (account-level key, not a
+// client's scoped one) — the only way to see workspaces no client is routed
+// to, e.g. a shared/default workspace an external integration uploads into.
+export async function ebListWorkspaces(instance) {
+  const isPersonal = instance === "eb_personal";
+  const base = isPersonal ? EB_PERSONAL_BASE : EB_SEND_BASE;
+  const key = isPersonal ? EB_PERSONAL_KEY : EB_SEND_KEY;
+  if (!key) throw new Error(`No account-level EmailBison key for instance "${instance}"`);
+  const res = await fetch(`${base}/workspaces`, {
+    headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+  });
+  const data = await res.json();
+  return Array.isArray(data) ? data : (data?.data ?? data);
+}
+
 export async function ebSenderFetch(method, sender_email_id, instance, body) {
   const base = instance === "personal" ? EB_PERSONAL_BASE : EB_SEND_BASE;
   const key  = instance === "personal" ? EB_PERSONAL_KEY  : EB_SEND_KEY;

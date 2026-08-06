@@ -138,7 +138,9 @@ export async function listCampaigns({ client_name, page, all, max_pages, status 
   if (client.sequencer === "instantly") {
     const key = INSTANTLY_KEYS[client.instantly_ws];
     if (!key) throw new Error(`No Instantly API key configured for workspace "${client.instantly_ws}" (client: ${client_name})`);
-    const res = await fetch(`https://api.instantly.ai/api/v1/campaign/list?api_key=${key}`);
+    const res = await fetch(`https://api.instantly.ai/api/v2/campaigns`, {
+      headers: { Authorization: `Bearer ${key}` },
+    });
     return res.json();
   }
 

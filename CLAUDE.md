@@ -97,3 +97,36 @@ mcp/lib/infra.js  — self-sufficient registrar (NameSilo/Porkbun) + Inboxing ca
 
 Copy `.env.example` to `.env` and fill in your API keys before running. For the
 MCP agents, install deps once: `cd mcp && npm install`.
+
+## IMPORTANT: this is the LIVE repo — there is a stale duplicate at ~/outreach-engine
+
+`~/dev/oe` (this repo) is the one the desktop app's outreach-engine MCP server
+actually runs from — its `.env` has real API keys. `~/outreach-engine` is a
+separate, stale checkout with a near-empty `.env`; it is NOT what's live. Editing
+`~/outreach-engine/mcp/index.js` (or any file there) has NO effect on the running
+server, even after a full restart — a mistake already made once (2026-08-04). If
+in doubt which one to edit, check `.env` size (`ls -la .env` — the live one is
+several KB) before touching either copy, and prefer this one, `~/dev/oe`.
+
+## Restarting the MCP server after an index.js/agents.js/lib edit
+
+`mcp/index.js` runs as a plain `node` stdio process spawned by the MCP client
+(Claude desktop app / Cowork). It does NOT hot-reload — editing the code has no
+effect until the process is killed and respawned. There is no on/off toggle for
+it in the desktop app's UI. To restart after a code change, run this in Terminal
+on the machine running the desktop app:
+
+```bash
+pkill -f "dev/oe/mcp/index.js"
+```
+
+This kills only that one process. The client should respawn it automatically on
+the next tool call against it (test by calling `list_clients`). If it doesn't
+come back, fully quit (Cmd+Q) and reopen the desktop app — that always relaunches
+every locally-configured MCP server fresh.
+
+A cloud/remote Claude session (e.g. Cowork's cloud sandbox) cannot run this
+command itself — it has no access to real processes on the host machine, only
+to files via the device bridge. The command above must be run by a human, or by
+Claude via a tool that has actual host shell access (e.g. Claude Code running
+directly on the machine, not through the cloud device bridge).
