@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const PASSWORD = process.env.APP_PASSWORD ?? "outreach2026";
+const PASSWORD = process.env.APP_PASSWORD;
+if (!PASSWORD) {
+  throw new Error("APP_PASSWORD env var must be set — no default password is allowed.");
+}
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
