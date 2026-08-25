@@ -13,6 +13,14 @@ INSTANTLY_KEYS = {
     "surety_now": INSTANTLY_SURETY_NOW_API_KEY,
 }
 
+# ── Client state ──────────────────────────────────────────────────────────────
+
+_client: dict = {}
+
+def set_client(config: dict) -> None:
+    global _client
+    _client = config
+
 
 def get_campaign_tools():
     return [

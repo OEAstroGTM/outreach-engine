@@ -7,7 +7,7 @@ const MI_API = "https://api.masterinbox.com/api/api-webhook/v1/api";
 const MASTERINBOX_KEY = process.env.MASTERINBOX_API_KEY!;
 const SLACK_WEBHOOK_URL = process.env.SLACK_WEBHOOK_URL!;
 const CRON_SECRET = process.env.CRON_SECRET;
-const DIGEST_SECRET = process.env.DIGEST_SECRET ?? "digest-secret";
+const DIGEST_SECRET = process.env.DIGEST_SECRET;
 
 // Reverse map: masterinboxWsId → display client name
 const WS_TO_CLIENT: Record<number, string> = {};
@@ -171,7 +171,7 @@ export async function GET(req: NextRequest) {
   const authHeader = req.headers.get("authorization");
   const querySecret = req.nextUrl.searchParams.get("secret");
   const validCron = CRON_SECRET && authHeader === `Bearer ${CRON_SECRET}`;
-  const validManual = querySecret === DIGEST_SECRET;
+  const validManual = !!DIGEST_SECRET && querySecret === DIGEST_SECRET;
   if (!validCron && !validManual) {
     return new Response("Unauthorized", { status: 401 });
   }
