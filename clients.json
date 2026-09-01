@@ -238,7 +238,7 @@
     "sequencer": "eb_send",
     "eb_ws_id": 48,
     "eb_send_key_env": "EB_SEND_KEY_CLININTELL",
-    "mi_ws_id": 61,
+    "mi_ws_id": 2858,
     "mi_key_env": "MI_KEY_CLININTELL",
     "inboxing_tags": [
       "clinintell"
