@@ -318,7 +318,9 @@
     "inboxing_tags": [
       "Union Omaha",
       "union"
-    ]
+    ],
+    "eb_send_ws_id": 54,
+    "eb_personal_ws_id": 17
   },
   {
     "name": "Ujet",
