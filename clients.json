@@ -282,7 +282,9 @@
       "Arnon River Partners",
       "Arnon Rivers Partners",
       "ARP"
-    ]
+    ],
+    "status": "churned",
+    "churned_at": "2026-09-01"
   },
   {
     "name": "Campaygn",
