@@ -182,7 +182,9 @@
     "instantly_ws": "simplexity",
     "inboxing_tags": [
       "Simplexity"
-    ]
+    ],
+    "status": "churned",
+    "churned_at": "2026-09-01"
   },
   {
     "name": "Supply Wisdom",
