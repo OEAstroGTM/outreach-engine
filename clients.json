@@ -150,7 +150,9 @@
     "inboxing_tags": [
       "Outreach Engine",
       "outreachengine"
-    ]
+    ],
+    "eb_send_ws_id": 5,
+    "eb_personal_ws_id": 20
   },
   {
     "name": "ParGo",
