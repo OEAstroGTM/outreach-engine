@@ -328,5 +328,15 @@
     "inboxing_tags": [
       "Ujet"
     ]
+  },
+  {
+    "name": "Built Right",
+    "sequencer": "none",
+    "eb_ws_id": null,
+    "mi_ws_id": 1579,
+    "mi_key_env": "MI_KEY_BUILT_RIGHT",
+    "inboxing_tags": [
+      "Built Right"
+    ]
   }
 ]
