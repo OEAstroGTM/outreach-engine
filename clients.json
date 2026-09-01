@@ -279,7 +279,9 @@
     "mi_key_env": null,
     "inboxing_tags": [
       "Private Pargo"
-    ]
+    ],
+    "eb_send_ws_id": 45,
+    "eb_personal_ws_id": 19
   },
   {
     "name": "Arnon River Partners",
