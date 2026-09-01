@@ -8,7 +8,9 @@
     "mi_key_env": "MI_KEY_ASKTURING",
     "inboxing_tags": [
       "AskTuring"
-    ]
+    ],
+    "status": "churned",
+    "churned_at": "2026-09-01"
   },
   {
     "name": "Aunalytics",
