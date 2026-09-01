@@ -338,5 +338,15 @@
     "inboxing_tags": [
       "Built Right"
     ]
+  },
+  {
+    "name": "Geek Power Studios",
+    "sequencer": "none",
+    "eb_ws_id": null,
+    "mi_ws_id": 2698,
+    "mi_key_env": "MI_KEY_GEEK_POWER_STUDIOS",
+    "inboxing_tags": [
+      "Geek Power Studios"
+    ]
   }
 ]
