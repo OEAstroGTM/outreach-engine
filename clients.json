@@ -253,7 +253,9 @@
     "mi_key_env": "MI_KEY_ABRA",
     "inboxing_tags": [
       "Abra"
-    ]
+    ],
+    "eb_send_ws_id": 50,
+    "eb_personal_ws_id": 9
   },
   {
     "name": "Revo.ai",
