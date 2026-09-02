@@ -7,7 +7,9 @@
     "mi_ws_id": 620,
     "mi_key_env": "MI_KEY_ASKTURING",
     "status": "churned",
-    "inboxing_tags": ["AskTuring"]
+    "inboxing_tags": [
+      "AskTuring"
+    ]
   },
   {
     "name": "Aunalytics",
@@ -15,7 +17,9 @@
     "eb_ws_id": null,
     "mi_ws_id": null,
     "mi_key_env": null,
-    "inboxing_tags": ["Aunalytics"]
+    "inboxing_tags": [
+      "Aunalytics"
+    ]
   },
   {
     "name": "Braintracks",
@@ -24,7 +28,9 @@
     "eb_send_key_env": "EB_SEND_KEY_BRAINTRACKS",
     "mi_ws_id": 1073,
     "mi_key_env": "MI_KEY_BRAINTRACKS",
-    "inboxing_tags": ["Braintracks"]
+    "inboxing_tags": [
+      "Braintracks"
+    ]
   },
   {
     "name": "Bravura Technologies",
@@ -33,7 +39,9 @@
     "eb_send_key_env": "EB_SEND_KEY_BRAVURA_TECHNOLOGIES",
     "mi_ws_id": 664,
     "mi_key_env": "MI_KEY_BRAVURA_TECHNOLOGIES",
-    "inboxing_tags": ["Bravura Technologies"]
+    "inboxing_tags": [
+      "Bravura Technologies"
+    ]
   },
   {
     "name": "Chalktalk",
@@ -42,7 +50,9 @@
     "eb_send_key_env": "EB_SEND_KEY_CHALKTALK",
     "mi_ws_id": 355,
     "mi_key_env": "MI_KEY_CHALKTALK",
-    "inboxing_tags": ["Chalktalk"]
+    "inboxing_tags": [
+      "Chalktalk"
+    ]
   },
   {
     "name": "Coffee & Contracts",
@@ -51,7 +61,10 @@
     "eb_personal_key_env": "EB_PERSONAL_KEY_COFFEE_AND_CONTRACTS",
     "mi_ws_id": 58,
     "mi_key_env": "MI_KEY_COFFEE_AND_CONTRACTS",
-    "inboxing_tags": ["Coffee And Contracts", "Coffee and Contracts"]
+    "inboxing_tags": [
+      "Coffee And Contracts",
+      "Coffee and Contracts"
+    ]
   },
   {
     "name": "Dream It Reel",
@@ -60,7 +73,9 @@
     "eb_send_key_env": "EB_SEND_KEY_DREAM_IT_REEL",
     "mi_ws_id": 1077,
     "mi_key_env": "MI_KEY_DREAM_IT_REEL",
-    "inboxing_tags": ["Dream It Reel"]
+    "inboxing_tags": [
+      "Dream It Reel"
+    ]
   },
   {
     "name": "Hubengage",
@@ -69,16 +84,22 @@
     "eb_send_key_env": "EB_SEND_KEY_HUBENGAGE",
     "mi_ws_id": 1076,
     "mi_key_env": "MI_KEY_HUBENGAGE",
-    "inboxing_tags": ["Hubengage"]
+    "inboxing_tags": [
+      "Hubengage"
+    ]
   },
   {
     "name": "Intellectible",
     "sequencer": "eb_send",
     "eb_ws_id": 28,
     "eb_send_key_env": "EB_SEND_KEY_INTELLECTIBLE",
+    "pv_ws_id": "6a79e1077c6a5951cb620fd5",
     "mi_ws_id": 1058,
     "mi_key_env": "MI_KEY_INTELLECTIBLE",
-    "inboxing_tags": ["Intellectible", "intellectible"]
+    "inboxing_tags": [
+      "Intellectible",
+      "intellectible"
+    ]
   },
   {
     "name": "Lend Home Improvements",
@@ -87,7 +108,9 @@
     "eb_personal_key_env": "EB_PERSONAL_KEY_LEND_HOME_IMPROVEMENTS",
     "mi_ws_id": 1074,
     "mi_key_env": "MI_KEY_LEND_HOME_IMPROVEMENTS",
-    "inboxing_tags": ["Lend Home Improvements"]
+    "inboxing_tags": [
+      "Lend Home Improvements"
+    ]
   },
   {
     "name": "Nuvo Bath",
@@ -97,25 +120,38 @@
     "mi_ws_id": 825,
     "mi_key_env": "MI_KEY_NUVO_BATH",
     "status": "churned",
-    "inboxing_tags": ["Nuvo Bath"]
+    "inboxing_tags": [
+      "Nuvo Bath"
+    ]
   },
   {
     "name": "OR Trax",
     "sequencer": "eb_send",
     "eb_ws_id": 23,
     "eb_send_key_env": "EB_SEND_KEY_OR_TRAX",
+    "pv_ws_id": "6a74072efc0a6c4ee4122704",
+    "pv_key_env": "PV_KEY_OR_TRAX",
     "mi_ws_id": 1057,
     "mi_key_env": "MI_KEY_OR_TRAX",
-    "inboxing_tags": ["OR Trax", "ortrax"]
+    "inboxing_tags": [
+      "OR Trax",
+      "ortrax"
+    ]
   },
   {
     "name": "Outreach Engine",
-    "sequencer": "eb_send",
-    "eb_ws_id": 5,
-    "eb_send_key_env": "EB_SEND_KEY_OUTREACH_ENGINE",
+    "sequencer": "eb_personal",
+    "eb_ws_id": 20,
+    "pv_ws_id": "6a725c9094b3cfd96a9e5a22",
     "mi_ws_id": 1013,
     "mi_key_env": "MI_KEY_OUTREACH_ENGINE",
-    "inboxing_tags": ["Outreach Engine", "outreachengine"]
+    "inboxing_tags": [
+      "Outreach Engine",
+      "outreachengine"
+    ],
+    "eb_personal_key_env": "EB_PERSONAL_KEY_OUTREACH_ENGINE",
+    "eb_send_key_env_legacy": "EB_SEND_KEY_OUTREACH_ENGINE",
+    "eb_send_ws_id_legacy": 5
   },
   {
     "name": "ParGo",
@@ -124,16 +160,22 @@
     "eb_send_key_env": "EB_SEND_KEY_PARGO",
     "mi_ws_id": 552,
     "mi_key_env": "MI_KEY_PARGO",
-    "inboxing_tags": ["ParGo", "pargo"]
+    "inboxing_tags": [
+      "ParGo",
+      "pargo"
+    ]
   },
   {
     "name": "Savanti Travel",
     "sequencer": "eb_send",
     "eb_ws_id": 7,
     "eb_send_key_env": "EB_SEND_KEY_SAVANTI_TRAVEL",
+    "pv_ws_id": "6a74aba12db966271dbc98f4",
     "mi_ws_id": 121,
     "mi_key_env": "MI_KEY_SAVANTI_TRAVEL",
-    "inboxing_tags": ["Savanti Travel"]
+    "inboxing_tags": [
+      "Savanti Travel"
+    ]
   },
   {
     "name": "Simplexity",
@@ -143,7 +185,9 @@
     "mi_key_env": "MI_KEY_SIMPLEXITY",
     "instantly_ws": "simplexity",
     "status": "churned",
-    "inboxing_tags": ["Simplexity"]
+    "inboxing_tags": [
+      "Simplexity"
+    ]
   },
   {
     "name": "Supply Wisdom",
@@ -152,7 +196,10 @@
     "mi_ws_id": 1059,
     "mi_key_env": "MI_KEY_SUPPLY_WISDOM",
     "instantly_ws": "supply_wisdom",
-    "inboxing_tags": ["SupplyWisdom"]
+    "pv_ws_id": "6a73946b6f52daf49a4cb2e4",
+    "inboxing_tags": [
+      "SupplyWisdom"
+    ]
   },
   {
     "name": "True Dial",
@@ -161,7 +208,9 @@
     "eb_send_key_env": "EB_SEND_KEY_TRUE_DIAL",
     "mi_ws_id": 56,
     "mi_key_env": "MI_KEY_TRUE_DIAL",
-    "inboxing_tags": ["True Dial"]
+    "inboxing_tags": [
+      "True Dial"
+    ]
   },
   {
     "name": "Westlink",
@@ -171,7 +220,9 @@
     "mi_ws_id": 1049,
     "mi_key_env": "MI_KEY_WESTLINK",
     "status": "churned",
-    "inboxing_tags": ["Westlink"]
+    "inboxing_tags": [
+      "Westlink"
+    ]
   },
   {
     "name": "Carengen",
@@ -181,7 +232,9 @@
     "mi_ws_id": 190,
     "mi_key_env": "MI_KEY_CARENGEN",
     "status": "churned",
-    "inboxing_tags": ["carengen"]
+    "inboxing_tags": [
+      "carengen"
+    ]
   },
   {
     "name": "Clinintell",
@@ -190,7 +243,9 @@
     "eb_send_key_env": "EB_SEND_KEY_CLININTELL",
     "mi_ws_id": 61,
     "mi_key_env": "MI_KEY_CLININTELL",
-    "inboxing_tags": ["clinintell"]
+    "inboxing_tags": [
+      "clinintell"
+    ]
   },
   {
     "name": "Abra",
@@ -199,7 +254,9 @@
     "eb_send_key_env": "EB_SEND_KEY_ABRA",
     "mi_ws_id": 393,
     "mi_key_env": "MI_KEY_ABRA",
-    "inboxing_tags": ["Abra"]
+    "inboxing_tags": [
+      "Abra"
+    ]
   },
   {
     "name": "Revo.ai",
@@ -208,7 +265,9 @@
     "eb_send_key_env": "EB_SEND_KEY_REVO",
     "mi_ws_id": 392,
     "mi_key_env": "MI_KEY_REVO",
-    "inboxing_tags": ["Revo.ai"]
+    "inboxing_tags": [
+      "Revo.ai"
+    ]
   },
   {
     "name": "Private Pargo",
@@ -217,7 +276,9 @@
     "eb_send_key_env": "EB_SEND_KEY_PRIVATE_PARGO",
     "mi_ws_id": null,
     "mi_key_env": null,
-    "inboxing_tags": ["Private Pargo"]
+    "inboxing_tags": [
+      "Private Pargo"
+    ]
   },
   {
     "name": "Arnon River Partners",
@@ -226,7 +287,11 @@
     "eb_send_key_env": "EB_SEND_KEY_ARNON_RIVER_PARTNERS",
     "mi_ws_id": 2020,
     "mi_key_env": "MI_KEY_ARNON_RIVER_PARTNERS",
-    "inboxing_tags": ["Arnon River Partners", "Arnon Rivers Partners", "ARP"]
+    "inboxing_tags": [
+      "Arnon River Partners",
+      "Arnon Rivers Partners",
+      "ARP"
+    ]
   },
   {
     "name": "Campaygn",
@@ -235,7 +300,10 @@
     "eb_send_key_env": "EB_SEND_KEY_CAMPAYGN",
     "mi_ws_id": 1469,
     "mi_key_env": "MI_KEY_CAMPAYGN",
-    "inboxing_tags": ["Campaygn", "CMP"]
+    "inboxing_tags": [
+      "Campaygn",
+      "CMP"
+    ]
   },
   {
     "name": "Union Omaha",
@@ -244,7 +312,10 @@
     "eb_send_key_env": "EB_SEND_KEY_UNION_OMAHA",
     "mi_ws_id": 1470,
     "mi_key_env": "MI_KEY_UNION_OMAHA",
-    "inboxing_tags": ["Union Omaha", "union"]
+    "inboxing_tags": [
+      "Union Omaha",
+      "union"
+    ]
   },
   {
     "name": "Ujet",
@@ -253,6 +324,8 @@
     "eb_send_key_env": "EB_SEND_KEY_UJET",
     "mi_ws_id": 2096,
     "mi_key_env": "MI_KEY_UJET",
-    "inboxing_tags": ["Ujet"]
+    "inboxing_tags": [
+      "Ujet"
+    ]
   }
 ]

@@ -306,18 +306,125 @@ export async function deleteSenderEmail({ instance, sender_email_id }) {
 }
 
 // ── Inbox (MasterInbox) ──────────────────────────────────────────────────────
-export async function listReplies({ client_name, limit, label }) {
-  const body = { page: 1, limit: limit ?? 20 };
-  if (label) body.label = label;
-  return miFetch("POST", "/api/api-webhook/v1/api/get-threads", getClient(client_name), body);
+// The unit here is a PROSPECT, not a thread. /get-prospects lists them,
+// /get-messages returns one prospect's conversation, and labels are applied by
+// numeric label_id from /get-labels.
+//
+// The previous implementation posted to /get-threads, /get-thread and
+// /update-thread — none of which exist; every call 404'd. The working contract
+// is the one in tools/inbox.py, which this now mirrors.
+const MI_API = "/api/api-webhook/v1/api";
+
+function miCheck(res, what) {
+  if (res?.status && res.status !== "success") {
+    throw new Error(`MasterInbox ${what} failed: ${JSON.stringify(res.message ?? res).slice(0, 200)}`);
+  }
+  return res;
 }
 
-export async function getThread({ client_name, thread_id }) {
-  return miFetch("POST", "/api/api-webhook/v1/api/get-thread", getClient(client_name), { thread_id });
+const shapeProspect = p => ({
+  prospect_id: p._id,
+  email: p.email,
+  name: p.name ?? [p.first_name, p.last_name].filter(Boolean).join(" ").trim() ?? null,
+  subject: p.subject ?? null,
+  snippet: String(p.last_message ?? p.body ?? "").replace(/\s+/g, " ").slice(0, 200),
+  labels: p.label_names ?? [],
+  replied: !!p.is_replied,
+  reply_count: p.reply_count ?? 0,
+  last_received_at: p.last_received_at ?? p.time ?? null,
+  deal_status: p.deal_status ?? null,
+  thread_url: p.thread_url ?? null,
+});
+
+export async function listLabels({ client_name }) {
+  const client = getClient(client_name);
+  const r = miCheck(await miFetch("GET", `${MI_API}/get-labels`, client), "get-labels");
+  return (r?.data ?? []).map(l => ({ label_id: l.label_id, name: l.label_name, color: l.label_color }));
 }
 
-export async function tagReply({ client_name, thread_id, label }) {
-  return miFetch("POST", "/api/api-webhook/v1/api/update-thread", getClient(client_name), { thread_id, label });
+// Accept either a numeric label_id or a human label name, and validate it
+// against the client's own label set — label IDs differ per workspace.
+async function resolveLabel(client_name, { label_id, label }) {
+  if (label_id == null && !label) return null;
+  const labels = await listLabels({ client_name });
+  const hit = label_id != null
+    ? labels.find(l => String(l.label_id) === String(label_id))
+    : labels.find(l => l.name.toLowerCase() === String(label).toLowerCase());
+  if (!hit) {
+    throw new Error(
+      `No MasterInbox label ${label_id != null ? `with id ${label_id}` : `named "${label}"`} ` +
+      `for ${client_name}. Available: ${labels.map(l => `${l.name} (${l.label_id})`).join(", ")}`
+    );
+  }
+  return hit;
+}
+
+export async function listReplies({ client_name, label, label_id, search, page, limit, all, max_pages }) {
+  const client  = getClient(client_name);
+  const wanted  = await resolveLabel(client_name, { label_id, label });
+  const perPage = limit ?? 20;
+
+  const fetchPage = async p => miCheck(await miFetch("POST", `${MI_API}/get-prospects`, client, {
+    workspace_id: String(client.mi_ws_id),
+    label_id: wanted?.label_id,
+    search,
+    page: p,
+    limit: perPage,
+  }), "get-prospects");
+
+  const first = await fetchPage(page ?? 1);
+  const total = first?.metadata?.total ?? null;
+  const rows  = [...(first?.data ?? [])];
+  let pagesFetched = 1;
+
+  if (all && total != null) {
+    const cap = Math.min(Math.ceil(total / perPage), max_pages ?? 20);
+    for (let p = (page ?? 1) + 1; p <= cap; p++) {
+      rows.push(...((await fetchPage(p))?.data ?? []));
+      pagesFetched++;
+    }
+  }
+
+  let prospects = rows.map(shapeProspect);
+
+  // observability/README documents that this endpoint ignores label_id, so the
+  // server-side filter cannot be trusted — filter locally as well.
+  if (wanted) {
+    prospects = prospects.filter(p =>
+      (p.labels ?? []).some(n => String(n).toLowerCase() === wanted.name.toLowerCase()));
+  }
+
+  return {
+    client: client.name,
+    workspace_id: client.mi_ws_id,
+    total_in_workspace: total,
+    pages_fetched: pagesFetched,
+    returned: prospects.length,
+    ...(wanted && { filtered_by: { label: wanted.name, label_id: wanted.label_id } }),
+    prospects,
+  };
+}
+
+export async function getThread({ client_name, prospect_id, prospect_email }) {
+  if (!prospect_id && !prospect_email) {
+    throw new Error("get_thread needs prospect_id or prospect_email (both come from list_replies).");
+  }
+  return miCheck(
+    await miFetch("POST", `${MI_API}/get-messages`, getClient(client_name), { prospect_id, prospect_email }),
+    "get-messages"
+  );
+}
+
+export async function tagReply({ client_name, prospect_id, label, label_id }) {
+  if (!prospect_id) throw new Error("tag_reply needs prospect_id (from list_replies).");
+  const wanted = await resolveLabel(client_name, { label_id, label });
+  if (!wanted) throw new Error("tag_reply needs label or label_id — see list_labels.");
+  const res = miCheck(
+    await miFetch("POST", `${MI_API}/add-prospect-label`, getClient(client_name),
+      { prospect_id, label_id: wanted.label_id }),
+    "add-prospect-label"
+  );
+  return { prospect_id, label: wanted.name, label_id: wanted.label_id, response: res };
 }
 
 export async function getInterestedReplies({ client_name } = {}) {
@@ -325,10 +432,8 @@ export async function getInterestedReplies({ client_name } = {}) {
   const results = [];
   for (const client of targets) {
     try {
-      const c = { ...client, mi_pk: MI_KEYS[client.name] };
-      const data = await miFetch("POST", "/api/api-webhook/v1/api/get-threads", c, { page: 1, limit: 50, label: "interested" });
-      const threads = data?.data ?? [];
-      if (threads.length) results.push({ client: client.name, threads });
+      const r = await listReplies({ client_name: client.name, label: "Interested", limit: 50 });
+      if (r.returned) results.push({ client: client.name, count: r.returned, prospects: r.prospects });
     } catch (e) {
       results.push({ client: client.name, error: e.message });
     }

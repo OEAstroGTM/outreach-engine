@@ -1,0 +1,311 @@
+{
+  "652": {
+    "pv_campaign_id": "6a75f9500beeb7c564645dbd",
+    "pv_name": "New infra NET NEW - Jun - b2b Sales",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 1,
+    "adopted": true
+  },
+  "654": {
+    "pv_campaign_id": "6a75f94fdb7f58b581cd3618",
+    "pv_name": "New infra NET NEW - Jun - b2b Marketing",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 1,
+    "adopted": true
+  },
+  "655": {
+    "pv_campaign_id": "6a75f94eb91e73d0dd2e23ba",
+    "pv_name": "SAVED CONTACTS - Jun - B2B Sales",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 1,
+    "adopted": true
+  },
+  "656": {
+    "pv_campaign_id": "6a75f94ed162725bb09f2c6d",
+    "pv_name": "SAVED CONTACTS - Jun - B2B Marketing",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 1,
+    "adopted": true
+  },
+  "675": {
+    "pv_campaign_id": "6a75f94dd162725bb09f2c6c",
+    "pv_name": "  Jun - Outreach Engine - B2B Sales",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 1,
+    "adopted": true
+  },
+  "676": {
+    "pv_campaign_id": "6a75f94c6e958c56a3f77738",
+    "pv_name": "Jun - Outreach Engine - B2B Marketing",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 1,
+    "adopted": true
+  },
+  "678": {
+    "pv_campaign_id": "6a75f94b9f08eb98e6536ed5",
+    "pv_name": "Jun - Outreach Engine - B2B CEO",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 1,
+    "adopted": true
+  },
+  "679": {
+    "pv_campaign_id": "6a75f94bbce4a5f6f98305da",
+    "pv_name": "2 YEAR OLDS - Jun - Outreach Engine - CEO",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 1,
+    "adopted": true
+  },
+  "681": {
+    "pv_campaign_id": "6a75f949db7f58b581cd351d",
+    "pv_name": "2 YEAR OLDS - Jun - Outreach Engine - Marketing",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 1,
+    "adopted": true
+  },
+  "697": {
+    "pv_campaign_id": "6a75f94891cb0a04f9b75e52",
+    "pv_name": "Updated Search 2 YEAR OLDS - Jun - Outreach Engine - Sales",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 1,
+    "adopted": true
+  },
+  "698": {
+    "pv_campaign_id": "6a75f948e8a984102939b24f",
+    "pv_name": "June - Outreach Engine - B2B Sales Leaders - 1 Year",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 1,
+    "adopted": true
+  },
+  "721": {
+    "pv_campaign_id": "6a75f94774835df2d8263c15",
+    "pv_name": "Jun - Outreach Engine - B2B Sales RaaS NetNew",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 0
+  },
+  "722": {
+    "pv_campaign_id": "6a75f947d80eb8df86801c4d",
+    "pv_name": "Jun - Outreach Engine - B2B Marketing RaaS NetNew",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 0
+  },
+  "723": {
+    "pv_campaign_id": "6a75f9469f08eb98e6536ed4",
+    "pv_name": "SAVED CONTACTS - Jun - Outreach Engine - B2B Sales",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 0
+  },
+  "724": {
+    "pv_campaign_id": "6a75f9450beeb7c564645dbc",
+    "pv_name": "SAVED CONTACTS - Jun - Outreach Engine - B2B Marketing",
+    "steps": 3,
+    "variations": 7,
+    "disabled": 2,
+    "adopted": true
+  },
+  "749": {
+    "pv_campaign_id": "6a75f945db7f58b581cd351c",
+    "pv_name": "Jun - Outreach Engine - B2B CEO RaaS NetNew",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 0
+  },
+  "750": {
+    "pv_campaign_id": "6a75f944e8a984102939b154",
+    "pv_name": "SAVED CONTACTS - Jun - Outreach Engine - B2B CEO",
+    "steps": 3,
+    "variations": 7,
+    "disabled": 0
+  },
+  "987": {
+    "pv_campaign_id": "6a75f94478b225f68c373e4a",
+    "pv_name": "2 Jun - Outreach Engine - B2B Sales RaaS NetNew",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 0
+  },
+  "988": {
+    "pv_campaign_id": "6a75f943f982bcaa9524e216",
+    "pv_name": "2 Jun - Outreach Engine - B2B Marketing RaaS NetNew",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 2,
+    "adopted": true
+  },
+  "989": {
+    "pv_campaign_id": "6a75f9426e958c56a3f77737",
+    "pv_name": "2 Jun - Outreach Engine - B2B CEO RaaS NetNew",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 0
+  },
+  "991": {
+    "pv_campaign_id": "6a75f942db7f58b581cd351b",
+    "pv_name": "Jul - Outreach Engine - B2B Marketing RaaS Explorium",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 0
+  },
+  "992": {
+    "pv_campaign_id": "6a75f94174835df2d8263c14",
+    "pv_name": "July - Outreach Engine - B2B Sales Explorium Non Apollo",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 0
+  },
+  "1015": {
+    "pv_campaign_id": "6a75f941b91e73d0dd2e21c5",
+    "pv_name": "Copy of 2 Jun - Outreach Engine - B2B Sales RaaS NetNew",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 0
+  },
+  "1131": {
+    "pv_campaign_id": "6a75f9400beeb7c564645dbb",
+    "pv_name": "28 July - Outreach Engine - B2B Sales RaaS NetNew",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 0
+  },
+  "1132": {
+    "pv_campaign_id": "6a75f9406252a11a4a345b1f",
+    "pv_name": "28 July - Outreach Engine - B2B Marketing RaaS NetNew",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 2,
+    "adopted": true
+  },
+  "1153": {
+    "pv_campaign_id": "6a75f93fa7eba1f1bba7b159",
+    "pv_name": "29 July - Outreach Engine - B2B Sales RaaS NetNew",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 0
+  },
+  "1154": {
+    "pv_campaign_id": "6a75f93e78b225f68c373e49",
+    "pv_name": "29 July - Outreach Engine - B2B Marketing RaaS NetNew",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 2,
+    "adopted": true
+  },
+  "1162": {
+    "pv_campaign_id": "6a75f93e0beeb7c564645dba",
+    "pv_name": "30 July - Outreach Engine - B2B Sales RaaS NetNew",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 0
+  },
+  "1163": {
+    "pv_campaign_id": "6a75f93d6252a11a4a345b1e",
+    "pv_name": "30 July - Outreach Engine - B2B Marketing RaaS NetNew",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 2,
+    "adopted": true
+  },
+  "1166": {
+    "pv_campaign_id": "6a75f93cc04513ee12e6cedc",
+    "pv_name": "SAVED Aug - Outreach Engine - B2B Sales",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 0
+  },
+  "1167": {
+    "pv_campaign_id": "6a75f93c90ed9d1603206772",
+    "pv_name": "SAVED Aug - Outreach Engine - B2B Marketing",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 2,
+    "adopted": true
+  },
+  "1183": {
+    "pv_campaign_id": "6a75f93bbce4a5f6f98303e5",
+    "pv_name": "31 July - Outreach Engine - B2B Marketing RaaS NetNew",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 2,
+    "adopted": true
+  },
+  "1184": {
+    "pv_campaign_id": "6a75f93bbce4a5f6f98303e4",
+    "pv_name": "31 July - Outreach Engine - B2B Sales RaaS NetNew",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 0
+  },
+  "1217": {
+    "pv_campaign_id": "6a75f93ae8a984102939b059",
+    "pv_name": "8/3 SAVED Aug - Outreach Engine - B2B Sales List 2",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 0
+  },
+  "1218": {
+    "pv_campaign_id": "6a75f939c04513ee12e6cedb",
+    "pv_name": "8/3 SAVED Aug - Outreach Engine - B2B Marketing List 2",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 2,
+    "adopted": true
+  },
+  "1223": {
+    "pv_campaign_id": "6a75f9389f08eb98e6536cdf",
+    "pv_name": "8/4 SAVED Aug - Outreach Engine - B2B Marketing List 3",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 2,
+    "adopted": true
+  },
+  "1224": {
+    "pv_campaign_id": "6a75f9386e958c56a3f7763c",
+    "pv_name": "8/4 SAVED Aug - Outreach Engine - B2B Sales List 3",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 0
+  },
+  "1227": {
+    "pv_campaign_id": "6a75f93790ed9d1603206771",
+    "pv_name": "4 Aug - Outreach Engine - B2B Sales RaaS NetNew",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 0
+  },
+  "1229": {
+    "pv_campaign_id": "6a75f9370beeb7c564645db8",
+    "pv_name": "4 Aug - Outreach Engine - B2B Marketing RaaS NetNew",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 2,
+    "adopted": true
+  },
+  "1251": {
+    "pv_campaign_id": "6a75f93690ed9d1603206770",
+    "pv_name": "5 Aug - Outreach Engine - B2B Sales RaaS NetNew",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 0
+  },
+  "1252": {
+    "pv_campaign_id": "6a75f935f982bcaa9524e119",
+    "pv_name": "5 Aug - Outreach Engine - B2B Marketing RaaS NetNew",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 2,
+    "adopted": true
+  }
+}

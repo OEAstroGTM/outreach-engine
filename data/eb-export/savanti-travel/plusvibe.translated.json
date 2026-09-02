@@ -1,0 +1,440 @@
+[
+  {
+    "source_campaign_id": 1263,
+    "camp_name": "Updated Copy August - Savanti - SaaS Lookalike",
+    "first_wait_time": null,
+    "sequences": [
+      {
+        "step": 1,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "{{first_name}}",
+            "name": "",
+            "body": "<p>{{random|Hi|Hey|Hello}} {{first_name}}, </p><p><span style=\"font-size:14px;\"><br></span></p><p><span style=\"font-size:14px;\">{{random|Thought this might be relevant if you travel often for work.|Wanted to put this on your radar if you're frequently on the road.|Figured this may be worth sharing if business travel is a regular part of your schedule.}}</span></p><p><span style=\"font-size:14px;\"><br></span></p><p><span style=\"font-size:14px;\">{{random|Savanti|Savanti Travel|The team at Savanti}} helps members access premium hotel treatment that's normally reserved for elite loyalty members and invitation-only travel programs.</span></p><p><span style=\"font-size:14px;\"><br></span></p><p><span style=\"font-size:14px;\">{{random|Receive an exclusive hotel upgrade within your first 30 days, or your next month is free.|If you don't receive an exclusive upgrade in your first 30 days, we'll cover your next month.|No exclusive hotel upgrade in the first 30 days? Your next month is on us.}}</span></p><p><span style=\"font-size:14px;\"><br></span></p><p><span style=\"font-size:14px;\">{{random|Open to learning more?|Worth a brief conversation?|Interested in seeing how it works?}}<br><br></span></p><p dir=\"ltr\"><span style=\"font-size:14px;\">{{random|Thanks|Cheers|Appreciate it}},</span></p><p dir=\"ltr\"><span style=\"font-size:14px;\">{{sender_first_name}}  </span></p><p dir=\"ltr\"><span style=\"font-size:14px;\">{{random|Member Experience Director|Executive Travel Advisor|Client Experience Lead}}</span></p><p dir=\"ltr\"><span style=\"font-size:14px;\">Savanti Travel</span></p>",
+            "_eb_step_id": 6365,
+            "_eb_subject": "{FIRST_NAME}",
+            "_eb_active": true
+          },
+          {
+            "variation": "B",
+            "subject": "{{first_name}}",
+            "name": "",
+            "body": "<p>Hi {{first_name}},</p><p><br></p><p>I wanted to reach out to you and invite you personally because your background in the {{industry}} industry fits exactly who we welcome into our Elite Executive Travel program.<br><br>Savanti offers exclusive access luxury travel benefits not available to the public or on the internet.</p><p><br></p><p>Clients travel with elevated status and insider advantages few ever see.</p><p><br></p><p>If you don't get an exclusive upgrade in 30 days there's no cost to continue.</p><p dir=\"ltr\">Open to a quick call to learn more?</p><p dir=\"ltr\">{{sender_first_name}}  </p><p dir=\"ltr\">{{random|Head of Growth|Director of Growth|Growth Lead}}  </p><p dir=\"ltr\">Savanti Travel</p>",
+            "_eb_step_id": 6368,
+            "_eb_subject": "{FIRST_NAME}",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          },
+          {
+            "variation": "C",
+            "subject": "{{first_name}}",
+            "name": "",
+            "body": "<p>{{random|Hi|Hey|Hello}} {{first_name}}, </p><p><br></p><p>{{random|Most hotel stays look the same, even for frequent travelers.|Many frequent travelers never receive the recognition they should.|Business travel doesn't always come with the perks you'd expect.|Frequent travelers often leave valuable hotel benefits on the table.}}</p><p><br></p><p>{{random|Savanti Travel|Savanti|Our team at Savanti}} helps members receive upgrades, VIP recognition, and preferred treatment without waiting years to earn elite status.</p><p><br></p><p>{{random|Your membership should pay off quickly. If an exclusive upgrade isn't secured within 30 days, your next month is free.|If we don't secure an exclusive hotel upgrade within your first 30 days, your next month is on us.|Receive an exclusive hotel upgrade within 30 days, or your next month is free.}}</p><p><br></p><p>{{random|Would this be worth exploring?|Interested in hearing more?|Open to a brief conversation?}}</p><p><br></p><p dir=\"ltr\">{{random|Thanks|Cheers|Appreciate it}},</p><p dir=\"ltr\">{{sender_first_name}}  </p><p dir=\"ltr\">{{random|Member Experience Director|Executive Travel Advisor|Client Experience Lead}}</p><p dir=\"ltr\">Savanti Travel</p>",
+            "_eb_step_id": 6369,
+            "_eb_subject": "{FIRST_NAME}",
+            "_eb_active": true
+          },
+          {
+            "variation": "D",
+            "subject": "for {{first_name}}",
+            "name": "",
+            "body": "<p>{{random|Hi|Hey|Hello}} {{first_name}}, </p><p><span style=\"font-size:14px;\"><br style=\"border:0px solid;margin:0px;padding:0px;\"></span></p><p><span style=\"font-size:14px;\">{{random|Elite-level hotel treatment usually comes after years of loyalty.|The best hotel perks aren't typically available through standard bookings.|Most travelers don't realize how many premium hotel benefits they never see.|Hotel loyalty programs don't always reward travelers as quickly as they'd like.}}</span></p><p><span style=\"font-size:14px;\"><br></span></p><p><span style=\"font-size:14px;\">{{random|Savanti|Savanti Travel}} helps members unlock upgrades, preferred treatment, and VIP recognition from the start.</span></p><p><span style=\"font-size:14px;\"><br></span></p><p><span style=\"font-size:14px;\">{{random|Every membership includes a simple guarantee: receive an exclusive hotel upgrade within 30 days, or your next month is free.|No exclusive hotel upgrade within your first 30 days? We'll give you your next month free.|Join with confidence. If you don't receive an exclusive hotel upgrade in your first 30 days, your next month is on us.}}</span></p><p><span style=\"font-size:14px;\"><br></span></p><p><span style=\"font-size:14px;\">{{random|Interested in learning more?|Worth a conversation?|Should I send over the details?}}<br><br></span></p><p dir=\"ltr\"><span style=\"font-size:14px;\">{{random|Thanks|Cheers|Appreciate it}},</span></p><p dir=\"ltr\"><span style=\"font-size:14px;\">{{sender_first_name}}  </span></p><p dir=\"ltr\"><span style=\"font-size:14px;\">{{random|Member Experience Director|Executive Travel Advisor|Client Experience Lead}}</span></p><p dir=\"ltr\"><span style=\"font-size:14px;\">Savanti Travel</span></p>",
+            "_eb_step_id": 6370,
+            "_eb_subject": "for {FIRST_NAME}",
+            "_eb_active": true
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "wait_time": 2,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p><span style=\"font-size:14px;\">{{random|Hi|Hey|Hello}} {{first_name}},<br><br></span></p><p><span style=\"font-size:14px;\">{{random|Following up in case my last note got lost somewhere between the family detours in National Lampoon's Vacation.|Just checking back in case this disappeared during the airport chaos in Home Alone 2.|Circling back before this gets buried somewhere between the missed plans in The Hangover.|Following up in case this got rerouted during another vacation mishap in Just Go with It.}}</span></p><p><span style=\"font-size:14px;\"><br></span></p><p><span style=\"font-size:14px;\">Savanti helps frequent travelers enjoy upgrades, VIP recognition, and exclusive hotel benefits that typically aren't available through public booking channels.</span></p><p><span style=\"font-size:14px;\"><br></span></p><p><span style=\"font-size:14px;\">{{random|Still covered by our 30-day upgrade guarantee. No exclusive upgrade means your next month is free.|The same promise applies after you join: if an exclusive hotel upgrade isn't secured within 30 days, your next month is on us.|Every membership includes our 30-day guarantee. No exclusive upgrade? Your next month is free.|If we don't secure an exclusive hotel upgrade within your first 30 days, we'll cover your next month.}}</span></p><p><span style=\"font-size:14px;\"><br></span></p><p><span style=\"font-size:14px;\">{{random|Open to a brief conversation?|Interested in hearing more?|Worth exploring?|Should I send over the details?}}</span></p><p><span style=\"font-size:14px;\"><br></span></p><p dir=\"ltr\"><span style=\"font-size:14px;\">{{random|Thanks|Cheers|Appreciate it}},</span></p><p dir=\"ltr\"><span style=\"font-size:14px;\">{{sender_first_name}}  </span></p><p dir=\"ltr\"><span style=\"font-size:14px;\">{{random|Member Experience Director|Executive Travel Advisor|Client Experience Lead}}</span></p><p dir=\"ltr\"><span style=\"font-size:14px;\">Savanti Travel</span></p><p><br></p>",
+            "_eb_step_id": 6366,
+            "_eb_subject": "Re: {FIRST_NAME}",
+            "_eb_active": true
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p>{{random|Hi|Hey|Hello}} {{first_name}}, </p><p><br></p><p>Wanted to reach out one last time.</p><p><br></p><p>If premium hotel treatment and exclusive travel perks are relevant for you, <a href=\"https://savvycal.com/savantivip/savanti-vip?d=30&amp;sid=45b003b0-a06a-461c-b424-a32cab032500&amp;from=2026-07-12\" style=\"font-size:14px;\">you can grab a time here</a>.</p><p><br></p><p>{{random|If you're the right person, I'd be happy to show you how it works.|If this falls under your area, I'd be glad to walk you through it.|If travel benefits are something you look after, I'd be happy to share more.}}</p><p><br></p><p>{{random|If not, no worries. I'll disappear like a suitcase in The Terminal.|If not, all good. I'll be on my way like Ryan Bingham in Up in the Air.|If this misses the mark, I'll vanish faster than a backpacker in EuroTrip.}}</p><p><br></p><p dir=\"ltr\">{{random|Thanks|Cheers|Appreciate it}},</p><p dir=\"ltr\">{{sender_first_name}}  </p><p dir=\"ltr\">{{random|Member Experience Director|Executive Travel Advisor|Client Experience Lead}}</p><p dir=\"ltr\">Savanti Travel</p><p><br></p>",
+            "_eb_step_id": 6367,
+            "_eb_subject": "Re: Re: {FIRST_NAME}",
+            "_eb_active": true
+          }
+        ]
+      }
+    ],
+    "disable_variations": [],
+    "settings": {
+      "send_as_txt": "yes",
+      "is_emailopened_tracking": "no",
+      "is_unsubscribed_link": "no",
+      "stop_on_lead_replied": "yes",
+      "var_sel_type": "R_ROBIN"
+    },
+    "compat": {
+      "spintax_double": 5,
+      "spintax_single": 28,
+      "merge_tags": [
+        "{FIRST_NAME}",
+        "{INDUSTRY}",
+        "{SENDER_FULL_NAME}"
+      ],
+      "stale_calendly_month": 0
+    },
+    "_orphan_step_ids": [],
+    "_inferred_attachments": 1,
+    "_step_count_eb": 6,
+    "_variation_count_pv": 6
+  },
+  {
+    "source_campaign_id": 1203,
+    "camp_name": "August - Savanti - SaaS Lookalike",
+    "first_wait_time": null,
+    "sequences": [
+      {
+        "step": 1,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "{{first_name}}",
+            "name": "",
+            "body": "<p>Hi {{first_name}},</p><p><br></p><p>Reaching out because we recently opened this to a select group of executives in the {{industry}} industry.</p><p><br></p><p>Savanti helps members access the kind of travel treatment that usually comes from years of loyalty or invitation-only programs.</p><p><br></p><p>Think room upgrades, VIP recognition, preferred treatment, and access most travelers never know exists.</p><p><br></p><p>If you don't receive an exclusive upgrade within your first 30 days, there's no cost to continue.</p><p><br></p><p>Open to a quick conversation?<br><br></p><p dir=\"ltr\">{{random|Thanks|Cheers|Appreciate it}},</p><p dir=\"ltr\">{{sender_first_name}}  </p><p dir=\"ltr\">{{random|Head of Growth|Director of Growth|Growth Lead}}  </p><p dir=\"ltr\">Savanti Travel</p>",
+            "_eb_step_id": 6028,
+            "_eb_subject": "{FIRST_NAME}",
+            "_eb_active": true
+          },
+          {
+            "variation": "B",
+            "subject": "{{first_name}}",
+            "name": "",
+            "body": "<p>Hi {{first_name}},</p><p><br></p><p>I wanted to reach out to you and invite you personally because your background in the {{industry}} industry fits exactly who we welcome into our Elite Executive Travel program.<br><br>Savanti offers exclusive access luxury travel benefits not available to the public or on the internet.</p><p><br></p><p>Clients travel with elevated status and insider advantages few ever see.</p><p><br></p><p>If you don't get an exclusive upgrade in 30 days there's no cost to continue.</p><p dir=\"ltr\">Open to a quick call to learn more?</p><p dir=\"ltr\">{{sender_first_name}}  </p><p dir=\"ltr\">{{random|Head of Growth|Director of Growth|Growth Lead}}  </p><p dir=\"ltr\">Savanti Travel</p>",
+            "_eb_step_id": 6031,
+            "_eb_subject": "{FIRST_NAME}",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "wait_time": 2,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p>{{random|Hi|Hey|Hello}} {{first_name}}, <br><br>{{random|Following up in case my last note got delayed somewhere between flights and founder calls|Just bumping this in case it got stuck at the gate between meetings|Circling back before this gets lost like luggage on a packed travel week|Following up in case this landed while you were between airports and back-to-back calls|Just checking back in case my last note got rerouted during a busy travel day}}.</p><p><br></p><p>Savanti is built for people who travel often enough to appreciate the difference between booking a trip and being recognized when they arrive.</p><p><br></p><p>Members gain access to benefits, upgrades, and preferred treatment that typically aren't available through public booking channels.</p><p><br></p><p>Worth a quick conversation?</p><p><br></p><p dir=\"ltr\">{{random|Thanks|Cheers|Appreciate it}},</p><p>{{sender_first_name}}  </p><p>{{random|Head of Growth|Director of Growth|Growth Lead|Outbound Lead|GTM Strategy Lead|Revenue Growth Manager}}  </p><p>Savanti</p><p><br></p>",
+            "_eb_step_id": 6029,
+            "_eb_subject": "Re: {FIRST_NAME}",
+            "_eb_active": true
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p>{{random|Hi|Hey|Hello}} {{first_name}}, </p><p><br></p><p>Wanted to reach out one last time.</p><p><br></p><p>Is this something you'd want when you travel?</p><p><br></p><p><a href=\"https://savvycal.com/savantivip/savanti-vip?d=30&amp;sid=45b003b0-a06a-461c-b424-a32cab032500&amp;from=2026-07-12\" style=\"font-size:14px;\">If so, you can grab a quick time here.</a></p><p><br></p><p>{{random|If not, all good, I'll disappear like a suitcase in The Terminal.|If this isn't relevant, I'll be on my way like George Clooney after another flight in Up in the Air.|If this misses the mark, I'll vanish faster than a tourist chasing a train in EuroTrip.}}</p><p><br></p><p dir=\"ltr\">{{random|Thanks|Cheers|Appreciate it}},</p><p>{{random|Head of Growth|Director of Growth|Growth Lead|Outbound Lead|GTM Strategy Lead|Revenue Growth Manager}}  </p><p>Savanti</p><p><br></p>",
+            "_eb_step_id": 6030,
+            "_eb_subject": "Re: Re: {FIRST_NAME}",
+            "_eb_active": true
+          }
+        ]
+      }
+    ],
+    "disable_variations": [],
+    "settings": {
+      "send_as_txt": "yes",
+      "is_emailopened_tracking": "no",
+      "is_unsubscribed_link": "no",
+      "stop_on_lead_replied": "yes",
+      "var_sel_type": "R_ROBIN"
+    },
+    "compat": {
+      "spintax_double": 3,
+      "spintax_single": 8,
+      "merge_tags": [
+        "{FIRST_NAME}",
+        "{INDUSTRY}",
+        "{SENDER_FULL_NAME}"
+      ],
+      "stale_calendly_month": 0
+    },
+    "_orphan_step_ids": [],
+    "_inferred_attachments": 1,
+    "_step_count_eb": 4,
+    "_variation_count_pv": 4
+  },
+  {
+    "source_campaign_id": 924,
+    "camp_name": "July- Savanti Lookalike Real Estate [Hospital]",
+    "first_wait_time": null,
+    "sequences": [
+      {
+        "step": 1,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "{{first_name}}",
+            "name": "",
+            "body": "<p>Hi {{first_name}},</p><p><br></p><p>Reaching out because we recently opened this to a select group of executives in {{industry}} industry.</p><p><br></p><p>Savanti helps members access the kind of travel treatment that usually comes from years of loyalty or invitation-only programs.</p><p><br></p><p>Think room upgrades, VIP recognition, preferred treatment, and access most travelers never know exists.</p><p><br></p><p>If you don't receive an exclusive upgrade within your first 30 days, there's no cost to continue.</p><p><br></p><p>Open to a quick conversation?</p><p dir=\"ltr\">{{sender_first_name}}  </p><p dir=\"ltr\">{{random|Head of Growth|Director of Growth|Growth Lead}}  </p><p dir=\"ltr\">Savanti Travel</p>",
+            "_eb_step_id": 4648,
+            "_eb_subject": "{FIRST_NAME}",
+            "_eb_active": true
+          },
+          {
+            "variation": "B",
+            "subject": "{{first_name}}",
+            "name": "",
+            "body": "<p>Hi {{first_name}},</p><p><br></p><p>I wanted to reach out to you and invite you personally because your background in the {{industry}} industry fits exactly who we welcome into our Elite Executive Travel program.<br><br>Savanti offers exclusive access luxury travel benefits not available to the public or on the internet.</p><p><br></p><p>Clients travel with elevated status and insider advantages few ever see.</p><p><br></p><p>If you don't get an exclusive upgrade in 30 days there's no cost to continue.</p><p dir=\"ltr\">Open to a quick call to learn more?</p><p dir=\"ltr\">{{sender_first_name}}  </p><p dir=\"ltr\">{{random|Head of Growth|Director of Growth|Growth Lead}}  </p><p dir=\"ltr\">Savanti Travel</p>",
+            "_eb_step_id": 4651,
+            "_eb_subject": "{FIRST_NAME}",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "wait_time": 2,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p>{{random|Hi|Hey|Hello}} {{first_name}}, following up in case my last note got buried somewhere between flight delays and unread emails.</p><p><br></p><p>Savanti is built for people who travel often enough to appreciate the difference between booking a trip and being recognized when they arrive.</p><p><br></p><p>Members gain access to benefits, upgrades, and preferred treatment that typically aren't available through public booking channels.</p><p><br></p><p>Worth a quick conversation?</p><p><br></p><p>{{sender_first_name}}  </p><p>{{random|Head of Growth|Director of Growth|Growth Lead|Outbound Lead|GTM Strategy Lead|Revenue Growth Manager}}  </p><p>Savanti</p><p><br></p>",
+            "_eb_step_id": 4649,
+            "_eb_subject": "Re: {FIRST_NAME}",
+            "_eb_active": true
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p>{{random|Hi|Hey|Hello}} {{first_name}}, </p><p><br></p><p>Wanted to reach out one last time.</p><p><br></p><p>Is this something you'd want when you travel?<br><br></p><p>{{random|If not, all good, I'll disappear like a suitcase in The Terminal.|If this isn't relevant, I'll be on my way like George Clooney after another flight in Up in the Air.|If this misses the mark, I'll vanish faster than a tourist chasing a train in EuroTrip.}}</p><p><br></p><p>{{sender_first_name}}  </p><p>{{random|Head of Growth|Director of Growth|Growth Lead|Outbound Lead|GTM Strategy Lead|Revenue Growth Manager}}  </p><p>Savanti</p><p><br></p>",
+            "_eb_step_id": 4650,
+            "_eb_subject": "Re: Re: {FIRST_NAME}",
+            "_eb_active": true
+          }
+        ]
+      }
+    ],
+    "disable_variations": [],
+    "settings": {
+      "send_as_txt": "yes",
+      "is_emailopened_tracking": "no",
+      "is_unsubscribed_link": "no",
+      "stop_on_lead_replied": "yes",
+      "var_sel_type": "R_ROBIN"
+    },
+    "compat": {
+      "spintax_double": 0,
+      "spintax_single": 7,
+      "merge_tags": [
+        "{FIRST_NAME}",
+        "{INDUSTRY}",
+        "{SENDER_FULL_NAME}"
+      ],
+      "stale_calendly_month": 0
+    },
+    "_orphan_step_ids": [],
+    "_inferred_attachments": 1,
+    "_step_count_eb": 4,
+    "_variation_count_pv": 4
+  },
+  {
+    "source_campaign_id": 797,
+    "camp_name": "July- Savanti Lookalike Real Estate",
+    "first_wait_time": null,
+    "sequences": [
+      {
+        "step": 1,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "{{first_name}}",
+            "name": "",
+            "body": "<p>Hi {{first_name}},</p><p><br></p><p>Reaching out because we recently opened this to a select group of executives in {{industry}} industry.</p><p><br></p><p>Savanti helps members access the kind of travel treatment that usually comes from years of loyalty or invitation-only programs.</p><p><br></p><p>Think room upgrades, VIP recognition, preferred treatment, and access most travelers never know exists.</p><p><br></p><p>If you don't receive an exclusive upgrade within your first 30 days, there's no cost to continue.</p><p><br></p><p>Open to a quick conversation?</p><p dir=\"ltr\">{{sender_first_name}}  </p><p dir=\"ltr\">{{random|Head of Growth|Director of Growth|Growth Lead}}  </p><p dir=\"ltr\">Savanti Travel</p>",
+            "_eb_step_id": 4113,
+            "_eb_subject": "{FIRST_NAME}",
+            "_eb_active": true
+          },
+          {
+            "variation": "B",
+            "subject": "{{first_name}}",
+            "name": "",
+            "body": "<p>Hi {{first_name}},</p><p><br></p><p>I wanted to reach out to you and invite you personally because your background in the {{industry}} industry fits exactly who we welcome into our Elite Executive Travel program.<br><br>Savanti offers exclusive access luxury travel benefits not available to the public or on the internet.</p><p><br></p><p>Clients travel with elevated status and insider advantages few ever see.</p><p><br></p><p>If you don't get an exclusive upgrade in 30 days there's no cost to continue.</p><p dir=\"ltr\">Open to a quick call to learn more?</p><p dir=\"ltr\">{{sender_first_name}}  </p><p dir=\"ltr\">{{random|Head of Growth|Director of Growth|Growth Lead}}  </p><p dir=\"ltr\">Savanti Travel</p>",
+            "_eb_step_id": 4116,
+            "_eb_subject": "{FIRST_NAME}",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "wait_time": 2,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p>{{random|Hi|Hey|Hello}} {{first_name}}, following up in case my last note got buried somewhere between flight delays and unread emails.</p><p><br></p><p>Savanti is built for people who travel often enough to appreciate the difference between booking a trip and being recognized when they arrive.</p><p><br></p><p>Members gain access to benefits, upgrades, and preferred treatment that typically aren't available through public booking channels.</p><p><br></p><p>Worth a quick conversation?</p><p><br></p><p>{{sender_first_name}}  </p><p>{{random|Head of Growth|Director of Growth|Growth Lead|Outbound Lead|GTM Strategy Lead|Revenue Growth Manager}}  </p><p>Savanti</p><p><br></p>",
+            "_eb_step_id": 4114,
+            "_eb_subject": "Re: {FIRST_NAME}",
+            "_eb_active": true
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p>{{random|Hi|Hey|Hello}} {{first_name}}, </p><p><br></p><p>Wanted to reach out one last time.</p><p><br></p><p>Is this something you'd want when you travel?<br><br></p><p>{{random|If not, all good, I'll disappear like a suitcase in The Terminal.|If this isn't relevant, I'll be on my way like George Clooney after another flight in Up in the Air.|If this misses the mark, I'll vanish faster than a tourist chasing a train in EuroTrip.}}</p><p><br></p><p>{{sender_first_name}}  </p><p>{{random|Head of Growth|Director of Growth|Growth Lead|Outbound Lead|GTM Strategy Lead|Revenue Growth Manager}}  </p><p>Savanti</p><p><br></p>",
+            "_eb_step_id": 4115,
+            "_eb_subject": "Re: Re: {FIRST_NAME}",
+            "_eb_active": true
+          }
+        ]
+      }
+    ],
+    "disable_variations": [],
+    "settings": {
+      "send_as_txt": "yes",
+      "is_emailopened_tracking": "no",
+      "is_unsubscribed_link": "no",
+      "stop_on_lead_replied": "yes",
+      "var_sel_type": "R_ROBIN"
+    },
+    "compat": {
+      "spintax_double": 0,
+      "spintax_single": 7,
+      "merge_tags": [
+        "{FIRST_NAME}",
+        "{INDUSTRY}",
+        "{SENDER_FULL_NAME}"
+      ],
+      "stale_calendly_month": 0
+    },
+    "_orphan_step_ids": [],
+    "_inferred_attachments": 1,
+    "_step_count_eb": 4,
+    "_variation_count_pv": 4
+  },
+  {
+    "source_campaign_id": 771,
+    "camp_name": "New Copy July Apollo+Clay Savanti Lookalike VC New Search Wndr / Caffeinated",
+    "first_wait_time": null,
+    "sequences": [
+      {
+        "step": 1,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "{{first_name}}",
+            "name": "",
+            "body": "<p>Hi {{first_name}},</p><p><br></p><p>Reaching out because we recently opened this to a select group of executives in {{industry}} industry.</p><p><br></p><p>Savanti helps members access the kind of travel treatment that usually comes from years of loyalty or invitation-only programs.</p><p><br></p><p>Think room upgrades, VIP recognition, preferred treatment, and access most travelers never know exists.</p><p><br></p><p>If you don't receive an exclusive upgrade within your first 30 days, there's no cost to continue.</p><p><br></p><p>Open to a quick conversation?</p><p dir=\"ltr\">{{sender_first_name}}  </p><p dir=\"ltr\">{{random|Head of Growth|Director of Growth|Growth Lead}}  </p><p dir=\"ltr\">Savanti Travel</p>",
+            "_eb_step_id": 3990,
+            "_eb_subject": "{FIRST_NAME}",
+            "_eb_active": true
+          },
+          {
+            "variation": "B",
+            "subject": "{{first_name}}",
+            "name": "",
+            "body": "<p>Hi {{first_name}},</p><p><br></p><p>I wanted to reach out to you and invite you personally because your background in the {{industry}} industry fits exactly who we welcome into our Elite Executive Travel program.<br><br>Savanti offers exclusive access luxury travel benefits not available to the public or on the internet.</p><p><br></p><p>Clients travel with elevated status and insider advantages few ever see.</p><p><br></p><p>If you don't get an exclusive upgrade in 30 days there's no cost to continue.</p><p dir=\"ltr\">Open to a quick call to learn more?</p><p dir=\"ltr\">{{sender_first_name}}  </p><p dir=\"ltr\">{{random|Head of Growth|Director of Growth|Growth Lead}}  </p><p dir=\"ltr\">Savanti Travel</p>",
+            "_eb_step_id": 3993,
+            "_eb_subject": "{FIRST_NAME}",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "wait_time": 2,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p>{{random|Hi|Hey|Hello}} {{first_name}}, following up in case my last note got buried somewhere between flight delays and unread emails.</p><p><br></p><p>Savanti is built for people who travel often enough to appreciate the difference between booking a trip and being recognized when they arrive.</p><p><br></p><p>Members gain access to benefits, upgrades, and preferred treatment that typically aren't available through public booking channels.</p><p><br></p><p>Worth a quick conversation?</p><p><br></p><p>{{sender_first_name}}  </p><p>{{random|Head of Growth|Director of Growth|Growth Lead|Outbound Lead|GTM Strategy Lead|Revenue Growth Manager}}  </p><p>Savanti</p><p><br></p>",
+            "_eb_step_id": 3991,
+            "_eb_subject": "Re: {FIRST_NAME}",
+            "_eb_active": true
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p><span style=\"font-size:14px;\">{{random|Hi|Hey|Hello}} {{first_name}}, </span></p><p><span style=\"font-size:14px;\"><br></span></p><p>Wanted to reach out one last time.</p><p><br></p><p>Is this something you'd want when you travel?<br><br></p><p>{{random|If not, all good, I'll disappear like a suitcase in The Terminal.|If this isn't relevant, I'll be on my way like George Clooney after another flight in Up in the Air.|If this misses the mark, I'll vanish faster than a tourist chasing a train in EuroTrip.}}</p><p><span style=\"font-size:14px;\"><br></span></p><p><span style=\"font-size:14px;\">{{sender_first_name}}  </span></p><p><span style=\"font-size:14px;\">{{random|Head of Growth|Director of Growth|Growth Lead|Outbound Lead|GTM Strategy Lead|Revenue Growth Manager}}  </span></p><p><span style=\"font-size:14px;\">Savanti</span></p><p><br></p>",
+            "_eb_step_id": 3992,
+            "_eb_subject": "Re: Re: {FIRST_NAME}",
+            "_eb_active": true
+          }
+        ]
+      }
+    ],
+    "disable_variations": [],
+    "settings": {
+      "send_as_txt": "yes",
+      "is_emailopened_tracking": "no",
+      "is_unsubscribed_link": "no",
+      "stop_on_lead_replied": "yes",
+      "var_sel_type": "R_ROBIN"
+    },
+    "compat": {
+      "spintax_double": 0,
+      "spintax_single": 7,
+      "merge_tags": [
+        "{FIRST_NAME}",
+        "{INDUSTRY}",
+        "{SENDER_FULL_NAME}"
+      ],
+      "stale_calendly_month": 0
+    },
+    "_orphan_step_ids": [],
+    "_inferred_attachments": 1,
+    "_step_count_eb": 4,
+    "_variation_count_pv": 4
+  }
+]

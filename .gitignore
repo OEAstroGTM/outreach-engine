@@ -233,3 +233,13 @@ observability/data/baseline-scan.txt
 observability/dashboard/build/
 
 mcp/smoketest.mjs
+
+# DNC reconciler: local ledger + nightly run logs
+data/dnc-ledger.json
+data/dnc-runs.log
+data/launchd.out.log
+data/launchd.err.log
+data/dnc-last-run.json
+mcp/mi-check.mjs
+mcp/label-probe.mjs
+mcp/inboxing-check.mjs

@@ -212,15 +212,59 @@ export async function apolloFetch(path, body) {
   return res.json();
 }
 
-export async function miFetch(method, path, client, body) {
-  const key = client.mi_pk;
-  if (!key) throw new Error(`No MI API key for ${client.name}`);
+export const MI_MASTER_KEY = process.env.MASTERINBOX_API_KEY;
+
+async function miCall(key, method, path, body) {
   const res = await fetch(`${MI_BASE}${path}`, {
     method,
     headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
     body: body ? JSON.stringify(body) : undefined,
   });
   return res.json();
+}
+
+const MI_AUTH_REJECTED = /invalid api credentials|unauthori[sz]ed/i;
+
+// Try the client's workspace-scoped pk_ key first. Several of those keys have
+// been rotated on MasterInbox's side and now return "Invalid API credentials";
+// when that happens, fall back to the account-level key WITH an explicit
+// workspace_id. Verified that the master key honours workspace_id — it returns
+// prospect IDs prefixed with the requested workspace, not a default one.
+//
+// The fallback is deliberately refused when it cannot be scoped, because an
+// unscoped master-key call would hand back some other client's inbox.
+export async function miFetch(method, path, client, body) {
+  const scoped = client.mi_pk;
+
+  if (!scoped && !MI_MASTER_KEY) {
+    throw new Error(
+      `No MasterInbox credentials for ${client.name}: ` +
+      `${client.mi_key_env ?? "mi_key_env"} is not set in .env, and neither is MASTERINBOX_API_KEY.`
+    );
+  }
+
+  if (scoped) {
+    const r = await miCall(scoped, method, path, body);
+    if (!MI_AUTH_REJECTED.test(String(r?.message ?? ""))) return r;
+    if (!MI_MASTER_KEY) return r;
+  }
+
+  if (client.mi_ws_id == null) {
+    throw new Error(
+      `MasterInbox rejected the key for ${client.name} and no mi_ws_id is set in clients.json, ` +
+      `so the master key cannot be scoped safely. Re-issue ${client.mi_key_env ?? "the client key"}.`
+    );
+  }
+
+  if (!body) {
+    throw new Error(
+      `MasterInbox rejected ${client.mi_key_env ?? "the client key"} for ${client.name}. ` +
+      `The master-key fallback needs a request body carrying workspace_id, and ${path} takes none — ` +
+      `re-issue this client's key in MasterInbox.`
+    );
+  }
+
+  return miCall(MI_MASTER_KEY, method, path, { ...body, workspace_id: String(client.mi_ws_id) });
 }
 
 // ── MCP response shapers ─────────────────────────────────────────────────────
