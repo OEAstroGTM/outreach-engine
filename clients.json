@@ -343,7 +343,9 @@
     "mi_key_env": "MI_KEY_BUILT_RIGHT",
     "inboxing_tags": [
       "Built Right"
-    ]
+    ],
+    "eb_personal_ws_id": 11,
+    "eb_personal_key_env": "EB_PERSONAL_KEY_BUILT_RIGHT"
   },
   {
     "name": "Geek Power Studios",
