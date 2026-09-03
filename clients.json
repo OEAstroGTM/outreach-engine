@@ -353,7 +353,9 @@
     "mi_key_env": "MI_KEY_GEEK_POWER_STUDIOS",
     "inboxing_tags": [
       "Geek Power Studios"
-    ]
+    ],
+    "eb_personal_ws_id": 21,
+    "eb_personal_key_env": "EB_PERSONAL_KEY_GEEK_POWER_STUDIOS"
   },
   {
     "name": "Bynd.com",
