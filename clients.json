@@ -354,5 +354,16 @@
     "inboxing_tags": [
       "Geek Power Studios"
     ]
+  },
+  {
+    "name": "Bynd.com",
+    "sequencer": "eb_send",
+    "eb_ws_id": 82,
+    "mi_ws_id": 2907,
+    "mi_key_env": "MI_KEY_BYND_COM",
+    "inboxing_tags": [
+      "bynd"
+    ],
+    "eb_send_key_env": "EB_SEND_KEY_BYND_COM"
   }
 ]
