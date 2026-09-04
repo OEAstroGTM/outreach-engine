@@ -378,8 +378,8 @@
     "name": "Meter.com",
     "sequencer": "eb_send",
     "eb_ws_id": null,
-    "mi_ws_id": null,
-    "mi_key_env": null,
+    "mi_ws_id": 2717,
+    "mi_key_env": "MI_KEY_METER_COM",
     "inboxing_tags": [
       "Meter.com"
     ],
