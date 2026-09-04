@@ -359,7 +359,9 @@
       "Geek Power Studios"
     ],
     "eb_personal_ws_id": 21,
-    "eb_personal_key_env": "EB_PERSONAL_KEY_GEEK_POWER_STUDIOS"
+    "eb_personal_key_env": "EB_PERSONAL_KEY_GEEK_POWER_STUDIOS",
+    "eb_send_ws_id": 221,
+    "eb_send_key_env": "EB_SEND_KEY_GEEK_POWER_STUDIOS"
   },
   {
     "name": "Bynd.com",
