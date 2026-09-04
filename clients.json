@@ -268,7 +268,9 @@
     "mi_key_env": "MI_KEY_REVO",
     "inboxing_tags": [
       "Revo.ai"
-    ]
+    ],
+    "status": "churned",
+    "churned_at": "2026-09-04"
   },
   {
     "name": "Private Pargo",
