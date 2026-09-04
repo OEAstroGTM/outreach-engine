@@ -54,7 +54,9 @@
     "mi_key_env": "MI_KEY_CHALKTALK",
     "inboxing_tags": [
       "Chalktalk"
-    ]
+    ],
+    "status": "churned",
+    "churned_at": "2026-09-04"
   },
   {
     "name": "Coffee & Contracts",
