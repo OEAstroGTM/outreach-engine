@@ -387,5 +387,16 @@
     ],
     "eb_send_ws_id": 225,
     "eb_send_key_env": "EB_SEND_KEY_METER_COM"
+  },
+  {
+    "name": "iShift",
+    "sequencer": "eb_send",
+    "eb_ws_id": 84,
+    "mi_ws_id": 2970,
+    "mi_key_env": "MI_KEY_ISHIFT",
+    "inboxing_tags": [
+      "iShift"
+    ],
+    "eb_send_key_env": "EB_SEND_KEY_ISHIFT"
   }
 ]
