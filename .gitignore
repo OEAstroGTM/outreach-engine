@@ -243,3 +243,8 @@ data/dnc-last-run.json
 mcp/mi-check.mjs
 mcp/label-probe.mjs
 mcp/inboxing-check.mjs
+mcp/cockpit-check.mjs
+mcp/oe-domain-probe.mjs
+
+# pw.sh: raw per-client mailbox roster dumps (names + emails) — PII, never git
+warmup-*.json
