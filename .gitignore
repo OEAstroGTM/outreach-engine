@@ -248,3 +248,6 @@ mcp/oe-domain-probe.mjs
 
 # pw.sh: raw per-client mailbox roster dumps (names + emails) — PII, never git
 warmup-*.json
+
+# Ad-hoc backup files — .env.bak-dnc carried live API keys, never git these
+*.bak-*
