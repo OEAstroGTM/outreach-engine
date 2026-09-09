@@ -10,6 +10,8 @@
 //   PORKBUN_API_KEY, PORKBUN_SECRET_API_KEY
 //   INBOXING_API_KEY, INBOXING_API_BASE_URL
 
+import { cockpitSecret } from "./core.js";
+
 export const INFRA_REGISTRAR = (process.env.INFRA_REGISTRAR || "namesilo").toLowerCase();
 
 // ── NameSilo (GET API, ?type=json, reply.code 300 == success) ────────────────
@@ -149,8 +151,9 @@ const INBOXING_BASE = (process.env.INBOXING_API_BASE_URL || "https://v2.inboxing
 const INBOXING_TIMEOUT_MS = Number(process.env.INBOXING_TIMEOUT_MS || 20000);
 
 async function inboxing(method, path, body) {
-  const key = process.env.INBOXING_API_KEY;
-  if (!key) throw new Error("INBOXING_API_KEY is not set");
+  // Cockpit's keychain (__global__.inboxing) first, then the local env var.
+  const key = cockpitSecret("__global__", "inboxing") ?? process.env.INBOXING_API_KEY;
+  if (!key) throw new Error("No Inboxing credentials: nothing in Cockpit's keychain and INBOXING_API_KEY is not set");
 
   let res;
   try {

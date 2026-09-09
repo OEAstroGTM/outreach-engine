@@ -25,15 +25,87 @@ export const EB_PERSONAL_BASE = "https://personal.outreachenginedashboard.co/api
 export const MI_BASE          = "https://api.masterinbox.com";
 export const APOLLO_THROTTLE_MS = 300;
 
-// ── Keys ───────────────────────────────────────────────────────────────────
-export const APOLLO_KEY     = process.env.APOLLO_API_KEY;
-export const EB_SEND_KEY     = process.env.EMAILBISON_SEND_API_KEY;
-export const EB_PERSONAL_KEY = process.env.EMAILBISON_PERSONAL_API_KEY;
+// ── Cockpit secrets API ──────────────────────────────────────────────────────
+// Cockpit's keychain is the place keys are managed now — notably, keys it
+// creates itself (Add Client's live EmailBison workspace + token provisioning)
+// never land in this repo's .env at all. Per docs/connecting-to-secrets-api.md:
+// fetch once at startup, cache in memory, fall back to env vars, and never let
+// a Cockpit outage take this process down.
+const COCKPIT_URL     = process.env.COCKPIT_URL?.replace(/\/$/, "");
+const COCKPIT_API_KEY = process.env.COCKPIT_API_KEY;
 
-// MasterInbox per-client public keys, derived from clients.json (single source
-// of truth). New clients only need a clients.json edit — never a code change.
+async function loadCockpitSecrets() {
+  if (!COCKPIT_URL || !COCKPIT_API_KEY) return {};
+  try {
+    const headers = { "x-api-key": COCKPIT_API_KEY };
+    // Vercel Deployment Protection sits in front of the app and answers with an
+    // SSO page before Cockpit ever sees the request. This token lets automated
+    // callers through without disabling protection for humans.
+    if (process.env.COCKPIT_VERCEL_BYPASS) {
+      headers["x-vercel-protection-bypass"] = process.env.COCKPIT_VERCEL_BYPASS;
+      headers["x-vercel-set-bypass-cookie"] = "false";
+    }
+    const res = await fetch(`${COCKPIT_URL}/api/secrets`, {
+      headers,
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!res.ok) {
+      const hint = res.status === 403 ? " (key has no secret_scopes — check /api-keys)"
+                 : res.status === 401 ? " (key missing, invalid, or revoked)" : "";
+      throw new Error(`HTTP ${res.status}${hint}`);
+    }
+    const text = await res.text();
+    if (text.trimStart().startsWith("<")) {
+      // A 200 carrying HTML means something in front of the app answered — on
+      // Vercel that's Deployment Protection serving an SSO page. The API key is
+      // irrelevant here; the request never reached Cockpit.
+      throw new Error(
+        `${COCKPIT_URL} returned HTML, not JSON — the request is being intercepted before it ` +
+        `reaches Cockpit (on Vercel this is Deployment Protection on a preview deployment). ` +
+        `Use the production URL, disable protection, or set a bypass token.`
+      );
+    }
+    const { secrets } = JSON.parse(text);
+    return secrets ?? {};
+  } catch (e) {
+    // stderr only — stdout is the MCP stdio channel and must stay clean.
+    console.error(`[cockpit] /api/secrets failed, falling back to .env: ${e.message}`);
+    return {};
+  }
+}
+
+export const COCKPIT_SECRETS = await loadCockpitSecrets();
+
+const slugify = n => String(n).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+// Cockpit keys its response by client_name; its own examples look slugified, so
+// accept either rather than silently missing every lookup.
+export function cockpitSecret(clientName, system) {
+  const s = COCKPIT_SECRETS;
+  if (!s) return undefined;
+  return s[clientName]?.[system] ?? s[slugify(clientName)]?.[system] ?? undefined;
+}
+
+const globalSecret = system => COCKPIT_SECRETS?.__global__?.[system];
+
+// ── Keys ───────────────────────────────────────────────────────────────────
+export const APOLLO_KEY      = process.env.APOLLO_API_KEY;
+export const EB_SEND_KEY     = globalSecret("emailbison_send_master")     ?? process.env.EMAILBISON_SEND_API_KEY;
+export const EB_PERSONAL_KEY = globalSecret("emailbison_personal_master") ?? process.env.EMAILBISON_PERSONAL_API_KEY;
+
+// Which store each account-level key actually came from, so key_source doesn't
+// claim ".env" for something Cockpit supplied.
+const MASTER_SOURCE = {
+  send:     globalSecret("emailbison_send_master")     ? "cockpit:emailbison_send_master"     : "EMAILBISON_SEND_API_KEY",
+  personal: globalSecret("emailbison_personal_master") ? "cockpit:emailbison_personal_master" : "EMAILBISON_PERSONAL_API_KEY",
+};
+
+// MasterInbox per-client public keys: Cockpit's keychain first, then the env
+// var named in clients.json. New clients need no code change either way.
 export const MI_KEYS = Object.fromEntries(
-  CLIENTS.filter(c => c.mi_key_env).map(c => [c.name, process.env[c.mi_key_env]])
+  CLIENTS
+    .filter(c => c.mi_key_env || cockpitSecret(c.name, "masterinbox"))
+    .map(c => [c.name, cockpitSecret(c.name, "masterinbox") ?? (c.mi_key_env ? process.env[c.mi_key_env] : undefined)])
 );
 
 export const INSTANTLY_KEYS = {
@@ -59,28 +131,50 @@ export function getClient(name) {
 // We carry the provenance (key_source, scoped, scoped_missing) so that when a
 // call fails the error can say which key was used and why it was chosen —
 // previously an auth failure gave no way to tell these cases apart.
-export function ebConfig(client) {
-  const isPersonal = client.sequencer === "eb_personal";
+// `instance` is optional: "send" | "personal". When omitted it follows the
+// client's sequencer, which is the legacy behaviour.
+//
+// Cockpit's "Configure systems" panel writes eb_send_ws_id / eb_personal_ws_id
+// and treats Send and Personal as two independent systems a client can be on
+// simultaneously (Abra is on both: send 50, personal 9). The old single
+// sequencer + eb_ws_id pair is still what most clients have, so resolve the
+// new fields first and fall back to eb_ws_id.
+export function ebConfig(client, instance) {
+  const isPersonal = instance === "personal" || (!instance && client.sequencer === "eb_personal");
   const envName    = isPersonal ? client.eb_personal_key_env : client.eb_send_key_env;
-  const scopedKey  = envName ? process.env[envName] : undefined;
-  const masterName = isPersonal ? "EMAILBISON_PERSONAL_API_KEY" : "EMAILBISON_SEND_API_KEY";
+  const system     = isPersonal ? "emailbison_personal" : "emailbison_send";
+
+  // Cockpit keychain → clients.json's env var → account-level master key.
+  const vaultKey   = cockpitSecret(client.name, system);
+  const envKey     = envName ? process.env[envName] : undefined;
+  const scopedKey  = vaultKey ?? envKey;
+  const masterName = isPersonal ? MASTER_SOURCE.personal : MASTER_SOURCE.send;
   const masterKey  = isPersonal ? EB_PERSONAL_KEY : EB_SEND_KEY;
   const key        = scopedKey || masterKey;
 
   if (!key) {
     throw new Error(
-      `No EmailBison credentials for ${client.name}: ` +
-      (envName ? `${envName} is not set in .env, and ` : "") +
-      `neither is ${masterName}.`
+      `No EmailBison credentials for ${client.name}: nothing in Cockpit's keychain for ` +
+      `${system}, ` + (envName ? `${envName} is not set in .env, ` : "") +
+      `and neither is ${masterName}.`
     );
   }
+
+  // Prefer the explicit per-instance id; fall back to the legacy eb_ws_id, but
+  // only when that legacy id actually refers to this instance.
+  const legacyMatches = isPersonal
+    ? client.sequencer === "eb_personal"
+    : client.sequencer !== "eb_personal";
+  const ws_id = (isPersonal ? client.eb_personal_ws_id : client.eb_send_ws_id)
+    ?? (legacyMatches ? client.eb_ws_id : null);
 
   return {
     base:  isPersonal ? EB_PERSONAL_BASE : EB_SEND_BASE,
     key,
-    ws_id: client.eb_ws_id,
+    ws_id,
+    instance:       isPersonal ? "personal" : "send",
     scoped:         !!scopedKey,
-    key_source:     scopedKey ? envName : masterName,
+    key_source:     vaultKey ? `cockpit:${system}` : envKey ? envName : masterName,
     declared_env:   envName ?? null,
     scoped_missing: !!(envName && !scopedKey),
   };
@@ -212,7 +306,12 @@ export async function apolloFetch(path, body) {
   return res.json();
 }
 
-export const MI_MASTER_KEY = process.env.MASTERINBOX_API_KEY;
+// Cockpit names this slot masterinbox_master (the per-client slot is plain
+// "masterinbox") — accept both rather than depending on that distinction.
+export const MI_MASTER_KEY =
+  globalSecret("masterinbox_master") ?? globalSecret("masterinbox") ?? process.env.MASTERINBOX_API_KEY;
+export const MI_MASTER_SOURCE =
+  globalSecret("masterinbox_master") || globalSecret("masterinbox") ? "cockpit" : "MASTERINBOX_API_KEY";
 
 async function miCall(key, method, path, body) {
   const res = await fetch(`${MI_BASE}${path}`, {
