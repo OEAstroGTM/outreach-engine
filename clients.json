@@ -97,6 +97,7 @@
     "sequencer": "eb_send",
     "eb_ws_id": 28,
     "eb_send_key_env": "EB_SEND_KEY_INTELLECTIBLE",
+    "pv_ws_id": "6a79e1077c6a5951cb620fd5",
     "mi_ws_id": 1058,
     "mi_key_env": "MI_KEY_INTELLECTIBLE",
     "inboxing_tags": [
@@ -135,6 +136,8 @@
     "sequencer": "eb_send",
     "eb_ws_id": 23,
     "eb_send_key_env": "EB_SEND_KEY_OR_TRAX",
+    "pv_ws_id": "6a74072efc0a6c4ee4122704",
+    "pv_key_env": "PV_KEY_OR_TRAX",
     "mi_ws_id": 1057,
     "mi_key_env": "MI_KEY_OR_TRAX",
     "inboxing_tags": [
@@ -147,6 +150,7 @@
     "sequencer": "eb_send",
     "eb_ws_id": 5,
     "eb_send_key_env": "EB_SEND_KEY_OUTREACH_ENGINE",
+    "pv_ws_id": "6a725c9094b3cfd96a9e5a22",
     "mi_ws_id": 1013,
     "mi_key_env": "MI_KEY_OUTREACH_ENGINE",
     "inboxing_tags": [
@@ -154,7 +158,8 @@
       "outreachengine"
     ],
     "eb_send_ws_id": 5,
-    "eb_personal_ws_id": 20
+    "eb_personal_ws_id": 20,
+    "eb_personal_key_env": "EB_PERSONAL_KEY_OUTREACH_ENGINE"
   },
   {
     "name": "ParGo",
@@ -173,6 +178,7 @@
     "sequencer": "eb_send",
     "eb_ws_id": 7,
     "eb_send_key_env": "EB_SEND_KEY_SAVANTI_TRAVEL",
+    "pv_ws_id": "6a74aba12db966271dbc98f4",
     "mi_ws_id": 121,
     "mi_key_env": "MI_KEY_SAVANTI_TRAVEL",
     "inboxing_tags": [
@@ -199,6 +205,7 @@
     "mi_ws_id": 1059,
     "mi_key_env": "MI_KEY_SUPPLY_WISDOM",
     "instantly_ws": "supply_wisdom",
+    "pv_ws_id": "6a73946b6f52daf49a4cb2e4",
     "inboxing_tags": [
       "SupplyWisdom"
     ]

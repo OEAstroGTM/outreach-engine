@@ -10,6 +10,8 @@
 //   PORKBUN_API_KEY, PORKBUN_SECRET_API_KEY
 //   INBOXING_API_KEY, INBOXING_API_BASE_URL
 
+import { cockpitSecret } from "./core.js";
+
 export const INFRA_REGISTRAR = (process.env.INFRA_REGISTRAR || "namesilo").toLowerCase();
 
 // ── NameSilo (GET API, ?type=json, reply.code 300 == success) ────────────────
@@ -145,16 +147,33 @@ export const getRegistrarBalance = ()     => registrar().getBalance();
 // ── Inboxing (mailbox provisioning — Inboxing API v2) ────────────────────────
 // Auth: X-API-Key header. Base includes /api/v2. Set INBOXING_API_BASE_URL to
 // your account's API base (dashboard host + /api/v2).
-const INBOXING_BASE = (process.env.INBOXING_API_BASE_URL || "https://app.inboxing.com/api/v2").replace(/\/$/, "");
+const INBOXING_BASE = (process.env.INBOXING_API_BASE_URL || "https://v2.inboxing.com/api/v2").replace(/\/$/, "");
+const INBOXING_TIMEOUT_MS = Number(process.env.INBOXING_TIMEOUT_MS || 20000);
 
 async function inboxing(method, path, body) {
-  const key = process.env.INBOXING_API_KEY;
-  if (!key) throw new Error("INBOXING_API_KEY is not set");
-  const res = await fetch(`${INBOXING_BASE}${path}`, {
-    method,
-    headers: { "X-API-Key": key, "Content-Type": "application/json" },
-    body: body ? JSON.stringify(body) : undefined,
-  });
+  // Cockpit's keychain (__global__.inboxing) first, then the local env var.
+  const key = cockpitSecret("__global__", "inboxing") ?? process.env.INBOXING_API_KEY;
+  if (!key) throw new Error("No Inboxing credentials: nothing in Cockpit's keychain and INBOXING_API_KEY is not set");
+
+  let res;
+  try {
+    res = await fetch(`${INBOXING_BASE}${path}`, {
+      method,
+      headers: { "X-API-Key": key, "Content-Type": "application/json" },
+      body: body ? JSON.stringify(body) : undefined,
+      // Without this an unreachable host hangs forever inside the agent loop,
+      // which reads as a credential problem rather than a connectivity one.
+      signal: AbortSignal.timeout(INBOXING_TIMEOUT_MS),
+    });
+  } catch (e) {
+    if (e.name === "TimeoutError" || e.name === "AbortError") {
+      throw new Error(
+        `Inboxing ${method} ${path} timed out after ${INBOXING_TIMEOUT_MS}ms against ${INBOXING_BASE}. ` +
+        `This is a connectivity/host problem, not an auth one — check INBOXING_API_BASE_URL.`
+      );
+    }
+    throw new Error(`Inboxing ${method} ${path} failed against ${INBOXING_BASE}: ${e.message}`);
+  }
   const text = await res.text();
   let data; try { data = JSON.parse(text); } catch { data = { raw: text }; }
   if (!res.ok) throw new Error(`Inboxing ${method} ${path} → HTTP ${res.status}: ${data.error || data.message || text.slice(0, 160)}`);

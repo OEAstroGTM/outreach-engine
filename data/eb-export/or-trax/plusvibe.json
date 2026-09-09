@@ -1,0 +1,1949 @@
+[
+  {
+    "source_campaign_id": 1258,
+    "camp_name": "Aug -  Recycle ASC List - Re Scrapper ",
+    "first_wait_time": null,
+    "sequences": [
+      {
+        "step": 1,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "{FIRST_NAME} scheduling",
+            "name": "",
+            "body": "<p dir=\"ltr\">{Hi|Hey|Hello},<br><br></p><p dir=\"ltr\">Noticed {COMPANY} while looking at ASCs in {STATE}, and figured I’d reach out.</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">Most audit flags we see are not from negligence. It is files quietly going out of date until someone catches it right before inspection.<br><br></p><p dir=\"ltr\">We built OR Trax to keep Joint Commission and AAAHC compliance handled in the background, including infection control, so teams are not scrambling last minute.</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">No added workload, and it is free for the facility since vendors cover it.</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">{Already live across Surgery Partners and USPI centers.|Teams at Surgery Partners and USPI are already running this.|This is already in place across Surgery Partners and USPI.}<br><br></p><p dir=\"ltr\">{Want to see how centers are staying audit ready without the scramble?|Should I send a quick breakdown of how this runs day to day?|Open to a short example of how teams are handling this now?}<br><br></p><p dir=\"ltr\">{Thanks|Cheers}</p><p dir=\"ltr\">{SENDER_FULL_NAME}</p><p dir=\"ltr\">OR Trax</p>",
+            "_eb_step_id": 6342,
+            "_eb_subject": "{FIRST_NAME} scheduling",
+            "_eb_active": true
+          },
+          {
+            "variation": "B",
+            "subject": "{FIRST_NAME} scheduling",
+            "name": "",
+            "body": "<p dir=\"ltr\">{Hi|Hey|Hello} {FIRST_NAME}<br><br></p><p dir=\"ltr\">Quick question, how is {COMPANY} currently keeping compliance files audit ready across vendors and staff in {STATE}?</p><p><br></p><p dir=\"ltr\">Most teams rely on periodic checks, which works until something slips and it turns into a fire drill.</p><p><br></p><p dir=\"ltr\">We automate that entire layer so everything stays current by default without extra admin work.</p><p dir=\"ltr\">Free for the facility since it is covered on the vendor side.</p><p><br></p><p dir=\"ltr\">{Already trusted across Surgery Partners and USPI.|Happy to share how similar ASCs are using it.|This is already running in Surgery Partners and USPI centers.}</p><p><br></p><p dir=\"ltr\">{Worth seeing how this removes the audit scramble?|Should I send a short example of how this works in practice?|Open to a quick look at how teams are handling this now?}</p><p><br></p><p dir=\"ltr\">{Thanks|Cheers}</p><p dir=\"ltr\">{SENDER_FULL_NAME}</p><p dir=\"ltr\">OR Trax</p>",
+            "_eb_step_id": 6345,
+            "_eb_subject": "{FIRST_NAME} scheduling",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          },
+          {
+            "variation": "C",
+            "subject": "{FIRST_NAME} scheduling",
+            "name": "",
+            "body": "<p dir=\"ltr\">{Hi|Hey|Hello} {FIRST_NAME},</p><p><br></p><p dir=\"ltr\">Not sure if you are running into this at {COMPANY}, but most compliance issues we see in ASCs across {STATE} come down to outdated files, not lack of effort.</p><p><br></p><p dir=\"ltr\">Everything looks fine until an audit forces a full review.</p><p><br></p><p dir=\"ltr\">We handle that automatically, keeping compliance and infection control up to date in the background.</p><p><br></p><p dir=\"ltr\">No new systems to manage and no cost to the ASC since vendors cover it.</p><p><br></p><p dir=\"ltr\">{Already rolling out across Surgery Partners and USPI.|Teams like Surgery Partners are already using this.|Happy to share a quick reference from similar centers.}</p><p><br></p><p dir=\"ltr\">{Curious to see how this runs without adding work?|Want a quick breakdown of how centers are handling this now?|Should I send a short example?}</p><p><br></p><p dir=\"ltr\">{Thanks|Cheers}</p><p dir=\"ltr\">{SENDER_FULL_NAME}</p><p dir=\"ltr\">OR Trax</p>",
+            "_eb_step_id": 6346,
+            "_eb_subject": "{FIRST_NAME} scheduling",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "wait_time": 2,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p dir=\"ltr\">{Hi|Hey|Hello},<br><br>{Following up in case this got buried like a chart in Grey’s Anatomy|Just bumping this in case it got lost between shifts like in The Resident|Circling back before this disappears like a case file in New Amsterdam|Following up in case this got missed like a handoff in Chicago Med}</p><p><br></p><p dir=\"ltr\">Most ASC teams only revisit compliance when audit pressure hits, which is where the scramble usually starts.</p><p><br></p><p dir=\"ltr\">This keeps everything current continuously so there is nothing to fix last minute.</p><p><br></p><p dir=\"ltr\">{Want me to show how centers are avoiding that scramble entirely?|Open to a quick example of how this runs day to day?|Should I send a short walkthrough?}<br><br>{Thanks|Cheers|Appreciate it}<br>{SENDER_FULL_NAME}<br>{Partnership Lead|Strategic Partnerships|Partner Relations|Partnership Coordinator}<br>{ORTrax}</p>",
+            "_eb_step_id": 6343,
+            "_eb_subject": "Re: Re: {FIRST_NAME} scheduling",
+            "_eb_active": true
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p dir=\"ltr\">{Hi|Hey|Hello},<br><br></p><p dir=\"ltr\">I might be off here.</p><p><br></p><p dir=\"ltr\">If compliance and vendor workflows are not something you own, just let me know and I will close this out.</p><p><br></p><p dir=\"ltr\">If they are, happy to show how teams stay audit-ready without extra work or cost. <br><br><a href=\"https://calendly.com/d/cvj5-hfn-kq8/intro-call-with-or-trax\" target=\"_blank\" rel=\"noreferrer noopener\">You can grab a time here,</a> or let me know who handles this on your team.</p><p><br></p><p dir=\"ltr\">{Thanks|Cheers}</p><p dir=\"ltr\">{SENDER_FULL_NAME}</p><p dir=\"ltr\">OR Trax</p>",
+            "_eb_step_id": 6344,
+            "_eb_subject": "Re: Re: {FIRST_NAME} scheduling",
+            "_eb_active": true
+          }
+        ]
+      }
+    ],
+    "disable_variations": [],
+    "settings": {
+      "send_as_txt": "yes",
+      "is_emailopened_tracking": "no",
+      "is_unsubscribed_link": "no",
+      "stop_on_lead_replied": "yes",
+      "var_sel_type": "R_ROBIN"
+    },
+    "compat": {
+      "spintax_double": 0,
+      "spintax_single": 19,
+      "merge_tags": [
+        "{COMPANY}",
+        "{FIRST_NAME}",
+        "{SENDER_FULL_NAME}",
+        "{STATE}"
+      ],
+      "stale_calendly_month": 0
+    },
+    "_orphan_step_ids": [],
+    "_inferred_attachments": 2,
+    "_step_count_eb": 5,
+    "_variation_count_pv": 5
+  },
+  {
+    "source_campaign_id": 1253,
+    "camp_name": "Aug OR Trax - CASA attendee list.xlsx - Attended",
+    "first_wait_time": null,
+    "sequences": [
+      {
+        "step": 1,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "{FIRST_NAME}",
+            "name": "",
+            "body": "<p>{Hi|Hey|Hello} {FIRST_NAME},</p><p><br></p><p>Saw on the app you were at the CASA event and noticed we did not get the chance to connect.<br><br>Would love to touch base because of your experience to get your feedback on what we do.</p><p><br></p><p>We help automate vendor compliance at no cost and with nothing to install. This has been implemented into hundreds of ASCs.<br><br>Would you be open to a fifteen minute chat some time this week to go over this?</p><p><br></p><p>{Thanks|Cheers}</p><p>{SENDER_FULL_NAME}</p>",
+            "_eb_step_id": 6316,
+            "_eb_subject": "{FIRST_NAME}",
+            "_eb_active": true
+          },
+          {
+            "variation": "B",
+            "subject": "{FIRST_NAME} scheduling",
+            "name": "",
+            "body": "<p dir=\"ltr\">{Hi|Hey|Hello} {FIRST_NAME}<br><br></p><p dir=\"ltr\">Quick question, how is {COMPANY} currently keeping compliance files audit ready across vendors and staff in {STATE}?</p><p><br></p><p dir=\"ltr\">Most teams rely on periodic checks, which works until something slips and it turns into a fire drill.</p><p><br></p><p dir=\"ltr\">We automate that entire layer so everything stays current by default without extra admin work.</p><p dir=\"ltr\">Free for the facility since it is covered on the vendor side.</p><p><br></p><p dir=\"ltr\">{Already trusted across Surgery Partners and USPI.|Happy to share how similar ASCs are using it.|This is already running in Surgery Partners and USPI centers.}</p><p><br></p><p dir=\"ltr\">{Worth seeing how this removes the audit scramble?|Should I send a short example of how this works in practice?|Open to a quick look at how teams are handling this now?}</p><p><br></p><p dir=\"ltr\">{Thanks|Cheers}</p><p dir=\"ltr\">{SENDER_FULL_NAME}</p><p dir=\"ltr\">OR Trax</p>",
+            "_eb_step_id": 6319,
+            "_eb_subject": "{FIRST_NAME} scheduling",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          },
+          {
+            "variation": "C",
+            "subject": "{FIRST_NAME} scheduling",
+            "name": "",
+            "body": "<p dir=\"ltr\">{Hi|Hey|Hello} {FIRST_NAME},</p><p><br></p><p dir=\"ltr\">Not sure if you are running into this at {COMPANY}, but most compliance issues we see in ASCs across {STATE} come down to outdated files, not lack of effort.</p><p><br></p><p dir=\"ltr\">Everything looks fine until an audit forces a full review.</p><p><br></p><p dir=\"ltr\">We handle that automatically, keeping compliance and infection control up to date in the background.</p><p><br></p><p dir=\"ltr\">No new systems to manage and no cost to the ASC since vendors cover it.</p><p><br></p><p dir=\"ltr\">{Already rolling out across Surgery Partners and USPI.|Teams like Surgery Partners are already using this.|Happy to share a quick reference from similar centers.}</p><p><br></p><p dir=\"ltr\">{Curious to see how this runs without adding work?|Want a quick breakdown of how centers are handling this now?|Should I send a short example?}</p><p><br></p><p dir=\"ltr\">{Thanks|Cheers}</p><p dir=\"ltr\">{SENDER_FULL_NAME}</p><p dir=\"ltr\">OR Trax</p>",
+            "_eb_step_id": 6320,
+            "_eb_subject": "{FIRST_NAME} scheduling",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "wait_time": 2,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p dir=\"ltr\">Hi {FIRST_NAME},<br><br></p><p>{Following up in case this got buried like a chart in Grey’s Anatomy|Just bumping this in case it got lost between shifts like in The Resident|Circling back before this disappears like a case file in New Amsterdam|Following up in case this got missed like a handoff in Chicago Med}</p><p><br></p><p>Vendor compliance issues often surface right before an inspection, when there is little time to fix them.</p><p><br></p><p>OR Trax keeps credentials, documentation, and infection control requirements current throughout the year, so facilities stay survey-ready without the last-minute scramble.</p><p><br></p><p>Happy to show you how it works and would really appreciate your feedback.<br><br></p><p>{Thanks|Cheers|Appreciate it}<br>{SENDER_FULL_NAME}<br>{Partnership Lead|Strategic Partnerships|Partner Relations|Partnership Coordinator}<br>{ORTrax}</p>",
+            "_eb_step_id": 6317,
+            "_eb_subject": "Re: {FIRST_NAME} scheduling",
+            "_eb_active": true
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p dir=\"ltr\">{Hi|Hey|Hello} {FIRST_NAME},<br><br></p><p>I might be off here.</p><p><br></p><p>If vendor compliance and credentialing are not areas you own, just let me know.</p><p><br></p><p>If they are, happy to show how facilities stay audit-ready without added work or cost.</p><p dir=\"ltr\"><br><a href=\"https://calendly.com/d/cvj5-hfn-kq8/intro-call-with-or-trax\" target=\"_blank\" rel=\"noreferrer noopener\">You can grab a time here,</a> or point me to whoever handles this on your team.</p><p><br></p><p dir=\"ltr\">{Thanks|Cheers}</p><p dir=\"ltr\">{SENDER_FULL_NAME}</p><p dir=\"ltr\">OR Trax</p>",
+            "_eb_step_id": 6318,
+            "_eb_subject": "Re: for {FIRST_NAME}",
+            "_eb_active": true
+          }
+        ]
+      }
+    ],
+    "disable_variations": [],
+    "settings": {
+      "send_as_txt": "yes",
+      "is_emailopened_tracking": "no",
+      "is_unsubscribed_link": "no",
+      "stop_on_lead_replied": "yes",
+      "var_sel_type": "R_ROBIN"
+    },
+    "compat": {
+      "spintax_double": 0,
+      "spintax_single": 15,
+      "merge_tags": [
+        "{COMPANY}",
+        "{FIRST_NAME}",
+        "{SENDER_FULL_NAME}",
+        "{STATE}"
+      ],
+      "stale_calendly_month": 0
+    },
+    "_orphan_step_ids": [],
+    "_inferred_attachments": 2,
+    "_step_count_eb": 5,
+    "_variation_count_pv": 5
+  },
+  {
+    "source_campaign_id": 1222,
+    "camp_name": "Aus - ORTrax - Event Followup - ASCA",
+    "first_wait_time": null,
+    "sequences": [
+      {
+        "step": 1,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "{FIRST_NAME}",
+            "name": "",
+            "body": "<p>{Hi|Hey|Hello} {FIRST_NAME},</p><p><br></p><p>Saw on the app you were at the ASCA event and noticed we did not get the chance to connect.<br><br>Would love to touch base because of your experience to get your feedback on what we do.</p><p><br></p><p>We help automate vendor compliance at no cost and with nothing to install. This has been implemented into hundreds of ASCs.<br><br>Would you be open to a fifteen minute chat some time this week to go over this?</p><p><br></p><p>{Thanks|Cheers}</p><p>{SENDER_FULL_NAME}</p>",
+            "_eb_step_id": 6117,
+            "_eb_subject": "{FIRST_NAME}",
+            "_eb_active": true
+          },
+          {
+            "variation": "B",
+            "subject": "{FIRST_NAME} scheduling",
+            "name": "",
+            "body": "<p dir=\"ltr\">{Hi|Hey|Hello} {FIRST_NAME}<br><br></p><p dir=\"ltr\">Quick question, how is {COMPANY} currently keeping compliance files audit ready across vendors and staff in {STATE}?</p><p><br></p><p dir=\"ltr\">Most teams rely on periodic checks, which works until something slips and it turns into a fire drill.</p><p><br></p><p dir=\"ltr\">We automate that entire layer so everything stays current by default without extra admin work.</p><p dir=\"ltr\">Free for the facility since it is covered on the vendor side.</p><p><br></p><p dir=\"ltr\">{Already trusted across Surgery Partners and USPI.|Happy to share how similar ASCs are using it.|This is already running in Surgery Partners and USPI centers.}</p><p><br></p><p dir=\"ltr\">{Worth seeing how this removes the audit scramble?|Should I send a short example of how this works in practice?|Open to a quick look at how teams are handling this now?}</p><p><br></p><p dir=\"ltr\">{Thanks|Cheers}</p><p dir=\"ltr\">{SENDER_FULL_NAME}</p><p dir=\"ltr\">OR Trax</p>",
+            "_eb_step_id": 6120,
+            "_eb_subject": "{FIRST_NAME} scheduling",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          },
+          {
+            "variation": "C",
+            "subject": "{FIRST_NAME} scheduling",
+            "name": "",
+            "body": "<p dir=\"ltr\">{Hi|Hey|Hello} {FIRST_NAME},</p><p><br></p><p dir=\"ltr\">Not sure if you are running into this at {COMPANY}, but most compliance issues we see in ASCs across {STATE} come down to outdated files, not lack of effort.</p><p><br></p><p dir=\"ltr\">Everything looks fine until an audit forces a full review.</p><p><br></p><p dir=\"ltr\">We handle that automatically, keeping compliance and infection control up to date in the background.</p><p><br></p><p dir=\"ltr\">No new systems to manage and no cost to the ASC since vendors cover it.</p><p><br></p><p dir=\"ltr\">{Already rolling out across Surgery Partners and USPI.|Teams like Surgery Partners are already using this.|Happy to share a quick reference from similar centers.}</p><p><br></p><p dir=\"ltr\">{Curious to see how this runs without adding work?|Want a quick breakdown of how centers are handling this now?|Should I send a short example?}</p><p><br></p><p dir=\"ltr\">{Thanks|Cheers}</p><p dir=\"ltr\">{SENDER_FULL_NAME}</p><p dir=\"ltr\">OR Trax</p>",
+            "_eb_step_id": 6121,
+            "_eb_subject": "{FIRST_NAME} scheduling",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "wait_time": 2,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p dir=\"ltr\">Hi {FIRST_NAME},<br><br></p><p>{Following up in case this got buried like a chart in Grey’s Anatomy|Just bumping this in case it got lost between shifts like in The Resident|Circling back before this disappears like a case file in New Amsterdam|Following up in case this got missed like a handoff in Chicago Med}</p><p><br></p><p>Vendor compliance issues often surface right before an inspection, when there is little time to fix them.</p><p><br></p><p>OR Trax keeps credentials, documentation, and infection control requirements current throughout the year, so facilities stay survey-ready without the last-minute scramble.</p><p><br></p><p>Happy to show you how it works and would really appreciate your feedback.<br><br></p><p>{Thanks|Cheers|Appreciate it}<br>{SENDER_FULL_NAME}<br>{Partnership Lead|Strategic Partnerships|Partner Relations|Partnership Coordinator}<br>{ORTrax}</p>",
+            "_eb_step_id": 6118,
+            "_eb_subject": "Re: {FIRST_NAME} scheduling",
+            "_eb_active": true
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p dir=\"ltr\">{Hi|Hey|Hello} {FIRST_NAME},<br><br></p><p>I might be off here.</p><p><br></p><p>If vendor compliance and credentialing are not areas you own, just let me know.</p><p><br></p><p>If they are, happy to show how facilities stay audit-ready without added work or cost.</p><p dir=\"ltr\"><br><a href=\"https://calendly.com/d/cvj5-hfn-kq8/intro-call-with-or-trax\" target=\"_blank\" rel=\"noreferrer noopener\">You can grab a time here,</a> or point me to whoever handles this on your team.</p><p><br></p><p dir=\"ltr\">{Thanks|Cheers}</p><p dir=\"ltr\">{SENDER_FULL_NAME}</p><p dir=\"ltr\">OR Trax</p>",
+            "_eb_step_id": 6119,
+            "_eb_subject": "Re: for {FIRST_NAME}",
+            "_eb_active": true
+          }
+        ]
+      }
+    ],
+    "disable_variations": [],
+    "settings": {
+      "send_as_txt": "yes",
+      "is_emailopened_tracking": "no",
+      "is_unsubscribed_link": "no",
+      "stop_on_lead_replied": "yes",
+      "var_sel_type": "R_ROBIN"
+    },
+    "compat": {
+      "spintax_double": 0,
+      "spintax_single": 15,
+      "merge_tags": [
+        "{COMPANY}",
+        "{FIRST_NAME}",
+        "{SENDER_FULL_NAME}",
+        "{STATE}"
+      ],
+      "stale_calendly_month": 0
+    },
+    "_orphan_step_ids": [],
+    "_inferred_attachments": 2,
+    "_step_count_eb": 5,
+    "_variation_count_pv": 5
+  },
+  {
+    "source_campaign_id": 1219,
+    "camp_name": "2 Aug - OR trax - ASC Titles - Apollo",
+    "first_wait_time": null,
+    "sequences": [
+      {
+        "step": 1,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "{FIRST_NAME} scheduling",
+            "name": "",
+            "body": "<p dir=\"ltr\">{Hi|Hey|Hello} {FIRST_NAME},<br><br></p><p dir=\"ltr\">Noticed {COMPANY} while looking into ASCs, and figured I'd reach out.</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">Most audit flags we see are not from negligence. It is files quietly going out of date until someone catches it right before inspection.<br><br></p><p dir=\"ltr\">We built OR Trax to keep Joint Commission and AAAHC compliance handled in the background, including infection control, so teams are not scrambling last minute.</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">No added workload, and it is free for the facility since vendors cover it.</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">{Already live across Surgery Partners and USPI centers.|Teams at Surgery Partners and USPI are already running this.|This is already in place across Surgery Partners and USPI.}<br><br></p><p dir=\"ltr\">{Want to see how centers are staying audit ready without the scramble?|Should I send a quick breakdown of how this runs day to day?|Open to a short example of how teams are handling this now?}<br><br></p><p dir=\"ltr\">{Thanks|Cheers}</p><p dir=\"ltr\">{SENDER_FULL_NAME}</p><p dir=\"ltr\">OR Trax</p>",
+            "_eb_step_id": 6103,
+            "_eb_subject": "{FIRST_NAME} scheduling",
+            "_eb_active": true
+          },
+          {
+            "variation": "B",
+            "subject": "{FIRST_NAME} scheduling",
+            "name": "",
+            "body": "<p dir=\"ltr\">{Hi|Hey|Hello} {FIRST_NAME}<br><br></p><p dir=\"ltr\">Quick question, how is {COMPANY} currently keeping compliance files audit ready across vendors and staff in {STATE}?</p><p><br></p><p dir=\"ltr\">Most teams rely on periodic checks, which works until something slips and it turns into a fire drill.</p><p><br></p><p dir=\"ltr\">We automate that entire layer so everything stays current by default without extra admin work.</p><p dir=\"ltr\">Free for the facility since it is covered on the vendor side.</p><p><br></p><p dir=\"ltr\">{Already trusted across Surgery Partners and USPI.|Happy to share how similar ASCs are using it.|This is already running in Surgery Partners and USPI centers.}</p><p><br></p><p dir=\"ltr\">{Worth seeing how this removes the audit scramble?|Should I send a short example of how this works in practice?|Open to a quick look at how teams are handling this now?}</p><p><br></p><p dir=\"ltr\">{Thanks|Cheers}</p><p dir=\"ltr\">{SENDER_FULL_NAME}</p><p dir=\"ltr\">OR Trax</p>",
+            "_eb_step_id": 6106,
+            "_eb_subject": "{FIRST_NAME} scheduling",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          },
+          {
+            "variation": "C",
+            "subject": "{FIRST_NAME} scheduling",
+            "name": "",
+            "body": "<p dir=\"ltr\">{Hi|Hey|Hello} {FIRST_NAME},</p><p><br></p><p dir=\"ltr\">Not sure if you are running into this at {COMPANY}, but most compliance issues we see in ASCs across {STATE} come down to outdated files, not lack of effort.</p><p><br></p><p dir=\"ltr\">Everything looks fine until an audit forces a full review.</p><p><br></p><p dir=\"ltr\">We handle that automatically, keeping compliance and infection control up to date in the background.</p><p><br></p><p dir=\"ltr\">No new systems to manage and no cost to the ASC since vendors cover it.</p><p><br></p><p dir=\"ltr\">{Already rolling out across Surgery Partners and USPI.|Teams like Surgery Partners are already using this.|Happy to share a quick reference from similar centers.}</p><p><br></p><p dir=\"ltr\">{Curious to see how this runs without adding work?|Want a quick breakdown of how centers are handling this now?|Should I send a short example?}</p><p><br></p><p dir=\"ltr\">{Thanks|Cheers}</p><p dir=\"ltr\">{SENDER_FULL_NAME}</p><p dir=\"ltr\">OR Trax</p>",
+            "_eb_step_id": 6107,
+            "_eb_subject": "{FIRST_NAME} scheduling",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "wait_time": 2,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p dir=\"ltr\">Hi {FIRST_NAME},<br><br>{Following up in case this got buried like a chart in Grey’s Anatomy|Just bumping this in case it got lost between shifts like in The Resident|Circling back before this disappears like a case file in New Amsterdam|Following up in case this got missed like a handoff in Chicago Med}</p><p><br></p><p dir=\"ltr\">Most ASC teams only revisit compliance when audit pressure hits, which is where the scramble usually starts.</p><p><br></p><p dir=\"ltr\">This keeps everything current continuously so there is nothing to fix last minute.</p><p><br></p><p dir=\"ltr\">{Want me to show how centers are avoiding that scramble entirely?|Open to a quick example of how this runs day to day?|Should I send a short walkthrough?}<br><br>{Thanks|Cheers|Appreciate it}<br>{SENDER_FULL_NAME}<br>{Partnership Lead|Strategic Partnerships|Partner Relations|Partnership Coordinator}<br>{ORTrax}</p>",
+            "_eb_step_id": 6104,
+            "_eb_subject": "Re: Re: {FIRST_NAME} scheduling",
+            "_eb_active": true
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p dir=\"ltr\">{Hi|Hey|Hello} {FIRST_NAME},<br><br></p><p dir=\"ltr\">I might be off here.</p><p><br></p><p dir=\"ltr\">If compliance and vendor workflows are not something you own, just let me know and I will close this out.</p><p><br></p><p dir=\"ltr\">If they are, happy to show how teams stay audit-ready without extra work or cost. <br><br><a href=\"https://calendly.com/d/cvj5-hfn-kq8/intro-call-with-or-trax\" target=\"_blank\" rel=\"noreferrer noopener\">You can grab a time here,</a> or let me know who handles this on your team.</p><p><br></p><p dir=\"ltr\">{Thanks|Cheers}</p><p dir=\"ltr\">{SENDER_FULL_NAME}</p><p dir=\"ltr\">OR Trax</p>",
+            "_eb_step_id": 6105,
+            "_eb_subject": "Re: Re: {FIRST_NAME} scheduling",
+            "_eb_active": true
+          }
+        ]
+      }
+    ],
+    "disable_variations": [],
+    "settings": {
+      "send_as_txt": "yes",
+      "is_emailopened_tracking": "no",
+      "is_unsubscribed_link": "no",
+      "stop_on_lead_replied": "yes",
+      "var_sel_type": "R_ROBIN"
+    },
+    "compat": {
+      "spintax_double": 0,
+      "spintax_single": 18,
+      "merge_tags": [
+        "{COMPANY}",
+        "{FIRST_NAME}",
+        "{SENDER_FULL_NAME}",
+        "{STATE}"
+      ],
+      "stale_calendly_month": 0
+    },
+    "_orphan_step_ids": [],
+    "_inferred_attachments": 2,
+    "_step_count_eb": 5,
+    "_variation_count_pv": 5
+  },
+  {
+    "source_campaign_id": 1151,
+    "camp_name": "AEROSEND July - OR Trax - Hospitals - Updated Titles - surgery and materials leaders [Hospital]",
+    "first_wait_time": null,
+    "sequences": [
+      {
+        "step": 1,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "{FIRST_NAME} ",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p>Noticed {COMPANY} while looking at hospitals in {STATE}, and figured I’d reach out.</p><p><br></p><p>Not sure if you're dealing with this, but we hear from other hospitals vendor access gets messy when schedules shift and reps miss updates.</p><p><br></p><p>OR Trax automates vendor coordination while keeping access tied to approved reps.</p><p><br></p><p>It is no costs for the hospital and there is no kiosk or bulky equipment to install.</p><p><br></p><p>Tampa General, VA Hospitals, and hundreds of other facilities across the nation already use us.</p><p><br></p><p>{Want to see how hospitals are reducing vendor confusion without adding work?|Should I send a quick breakdown of how this runs day to day?|Open to a short example of how teams handle this now?}</p><p dir=\"ltr\"><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 5779,
+            "_eb_subject": "{FIRST_NAME} ",
+            "_eb_active": true
+          },
+          {
+            "variation": "B",
+            "subject": "{FIRST_NAME}",
+            "name": "",
+            "body": "<p>{Hi|Hey|Hello} {FIRST_NAME},</p><p><br></p><p>I was curious, when schedules shift during the day, does someone on your team still have to make sure vendors were notified?</p><p><br></p><p>That small step is where things usually break. Delays, confusion, and staff pulled into coordination instead of staying focused on the room.</p><p><br></p><p>We remove that completely by automatically notifying vendors in real time when schedules change.</p><p><br></p><p>Also, hospitals do not pay for it. Vendors cover it because it keeps them aligned.</p><p><br></p><p>Want me to show you what that looks like in practice?</p><p><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>{Partnership Lead|Strategic Partnerships|Partner Relations|Partnership Coordinator}</p><p>{ORTrax}</p>",
+            "_eb_step_id": 5782,
+            "_eb_subject": "{FIRST_NAME}",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          },
+          {
+            "variation": "C",
+            "subject": "{FIRST_NAME}",
+            "name": "",
+            "body": "<p>{Hi|Hey|Hello} {FIRST_NAME},</p><p><br></p><p>Not sure if you have seen this yet, but when OR schedules shift, it usually turns into someone having to track down vendors to keep things moving.</p><p><br></p><p>It sounds small, but it is one of those things that quietly slows everything down.</p><p><br></p><p>We built a way to remove that entirely. Vendors get updated automatically in real time, no calls, no chasing.</p><p><br></p><p>The part most teams question is cost. Hospitals do not pay for it. Vendors cover it.</p><p><br></p><p>Curious if it would be useful to see how this actually works during a real schedule change?</p><p><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>{Partnership Lead|Strategic Partnerships|Partner Relations|Partnership Coordinator}</p><p>{ORTrax}</p>",
+            "_eb_step_id": 5783,
+            "_eb_subject": "{FIRST_NAME}",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          },
+          {
+            "variation": "D",
+            "subject": "for {FIRST_NAME}",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p>Reaching out because hospitals often run into vendor issues when schedules change.</p><p><br></p><p>OR Trax keeps vendor updates automated without new hardware or systems.</p><p><br></p><p>Your hospital is not charged either.</p><p><br></p><p>Tampa General, VA Hospitals, and hundreds of other facilities across the nation already use us.</p><p><br></p><p>{Want a quick look at how this works?|Should I send over a short breakdown?|Open to seeing how hospitals are using this?}</p><p dir=\"ltr\"><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 5784,
+            "_eb_subject": "for {FIRST_NAME}",
+            "_eb_active": false
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "wait_time": 2,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p>{Following up in case this got buried like a chart in Grey’s Anatomy|Just bumping this in case it got lost between shifts like in The Resident|Circling back before this disappears like a case file in New Amsterdam|Following up in case this got missed like a handoff in Chicago Med}</p><p><br></p><p>Vendor coordination usually becomes urgent only after something breaks.</p><p><br></p><p>That could be schedule changes, rep confusion, manual outreach, or unauthorized arrivals.</p><p><br></p><p>OR Trax keeps updates current and access tied to approved reps.</p><p><br></p><p>{Want me to show how hospitals avoid that scramble?|Open to a quick example of how this runs day to day?|Should I send a short walkthrough?}</p><p><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 5780,
+            "_eb_subject": "Re: {FIRST_NAME}",
+            "_eb_active": true
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p>Before I close this out.</p><p><br></p><p>Are you the right person for vendor coordination or vendor access workflows?</p><p><br></p><p>If so, happy to show how hospitals keep vendor access organized without extra work or cost.</p><p dir=\"ltr\"><br><a href=\"https://calendly.com/d/cvj5-hfn-kq8/intro-call-with-or-trax\" target=\"_blank\" rel=\"noreferrer noopener\">You can grab a time here,</a> or let me know who handles this on your team.</p><p><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 5781,
+            "_eb_subject": "Re: {FIRST_NAME}",
+            "_eb_active": true
+          }
+        ]
+      }
+    ],
+    "disable_variations": [
+      {
+        "step": 1,
+        "variation": "D",
+        "is_active": "no"
+      }
+    ],
+    "settings": {
+      "send_as_txt": "yes",
+      "is_emailopened_tracking": "no",
+      "is_unsubscribed_link": "no",
+      "stop_on_lead_replied": "yes",
+      "var_sel_type": "R_ROBIN"
+    },
+    "compat": {
+      "spintax_double": 0,
+      "spintax_single": 14,
+      "merge_tags": [
+        "{COMPANY}",
+        "{FIRST_NAME}",
+        "{SENDER_FULL_NAME}",
+        "{STATE}"
+      ],
+      "stale_calendly_month": 0
+    },
+    "_orphan_step_ids": [],
+    "_inferred_attachments": 2,
+    "_step_count_eb": 6,
+    "_variation_count_pv": 6
+  },
+  {
+    "source_campaign_id": 1150,
+    "camp_name": "2 July - OR Trax - Hospitals - Updated Titles - surgery and materials leaders [Hospital]",
+    "first_wait_time": null,
+    "sequences": [
+      {
+        "step": 1,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "{FIRST_NAME} ",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p>Noticed {COMPANY} while looking at hospitals in {STATE}, and figured I’d reach out.</p><p><br></p><p>Not sure if you're dealing with this, but we hear from other hospitals vendor access gets messy when schedules shift and reps miss updates.</p><p><br></p><p>OR Trax automates vendor coordination while keeping access tied to approved reps.</p><p><br></p><p>It is no costs for the hospital and there is no kiosk or bulky equipment to install.</p><p><br></p><p>Tampa General, VA Hospitals, and hundreds of other facilities across the nation already use us.</p><p><br></p><p>{Want to see how hospitals are reducing vendor confusion without adding work?|Should I send a quick breakdown of how this runs day to day?|Open to a short example of how teams handle this now?}</p><p dir=\"ltr\"><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 5773,
+            "_eb_subject": "{FIRST_NAME} ",
+            "_eb_active": true
+          },
+          {
+            "variation": "B",
+            "subject": "{FIRST_NAME}",
+            "name": "",
+            "body": "<p>{Hi|Hey|Hello} {FIRST_NAME},</p><p><br></p><p>I was curious, when schedules shift during the day, does someone on your team still have to make sure vendors were notified?</p><p><br></p><p>That small step is where things usually break. Delays, confusion, and staff pulled into coordination instead of staying focused on the room.</p><p><br></p><p>We remove that completely by automatically notifying vendors in real time when schedules change.</p><p><br></p><p>Also, hospitals do not pay for it. Vendors cover it because it keeps them aligned.</p><p><br></p><p>Want me to show you what that looks like in practice?</p><p><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>{Partnership Lead|Strategic Partnerships|Partner Relations|Partnership Coordinator}</p><p>{ORTrax}</p>",
+            "_eb_step_id": 5776,
+            "_eb_subject": "{FIRST_NAME}",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          },
+          {
+            "variation": "C",
+            "subject": "{FIRST_NAME}",
+            "name": "",
+            "body": "<p>{Hi|Hey|Hello} {FIRST_NAME},</p><p><br></p><p>Not sure if you have seen this yet, but when OR schedules shift, it usually turns into someone having to track down vendors to keep things moving.</p><p><br></p><p>It sounds small, but it is one of those things that quietly slows everything down.</p><p><br></p><p>We built a way to remove that entirely. Vendors get updated automatically in real time, no calls, no chasing.</p><p><br></p><p>The part most teams question is cost. Hospitals do not pay for it. Vendors cover it.</p><p><br></p><p>Curious if it would be useful to see how this actually works during a real schedule change?</p><p><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>{Partnership Lead|Strategic Partnerships|Partner Relations|Partnership Coordinator}</p><p>{ORTrax}</p>",
+            "_eb_step_id": 5777,
+            "_eb_subject": "{FIRST_NAME}",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          },
+          {
+            "variation": "D",
+            "subject": "for {FIRST_NAME}",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p>Reaching out because hospitals often run into vendor issues when schedules change.</p><p><br></p><p>OR Trax keeps vendor updates automated without new hardware or systems.</p><p><br></p><p>Your hospital is not charged either.</p><p><br></p><p>Tampa General, VA Hospitals, and hundreds of other facilities across the nation already use us.</p><p><br></p><p>{Want a quick look at how this works?|Should I send over a short breakdown?|Open to seeing how hospitals are using this?}</p><p dir=\"ltr\"><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 5778,
+            "_eb_subject": "for {FIRST_NAME}",
+            "_eb_active": false
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "wait_time": 2,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p>{Following up in case this got buried like a chart in Grey’s Anatomy|Just bumping this in case it got lost between shifts like in The Resident|Circling back before this disappears like a case file in New Amsterdam|Following up in case this got missed like a handoff in Chicago Med}</p><p><br></p><p>Vendor coordination usually becomes urgent only after something breaks.</p><p><br></p><p>That could be schedule changes, rep confusion, manual outreach, or unauthorized arrivals.</p><p><br></p><p>OR Trax keeps updates current and access tied to approved reps.</p><p><br></p><p>{Want me to show how hospitals avoid that scramble?|Open to a quick example of how this runs day to day?|Should I send a short walkthrough?}</p><p><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 5774,
+            "_eb_subject": "Re: {FIRST_NAME}",
+            "_eb_active": true
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p>Before I close this out.</p><p><br></p><p>Are you the right person for vendor coordination or vendor access workflows?</p><p><br></p><p>If so, happy to show how hospitals keep vendor access organized without extra work or cost.</p><p dir=\"ltr\"><br><a href=\"https://calendly.com/d/cvj5-hfn-kq8/intro-call-with-or-trax\" target=\"_blank\" rel=\"noreferrer noopener\">You can grab a time here,</a> or let me know who handles this on your team.</p><p><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 5775,
+            "_eb_subject": "Re: {FIRST_NAME}",
+            "_eb_active": true
+          }
+        ]
+      }
+    ],
+    "disable_variations": [
+      {
+        "step": 1,
+        "variation": "D",
+        "is_active": "no"
+      }
+    ],
+    "settings": {
+      "send_as_txt": "yes",
+      "is_emailopened_tracking": "no",
+      "is_unsubscribed_link": "no",
+      "stop_on_lead_replied": "yes",
+      "var_sel_type": "R_ROBIN"
+    },
+    "compat": {
+      "spintax_double": 0,
+      "spintax_single": 14,
+      "merge_tags": [
+        "{COMPANY}",
+        "{FIRST_NAME}",
+        "{SENDER_FULL_NAME}",
+        "{STATE}"
+      ],
+      "stale_calendly_month": 0
+    },
+    "_orphan_step_ids": [],
+    "_inferred_attachments": 2,
+    "_step_count_eb": 6,
+    "_variation_count_pv": 6
+  },
+  {
+    "source_campaign_id": 1148,
+    "camp_name": "AEROSEND July - OR Trax - Hospitals - Updated Titles - surgery and materials leaders [Hospital]",
+    "first_wait_time": null,
+    "sequences": [
+      {
+        "step": 1,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "{FIRST_NAME} ",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p>Noticed {COMPANY} while looking at hospitals in {STATE}, and figured I’d reach out.</p><p><br></p><p>Not sure if you're dealing with this, but we hear from other hospitals vendor access gets messy when schedules shift and reps miss updates.</p><p><br></p><p>OR Trax automates vendor coordination while keeping access tied to approved reps.</p><p><br></p><p>It is no costs for the hospital and there is no kiosk or bulky equipment to install.</p><p><br></p><p>Tampa General, VA Hospitals, and hundreds of other facilities across the nation already use us.</p><p><br></p><p>{Want to see how hospitals are reducing vendor confusion without adding work?|Should I send a quick breakdown of how this runs day to day?|Open to a short example of how teams handle this now?}</p><p dir=\"ltr\"><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 5762,
+            "_eb_subject": "{FIRST_NAME} ",
+            "_eb_active": true
+          },
+          {
+            "variation": "B",
+            "subject": "{FIRST_NAME}",
+            "name": "",
+            "body": "<p>{Hi|Hey|Hello} {FIRST_NAME},</p><p><br></p><p>I was curious, when schedules shift during the day, does someone on your team still have to make sure vendors were notified?</p><p><br></p><p>That small step is where things usually break. Delays, confusion, and staff pulled into coordination instead of staying focused on the room.</p><p><br></p><p>We remove that completely by automatically notifying vendors in real time when schedules change.</p><p><br></p><p>Also, hospitals do not pay for it. Vendors cover it because it keeps them aligned.</p><p><br></p><p>Want me to show you what that looks like in practice?</p><p><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>{Partnership Lead|Strategic Partnerships|Partner Relations|Partnership Coordinator}</p><p>{ORTrax}</p>",
+            "_eb_step_id": 5765,
+            "_eb_subject": "{FIRST_NAME}",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          },
+          {
+            "variation": "C",
+            "subject": "{FIRST_NAME}",
+            "name": "",
+            "body": "<p>{Hi|Hey|Hello} {FIRST_NAME},</p><p><br></p><p>Not sure if you have seen this yet, but when OR schedules shift, it usually turns into someone having to track down vendors to keep things moving.</p><p><br></p><p>It sounds small, but it is one of those things that quietly slows everything down.</p><p><br></p><p>We built a way to remove that entirely. Vendors get updated automatically in real time, no calls, no chasing.</p><p><br></p><p>The part most teams question is cost. Hospitals do not pay for it. Vendors cover it.</p><p><br></p><p>Curious if it would be useful to see how this actually works during a real schedule change?</p><p><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>{Partnership Lead|Strategic Partnerships|Partner Relations|Partnership Coordinator}</p><p>{ORTrax}</p>",
+            "_eb_step_id": 5766,
+            "_eb_subject": "{FIRST_NAME}",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          },
+          {
+            "variation": "D",
+            "subject": "for {FIRST_NAME}",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p>Reaching out because hospitals often run into vendor issues when schedules change.</p><p><br></p><p>OR Trax keeps vendor updates automated without new hardware or systems.</p><p><br></p><p>Your hospital is not charged either.</p><p><br></p><p>Tampa General, VA Hospitals, and hundreds of other facilities across the nation already use us.</p><p><br></p><p>{Want a quick look at how this works?|Should I send over a short breakdown?|Open to seeing how hospitals are using this?}</p><p dir=\"ltr\"><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 5767,
+            "_eb_subject": "for {FIRST_NAME}",
+            "_eb_active": false
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "wait_time": 2,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p>{Following up in case this got buried like a chart in Grey’s Anatomy|Just bumping this in case it got lost between shifts like in The Resident|Circling back before this disappears like a case file in New Amsterdam|Following up in case this got missed like a handoff in Chicago Med}</p><p><br></p><p>Vendor coordination usually becomes urgent only after something breaks.</p><p><br></p><p>That could be schedule changes, rep confusion, manual outreach, or unauthorized arrivals.</p><p><br></p><p>OR Trax keeps updates current and access tied to approved reps.</p><p><br></p><p>{Want me to show how hospitals avoid that scramble?|Open to a quick example of how this runs day to day?|Should I send a short walkthrough?}</p><p><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 5763,
+            "_eb_subject": "Re: {FIRST_NAME}",
+            "_eb_active": true
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p>Before I close this out.</p><p><br></p><p>Are you the right person for vendor coordination or vendor access workflows?</p><p><br></p><p>If so, happy to show how hospitals keep vendor access organized without extra work or cost.</p><p dir=\"ltr\"><br><a href=\"https://calendly.com/d/cvj5-hfn-kq8/intro-call-with-or-trax\" target=\"_blank\" rel=\"noreferrer noopener\">You can grab a time here,</a> or let me know who handles this on your team.</p><p><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 5764,
+            "_eb_subject": "Re: {FIRST_NAME}",
+            "_eb_active": true
+          }
+        ]
+      }
+    ],
+    "disable_variations": [
+      {
+        "step": 1,
+        "variation": "D",
+        "is_active": "no"
+      }
+    ],
+    "settings": {
+      "send_as_txt": "yes",
+      "is_emailopened_tracking": "no",
+      "is_unsubscribed_link": "no",
+      "stop_on_lead_replied": "yes",
+      "var_sel_type": "R_ROBIN"
+    },
+    "compat": {
+      "spintax_double": 0,
+      "spintax_single": 14,
+      "merge_tags": [
+        "{COMPANY}",
+        "{FIRST_NAME}",
+        "{SENDER_FULL_NAME}",
+        "{STATE}"
+      ],
+      "stale_calendly_month": 0
+    },
+    "_orphan_step_ids": [],
+    "_inferred_attachments": 2,
+    "_step_count_eb": 6,
+    "_variation_count_pv": 6
+  },
+  {
+    "source_campaign_id": 1147,
+    "camp_name": "2 July - OR Trax - Hospitals - Updated Titles - surgery and materials leaders [Hospital]",
+    "first_wait_time": null,
+    "sequences": [
+      {
+        "step": 1,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "{FIRST_NAME} ",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p>Noticed {COMPANY} while looking at hospitals in {STATE}, and figured I’d reach out.</p><p><br></p><p>Not sure if you're dealing with this, but we hear from other hospitals vendor access gets messy when schedules shift and reps miss updates.</p><p><br></p><p>OR Trax automates vendor coordination while keeping access tied to approved reps.</p><p><br></p><p>It is no costs for the hospital and there is no kiosk or bulky equipment to install.</p><p><br></p><p>Tampa General, VA Hospitals, and hundreds of other facilities across the nation already use us.</p><p><br></p><p>{Want to see how hospitals are reducing vendor confusion without adding work?|Should I send a quick breakdown of how this runs day to day?|Open to a short example of how teams handle this now?}</p><p dir=\"ltr\"><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 5756,
+            "_eb_subject": "{FIRST_NAME} ",
+            "_eb_active": true
+          },
+          {
+            "variation": "B",
+            "subject": "{FIRST_NAME}",
+            "name": "",
+            "body": "<p>{Hi|Hey|Hello} {FIRST_NAME},</p><p><br></p><p>I was curious, when schedules shift during the day, does someone on your team still have to make sure vendors were notified?</p><p><br></p><p>That small step is where things usually break. Delays, confusion, and staff pulled into coordination instead of staying focused on the room.</p><p><br></p><p>We remove that completely by automatically notifying vendors in real time when schedules change.</p><p><br></p><p>Also, hospitals do not pay for it. Vendors cover it because it keeps them aligned.</p><p><br></p><p>Want me to show you what that looks like in practice?</p><p><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>{Partnership Lead|Strategic Partnerships|Partner Relations|Partnership Coordinator}</p><p>{ORTrax}</p>",
+            "_eb_step_id": 5759,
+            "_eb_subject": "{FIRST_NAME}",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          },
+          {
+            "variation": "C",
+            "subject": "{FIRST_NAME}",
+            "name": "",
+            "body": "<p>{Hi|Hey|Hello} {FIRST_NAME},</p><p><br></p><p>Not sure if you have seen this yet, but when OR schedules shift, it usually turns into someone having to track down vendors to keep things moving.</p><p><br></p><p>It sounds small, but it is one of those things that quietly slows everything down.</p><p><br></p><p>We built a way to remove that entirely. Vendors get updated automatically in real time, no calls, no chasing.</p><p><br></p><p>The part most teams question is cost. Hospitals do not pay for it. Vendors cover it.</p><p><br></p><p>Curious if it would be useful to see how this actually works during a real schedule change?</p><p><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>{Partnership Lead|Strategic Partnerships|Partner Relations|Partnership Coordinator}</p><p>{ORTrax}</p>",
+            "_eb_step_id": 5760,
+            "_eb_subject": "{FIRST_NAME}",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          },
+          {
+            "variation": "D",
+            "subject": "for {FIRST_NAME}",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p>Reaching out because hospitals often run into vendor issues when schedules change.</p><p><br></p><p>OR Trax keeps vendor updates automated without new hardware or systems.</p><p><br></p><p>Your hospital is not charged either.</p><p><br></p><p>Tampa General, VA Hospitals, and hundreds of other facilities across the nation already use us.</p><p><br></p><p>{Want a quick look at how this works?|Should I send over a short breakdown?|Open to seeing how hospitals are using this?}</p><p dir=\"ltr\"><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 5761,
+            "_eb_subject": "for {FIRST_NAME}",
+            "_eb_active": false
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "wait_time": 2,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p>{Following up in case this got buried like a chart in Grey’s Anatomy|Just bumping this in case it got lost between shifts like in The Resident|Circling back before this disappears like a case file in New Amsterdam|Following up in case this got missed like a handoff in Chicago Med}</p><p><br></p><p>Vendor coordination usually becomes urgent only after something breaks.</p><p><br></p><p>That could be schedule changes, rep confusion, manual outreach, or unauthorized arrivals.</p><p><br></p><p>OR Trax keeps updates current and access tied to approved reps.</p><p><br></p><p>{Want me to show how hospitals avoid that scramble?|Open to a quick example of how this runs day to day?|Should I send a short walkthrough?}</p><p><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 5757,
+            "_eb_subject": "Re: {FIRST_NAME}",
+            "_eb_active": true
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p>Before I close this out.</p><p><br></p><p>Are you the right person for vendor coordination or vendor access workflows?</p><p><br></p><p>If so, happy to show how hospitals keep vendor access organized without extra work or cost.</p><p dir=\"ltr\"><br><a href=\"https://calendly.com/d/cvj5-hfn-kq8/intro-call-with-or-trax\" target=\"_blank\" rel=\"noreferrer noopener\">You can grab a time here,</a> or let me know who handles this on your team.</p><p><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 5758,
+            "_eb_subject": "Re: {FIRST_NAME}",
+            "_eb_active": true
+          }
+        ]
+      }
+    ],
+    "disable_variations": [
+      {
+        "step": 1,
+        "variation": "D",
+        "is_active": "no"
+      }
+    ],
+    "settings": {
+      "send_as_txt": "yes",
+      "is_emailopened_tracking": "no",
+      "is_unsubscribed_link": "no",
+      "stop_on_lead_replied": "yes",
+      "var_sel_type": "R_ROBIN"
+    },
+    "compat": {
+      "spintax_double": 0,
+      "spintax_single": 14,
+      "merge_tags": [
+        "{COMPANY}",
+        "{FIRST_NAME}",
+        "{SENDER_FULL_NAME}",
+        "{STATE}"
+      ],
+      "stale_calendly_month": 0
+    },
+    "_orphan_step_ids": [],
+    "_inferred_attachments": 2,
+    "_step_count_eb": 6,
+    "_variation_count_pv": 6
+  },
+  {
+    "source_campaign_id": 1123,
+    "camp_name": "2 July - OR Trax - Hospitals - Updated Titles - surgery and materials leaders ",
+    "first_wait_time": null,
+    "sequences": [
+      {
+        "step": 1,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "{FIRST_NAME} ",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p>Noticed {COMPANY} while looking at hospitals in {STATE}, and figured I’d reach out.</p><p><br></p><p>Not sure if you're dealing with this, but we hear from other hospitals vendor access gets messy when schedules shift and reps miss updates.</p><p><br></p><p>OR Trax automates vendor coordination while keeping access tied to approved reps.</p><p><br></p><p>It is no costs for the hospital and there is no kiosk or bulky equipment to install.</p><p><br></p><p>Tampa General, VA Hospitals, and hundreds of other facilities across the nation already use us.</p><p><br></p><p>{Want to see how hospitals are reducing vendor confusion without adding work?|Should I send a quick breakdown of how this runs day to day?|Open to a short example of how teams handle this now?}</p><p dir=\"ltr\"><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 5639,
+            "_eb_subject": "{FIRST_NAME} ",
+            "_eb_active": true
+          },
+          {
+            "variation": "B",
+            "subject": "{FIRST_NAME}",
+            "name": "",
+            "body": "<p>{Hi|Hey|Hello} {FIRST_NAME},</p><p><br></p><p>I was curious, when schedules shift during the day, does someone on your team still have to make sure vendors were notified?</p><p><br></p><p>That small step is where things usually break. Delays, confusion, and staff pulled into coordination instead of staying focused on the room.</p><p><br></p><p>We remove that completely by automatically notifying vendors in real time when schedules change.</p><p><br></p><p>Also, hospitals do not pay for it. Vendors cover it because it keeps them aligned.</p><p><br></p><p>Want me to show you what that looks like in practice?</p><p><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>{Partnership Lead|Strategic Partnerships|Partner Relations|Partnership Coordinator}</p><p>{ORTrax}</p>",
+            "_eb_step_id": 5642,
+            "_eb_subject": "{FIRST_NAME}",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          },
+          {
+            "variation": "C",
+            "subject": "{FIRST_NAME}",
+            "name": "",
+            "body": "<p>{Hi|Hey|Hello} {FIRST_NAME},</p><p><br></p><p>Not sure if you have seen this yet, but when OR schedules shift, it usually turns into someone having to track down vendors to keep things moving.</p><p><br></p><p>It sounds small, but it is one of those things that quietly slows everything down.</p><p><br></p><p>We built a way to remove that entirely. Vendors get updated automatically in real time, no calls, no chasing.</p><p><br></p><p>The part most teams question is cost. Hospitals do not pay for it. Vendors cover it.</p><p><br></p><p>Curious if it would be useful to see how this actually works during a real schedule change?</p><p><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>{Partnership Lead|Strategic Partnerships|Partner Relations|Partnership Coordinator}</p><p>{ORTrax}</p>",
+            "_eb_step_id": 5643,
+            "_eb_subject": "{FIRST_NAME}",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          },
+          {
+            "variation": "D",
+            "subject": "for {FIRST_NAME}",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p>Reaching out because hospitals often run into vendor issues when schedules change.</p><p><br></p><p>OR Trax keeps vendor updates automated without new hardware or systems.</p><p><br></p><p>Your hospital is not charged either.</p><p><br></p><p>Tampa General, VA Hospitals, and hundreds of other facilities across the nation already use us.</p><p><br></p><p>{Want a quick look at how this works?|Should I send over a short breakdown?|Open to seeing how hospitals are using this?}</p><p dir=\"ltr\"><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 5644,
+            "_eb_subject": "for {FIRST_NAME}",
+            "_eb_active": false
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "wait_time": 2,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p>{Following up in case this got buried like a chart in Grey’s Anatomy|Just bumping this in case it got lost between shifts like in The Resident|Circling back before this disappears like a case file in New Amsterdam|Following up in case this got missed like a handoff in Chicago Med}</p><p><br></p><p>Vendor coordination usually becomes urgent only after something breaks.</p><p><br></p><p>That could be schedule changes, rep confusion, manual outreach, or unauthorized arrivals.</p><p><br></p><p>OR Trax keeps updates current and access tied to approved reps.</p><p><br></p><p>{Want me to show how hospitals avoid that scramble?|Open to a quick example of how this runs day to day?|Should I send a short walkthrough?}</p><p><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 5640,
+            "_eb_subject": "Re: {FIRST_NAME}",
+            "_eb_active": true
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p>Before I close this out.</p><p><br></p><p>Are you the right person for vendor coordination or vendor access workflows?</p><p><br></p><p>If so, happy to show how hospitals keep vendor access organized without extra work or cost.</p><p dir=\"ltr\"><br><a href=\"https://calendly.com/d/cvj5-hfn-kq8/intro-call-with-or-trax\" target=\"_blank\" rel=\"noreferrer noopener\">You can grab a time here,</a> or let me know who handles this on your team.</p><p><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 5641,
+            "_eb_subject": "Re: {FIRST_NAME}",
+            "_eb_active": true
+          }
+        ]
+      }
+    ],
+    "disable_variations": [
+      {
+        "step": 1,
+        "variation": "D",
+        "is_active": "no"
+      }
+    ],
+    "settings": {
+      "send_as_txt": "yes",
+      "is_emailopened_tracking": "no",
+      "is_unsubscribed_link": "no",
+      "stop_on_lead_replied": "yes",
+      "var_sel_type": "R_ROBIN"
+    },
+    "compat": {
+      "spintax_double": 0,
+      "spintax_single": 14,
+      "merge_tags": [
+        "{COMPANY}",
+        "{FIRST_NAME}",
+        "{SENDER_FULL_NAME}",
+        "{STATE}"
+      ],
+      "stale_calendly_month": 0
+    },
+    "_orphan_step_ids": [],
+    "_inferred_attachments": 2,
+    "_step_count_eb": 6,
+    "_variation_count_pv": 6
+  },
+  {
+    "source_campaign_id": 1122,
+    "camp_name": "Aug - OR trax - ASC Titles - Apollo",
+    "first_wait_time": null,
+    "sequences": [
+      {
+        "step": 1,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "{FIRST_NAME} scheduling",
+            "name": "",
+            "body": "<p dir=\"ltr\">{Hi|Hey|Hello} {FIRST_NAME},<br><br></p><p dir=\"ltr\">Noticed {COMPANY} while looking into ASCs, and figured I'd reach out.</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">Most audit flags we see are not from negligence. It is files quietly going out of date until someone catches it right before inspection.<br><br></p><p dir=\"ltr\">We built OR Trax to keep Joint Commission and AAAHC compliance handled in the background, including infection control, so teams are not scrambling last minute.</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">No added workload, and it is free for the facility since vendors cover it.</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">{Already live across Surgery Partners and USPI centers.|Teams at Surgery Partners and USPI are already running this.|This is already in place across Surgery Partners and USPI.}<br><br></p><p dir=\"ltr\">{Want to see how centers are staying audit ready without the scramble?|Should I send a quick breakdown of how this runs day to day?|Open to a short example of how teams are handling this now?}<br><br></p><p dir=\"ltr\">{Thanks|Cheers}</p><p dir=\"ltr\">{SENDER_FULL_NAME}</p><p dir=\"ltr\">OR Trax</p>",
+            "_eb_step_id": 5634,
+            "_eb_subject": "{FIRST_NAME} scheduling",
+            "_eb_active": true
+          },
+          {
+            "variation": "B",
+            "subject": "{FIRST_NAME} scheduling",
+            "name": "",
+            "body": "<p dir=\"ltr\">{Hi|Hey|Hello} {FIRST_NAME}<br><br></p><p dir=\"ltr\">Quick question, how is {COMPANY} currently keeping compliance files audit ready across vendors and staff in {STATE}?</p><p><br></p><p dir=\"ltr\">Most teams rely on periodic checks, which works until something slips and it turns into a fire drill.</p><p><br></p><p dir=\"ltr\">We automate that entire layer so everything stays current by default without extra admin work.</p><p dir=\"ltr\">Free for the facility since it is covered on the vendor side.</p><p><br></p><p dir=\"ltr\">{Already trusted across Surgery Partners and USPI.|Happy to share how similar ASCs are using it.|This is already running in Surgery Partners and USPI centers.}</p><p><br></p><p dir=\"ltr\">{Worth seeing how this removes the audit scramble?|Should I send a short example of how this works in practice?|Open to a quick look at how teams are handling this now?}</p><p><br></p><p dir=\"ltr\">{Thanks|Cheers}</p><p dir=\"ltr\">{SENDER_FULL_NAME}</p><p dir=\"ltr\">OR Trax</p>",
+            "_eb_step_id": 5637,
+            "_eb_subject": "{FIRST_NAME} scheduling",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          },
+          {
+            "variation": "C",
+            "subject": "{FIRST_NAME} scheduling",
+            "name": "",
+            "body": "<p dir=\"ltr\">{Hi|Hey|Hello} {FIRST_NAME},</p><p><br></p><p dir=\"ltr\">Not sure if you are running into this at {COMPANY}, but most compliance issues we see in ASCs across {STATE} come down to outdated files, not lack of effort.</p><p><br></p><p dir=\"ltr\">Everything looks fine until an audit forces a full review.</p><p><br></p><p dir=\"ltr\">We handle that automatically, keeping compliance and infection control up to date in the background.</p><p><br></p><p dir=\"ltr\">No new systems to manage and no cost to the ASC since vendors cover it.</p><p><br></p><p dir=\"ltr\">{Already rolling out across Surgery Partners and USPI.|Teams like Surgery Partners are already using this.|Happy to share a quick reference from similar centers.}</p><p><br></p><p dir=\"ltr\">{Curious to see how this runs without adding work?|Want a quick breakdown of how centers are handling this now?|Should I send a short example?}</p><p><br></p><p dir=\"ltr\">{Thanks|Cheers}</p><p dir=\"ltr\">{SENDER_FULL_NAME}</p><p dir=\"ltr\">OR Trax</p>",
+            "_eb_step_id": 5638,
+            "_eb_subject": "{FIRST_NAME} scheduling",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "wait_time": 2,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p dir=\"ltr\">Hi {FIRST_NAME},<br><br>{Following up in case this got buried like a chart in Grey’s Anatomy|Just bumping this in case it got lost between shifts like in The Resident|Circling back before this disappears like a case file in New Amsterdam|Following up in case this got missed like a handoff in Chicago Med}</p><p><br></p><p dir=\"ltr\">Most ASC teams only revisit compliance when audit pressure hits, which is where the scramble usually starts.</p><p><br></p><p dir=\"ltr\">This keeps everything current continuously so there is nothing to fix last minute.</p><p><br></p><p dir=\"ltr\">{Want me to show how centers are avoiding that scramble entirely?|Open to a quick example of how this runs day to day?|Should I send a short walkthrough?}<br><br>{Thanks|Cheers|Appreciate it}<br>{SENDER_FULL_NAME}<br>{Partnership Lead|Strategic Partnerships|Partner Relations|Partnership Coordinator}<br>{ORTrax}</p>",
+            "_eb_step_id": 5635,
+            "_eb_subject": "Re: Re: {FIRST_NAME} scheduling",
+            "_eb_active": true
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p dir=\"ltr\">{Hi|Hey|Hello} {FIRST_NAME},<br><br></p><p dir=\"ltr\">I might be off here.</p><p><br></p><p dir=\"ltr\">If compliance and vendor workflows are not something you own, just let me know and I will close this out.</p><p><br></p><p dir=\"ltr\">If they are, happy to show how teams stay audit-ready without extra work or cost. <br><br><a href=\"https://calendly.com/d/cvj5-hfn-kq8/intro-call-with-or-trax\" target=\"_blank\" rel=\"noreferrer noopener\">You can grab a time here,</a> or let me know who handles this on your team.</p><p><br></p><p dir=\"ltr\">{Thanks|Cheers}</p><p dir=\"ltr\">{SENDER_FULL_NAME}</p><p dir=\"ltr\">OR Trax</p>",
+            "_eb_step_id": 5636,
+            "_eb_subject": "Re: Re: {FIRST_NAME} scheduling",
+            "_eb_active": true
+          }
+        ]
+      }
+    ],
+    "disable_variations": [],
+    "settings": {
+      "send_as_txt": "yes",
+      "is_emailopened_tracking": "no",
+      "is_unsubscribed_link": "no",
+      "stop_on_lead_replied": "yes",
+      "var_sel_type": "R_ROBIN"
+    },
+    "compat": {
+      "spintax_double": 0,
+      "spintax_single": 18,
+      "merge_tags": [
+        "{COMPANY}",
+        "{FIRST_NAME}",
+        "{SENDER_FULL_NAME}",
+        "{STATE}"
+      ],
+      "stale_calendly_month": 0
+    },
+    "_orphan_step_ids": [],
+    "_inferred_attachments": 2,
+    "_step_count_eb": 5,
+    "_variation_count_pv": 5
+  },
+  {
+    "source_campaign_id": 1099,
+    "camp_name": "AEROSEND July - OR Trax - Hospitals - Updated Titles - surgery and materials leaders ",
+    "first_wait_time": null,
+    "sequences": [
+      {
+        "step": 1,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "{FIRST_NAME} ",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p>Noticed {COMPANY} while looking at hospitals in {STATE}, and figured I’d reach out.</p><p><br></p><p>Not sure if you're dealing with this, but we hear from other hospitals vendor access gets messy when schedules shift and reps miss updates.</p><p><br></p><p>OR Trax automates vendor coordination while keeping access tied to approved reps.</p><p><br></p><p>It is no costs for the hospital and there is no kiosk or bulky equipment to install.</p><p><br></p><p>Tampa General, VA Hospitals, and hundreds of other facilities across the nation already use us.</p><p><br></p><p>{Want to see how hospitals are reducing vendor confusion without adding work?|Should I send a quick breakdown of how this runs day to day?|Open to a short example of how teams handle this now?}</p><p dir=\"ltr\"><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 5522,
+            "_eb_subject": "{FIRST_NAME} ",
+            "_eb_active": true
+          },
+          {
+            "variation": "B",
+            "subject": "{FIRST_NAME}",
+            "name": "",
+            "body": "<p>{Hi|Hey|Hello} {FIRST_NAME},</p><p><br></p><p>I was curious, when schedules shift during the day, does someone on your team still have to make sure vendors were notified?</p><p><br></p><p>That small step is where things usually break. Delays, confusion, and staff pulled into coordination instead of staying focused on the room.</p><p><br></p><p>We remove that completely by automatically notifying vendors in real time when schedules change.</p><p><br></p><p>Also, hospitals do not pay for it. Vendors cover it because it keeps them aligned.</p><p><br></p><p>Want me to show you what that looks like in practice?</p><p><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>{Partnership Lead|Strategic Partnerships|Partner Relations|Partnership Coordinator}</p><p>{ORTrax}</p>",
+            "_eb_step_id": 5525,
+            "_eb_subject": "{FIRST_NAME}",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          },
+          {
+            "variation": "C",
+            "subject": "{FIRST_NAME}",
+            "name": "",
+            "body": "<p>{Hi|Hey|Hello} {FIRST_NAME},</p><p><br></p><p>Not sure if you have seen this yet, but when OR schedules shift, it usually turns into someone having to track down vendors to keep things moving.</p><p><br></p><p>It sounds small, but it is one of those things that quietly slows everything down.</p><p><br></p><p>We built a way to remove that entirely. Vendors get updated automatically in real time, no calls, no chasing.</p><p><br></p><p>The part most teams question is cost. Hospitals do not pay for it. Vendors cover it.</p><p><br></p><p>Curious if it would be useful to see how this actually works during a real schedule change?</p><p><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>{Partnership Lead|Strategic Partnerships|Partner Relations|Partnership Coordinator}</p><p>{ORTrax}</p>",
+            "_eb_step_id": 5526,
+            "_eb_subject": "{FIRST_NAME}",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          },
+          {
+            "variation": "D",
+            "subject": "for {FIRST_NAME}",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p>Reaching out because hospitals often run into vendor issues when schedules change.</p><p><br></p><p>OR Trax keeps vendor updates automated without new hardware or systems.</p><p><br></p><p>Your hospital is not charged either.</p><p><br></p><p>Tampa General, VA Hospitals, and hundreds of other facilities across the nation already use us.</p><p><br></p><p>{Want a quick look at how this works?|Should I send over a short breakdown?|Open to seeing how hospitals are using this?}</p><p dir=\"ltr\"><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 5527,
+            "_eb_subject": "for {FIRST_NAME}",
+            "_eb_active": false
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "wait_time": 2,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p>{Following up in case this got buried like a chart in Grey’s Anatomy|Just bumping this in case it got lost between shifts like in The Resident|Circling back before this disappears like a case file in New Amsterdam|Following up in case this got missed like a handoff in Chicago Med}</p><p><br></p><p>Vendor coordination usually becomes urgent only after something breaks.</p><p><br></p><p>That could be schedule changes, rep confusion, manual outreach, or unauthorized arrivals.</p><p><br></p><p>OR Trax keeps updates current and access tied to approved reps.</p><p><br></p><p>{Want me to show how hospitals avoid that scramble?|Open to a quick example of how this runs day to day?|Should I send a short walkthrough?}</p><p><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 5523,
+            "_eb_subject": "Re: {FIRST_NAME}",
+            "_eb_active": true
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p>Before I close this out.</p><p><br></p><p>Are you the right person for vendor coordination or vendor access workflows?</p><p><br></p><p>If so, happy to show how hospitals keep vendor access organized without extra work or cost.</p><p dir=\"ltr\"><br><a href=\"https://calendly.com/d/cvj5-hfn-kq8/intro-call-with-or-trax\" target=\"_blank\" rel=\"noreferrer noopener\">You can grab a time here,</a> or let me know who handles this on your team.</p><p><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 5524,
+            "_eb_subject": "Re: {FIRST_NAME}",
+            "_eb_active": true
+          }
+        ]
+      }
+    ],
+    "disable_variations": [
+      {
+        "step": 1,
+        "variation": "D",
+        "is_active": "no"
+      }
+    ],
+    "settings": {
+      "send_as_txt": "yes",
+      "is_emailopened_tracking": "no",
+      "is_unsubscribed_link": "no",
+      "stop_on_lead_replied": "yes",
+      "var_sel_type": "R_ROBIN"
+    },
+    "compat": {
+      "spintax_double": 0,
+      "spintax_single": 14,
+      "merge_tags": [
+        "{COMPANY}",
+        "{FIRST_NAME}",
+        "{SENDER_FULL_NAME}",
+        "{STATE}"
+      ],
+      "stale_calendly_month": 0
+    },
+    "_orphan_step_ids": [],
+    "_inferred_attachments": 2,
+    "_step_count_eb": 6,
+    "_variation_count_pv": 6
+  },
+  {
+    "source_campaign_id": 1035,
+    "camp_name": "June -  Recycle ASC List - NewScrapper [Hospital]",
+    "first_wait_time": null,
+    "sequences": [
+      {
+        "step": 1,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "{FIRST_NAME} scheduling",
+            "name": "",
+            "body": "<p dir=\"ltr\">{Hi|Hey|Hello} {FIRST_NAME},<br><br></p><p dir=\"ltr\">Noticed {COMPANY} while looking at ASCs in {STATE}, and figured I’d reach out.</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">Most audit flags we see are not from negligence. It is files quietly going out of date until someone catches it right before inspection.<br><br></p><p dir=\"ltr\">We built OR Trax to keep Joint Commission and AAAHC compliance handled in the background, including infection control, so teams are not scrambling last minute.</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">No added workload, and it is free for the facility since vendors cover it.</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">{Already live across Surgery Partners and USPI centers.|Teams at Surgery Partners and USPI are already running this.|This is already in place across Surgery Partners and USPI.}<br><br></p><p dir=\"ltr\">{Want to see how centers are staying audit ready without the scramble?|Should I send a quick breakdown of how this runs day to day?|Open to a short example of how teams are handling this now?}<br><br></p><p dir=\"ltr\">{Thanks|Cheers}</p><p dir=\"ltr\">{SENDER_FULL_NAME}</p><p dir=\"ltr\">OR Trax</p>",
+            "_eb_step_id": 5245,
+            "_eb_subject": "{FIRST_NAME} scheduling",
+            "_eb_active": true
+          },
+          {
+            "variation": "B",
+            "subject": "{FIRST_NAME} scheduling",
+            "name": "",
+            "body": "<p dir=\"ltr\">{Hi|Hey|Hello} {FIRST_NAME}<br><br></p><p dir=\"ltr\">Quick question, how is {COMPANY} currently keeping compliance files audit ready across vendors and staff in {STATE}?</p><p><br></p><p dir=\"ltr\">Most teams rely on periodic checks, which works until something slips and it turns into a fire drill.</p><p><br></p><p dir=\"ltr\">We automate that entire layer so everything stays current by default without extra admin work.</p><p dir=\"ltr\">Free for the facility since it is covered on the vendor side.</p><p><br></p><p dir=\"ltr\">{Already trusted across Surgery Partners and USPI.|Happy to share how similar ASCs are using it.|This is already running in Surgery Partners and USPI centers.}</p><p><br></p><p dir=\"ltr\">{Worth seeing how this removes the audit scramble?|Should I send a short example of how this works in practice?|Open to a quick look at how teams are handling this now?}</p><p><br></p><p dir=\"ltr\">{Thanks|Cheers}</p><p dir=\"ltr\">{SENDER_FULL_NAME}</p><p dir=\"ltr\">OR Trax</p>",
+            "_eb_step_id": 5248,
+            "_eb_subject": "{FIRST_NAME} scheduling",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          },
+          {
+            "variation": "C",
+            "subject": "{FIRST_NAME} scheduling",
+            "name": "",
+            "body": "<p dir=\"ltr\">{Hi|Hey|Hello} {FIRST_NAME},</p><p><br></p><p dir=\"ltr\">Not sure if you are running into this at {COMPANY}, but most compliance issues we see in ASCs across {STATE} come down to outdated files, not lack of effort.</p><p><br></p><p dir=\"ltr\">Everything looks fine until an audit forces a full review.</p><p><br></p><p dir=\"ltr\">We handle that automatically, keeping compliance and infection control up to date in the background.</p><p><br></p><p dir=\"ltr\">No new systems to manage and no cost to the ASC since vendors cover it.</p><p><br></p><p dir=\"ltr\">{Already rolling out across Surgery Partners and USPI.|Teams like Surgery Partners are already using this.|Happy to share a quick reference from similar centers.}</p><p><br></p><p dir=\"ltr\">{Curious to see how this runs without adding work?|Want a quick breakdown of how centers are handling this now?|Should I send a short example?}</p><p><br></p><p dir=\"ltr\">{Thanks|Cheers}</p><p dir=\"ltr\">{SENDER_FULL_NAME}</p><p dir=\"ltr\">OR Trax</p>",
+            "_eb_step_id": 5249,
+            "_eb_subject": "{FIRST_NAME} scheduling",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "wait_time": 2,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p dir=\"ltr\">Hi {FIRST_NAME},<br><br>{Following up in case this got buried like a chart in Grey’s Anatomy|Just bumping this in case it got lost between shifts like in The Resident|Circling back before this disappears like a case file in New Amsterdam|Following up in case this got missed like a handoff in Chicago Med}</p><p><br></p><p dir=\"ltr\">Most ASC teams only revisit compliance when audit pressure hits, which is where the scramble usually starts.</p><p><br></p><p dir=\"ltr\">This keeps everything current continuously so there is nothing to fix last minute.</p><p><br></p><p dir=\"ltr\">{Want me to show how centers are avoiding that scramble entirely?|Open to a quick example of how this runs day to day?|Should I send a short walkthrough?}<br><br>{Thanks|Cheers|Appreciate it}<br>{SENDER_FULL_NAME}<br>{Partnership Lead|Strategic Partnerships|Partner Relations|Partnership Coordinator}<br>{ORTrax}</p>",
+            "_eb_step_id": 5246,
+            "_eb_subject": "Re: Re: {FIRST_NAME} scheduling",
+            "_eb_active": true
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p dir=\"ltr\">{Hi|Hey|Hello} {FIRST_NAME},<br><br></p><p dir=\"ltr\">I might be off here.</p><p><br></p><p dir=\"ltr\">If compliance and vendor workflows are not something you own, just let me know and I will close this out.</p><p><br></p><p dir=\"ltr\">If they are, happy to show how teams stay audit-ready without extra work or cost. <br><br><a href=\"https://calendly.com/d/cvj5-hfn-kq8/intro-call-with-or-trax\" target=\"_blank\" rel=\"noreferrer noopener\">You can grab a time here,</a> or let me know who handles this on your team.</p><p><br></p><p dir=\"ltr\">{Thanks|Cheers}</p><p dir=\"ltr\">{SENDER_FULL_NAME}</p><p dir=\"ltr\">OR Trax</p>",
+            "_eb_step_id": 5247,
+            "_eb_subject": "Re: Re: {FIRST_NAME} scheduling",
+            "_eb_active": true
+          }
+        ]
+      }
+    ],
+    "disable_variations": [],
+    "settings": {
+      "send_as_txt": "yes",
+      "is_emailopened_tracking": "no",
+      "is_unsubscribed_link": "no",
+      "stop_on_lead_replied": "yes",
+      "var_sel_type": "R_ROBIN"
+    },
+    "compat": {
+      "spintax_double": 0,
+      "spintax_single": 18,
+      "merge_tags": [
+        "{COMPANY}",
+        "{FIRST_NAME}",
+        "{SENDER_FULL_NAME}",
+        "{STATE}"
+      ],
+      "stale_calendly_month": 0
+    },
+    "_orphan_step_ids": [],
+    "_inferred_attachments": 2,
+    "_step_count_eb": 5,
+    "_variation_count_pv": 5
+  },
+  {
+    "source_campaign_id": 1029,
+    "camp_name": "July - OR Trax - Hospitals - Updated Titles - surgery and materials leaders [Hospital]",
+    "first_wait_time": null,
+    "sequences": [
+      {
+        "step": 1,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "{FIRST_NAME} ",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p>Noticed {COMPANY} while looking at hospitals in {STATE}, and figured I’d reach out.</p><p><br></p><p>Vendor access gets messy when schedules shift and reps miss updates.</p><p><br></p><p>OR Trax automates vendor coordination while keeping access tied to approved reps.</p><p><br></p><p>It is no costs for the hospital and there is no kiosk or bulky equipment to install.</p><p><br></p><p>Tampa General, VA Hospitals, and hundreds of other facilities across the nation already use us.</p><p><br></p><p>{Want to see how hospitals are reducing vendor confusion without adding work?|Should I send a quick breakdown of how this runs day to day?|Open to a short example of how teams handle this now?}</p><p dir=\"ltr\"><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 5214,
+            "_eb_subject": "{FIRST_NAME} ",
+            "_eb_active": true
+          },
+          {
+            "variation": "B",
+            "subject": "{FIRST_NAME}",
+            "name": "",
+            "body": "<p>{Hi|Hey|Hello} {FIRST_NAME},</p><p><br></p><p>I was curious, when schedules shift during the day, does someone on your team still have to make sure vendors were notified?</p><p><br></p><p>That small step is where things usually break. Delays, confusion, and staff pulled into coordination instead of staying focused on the room.</p><p><br></p><p>We remove that completely by automatically notifying vendors in real time when schedules change.</p><p><br></p><p>Also, hospitals do not pay for it. Vendors cover it because it keeps them aligned.</p><p><br></p><p>Want me to show you what that looks like in practice?</p><p><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>{Partnership Lead|Strategic Partnerships|Partner Relations|Partnership Coordinator}</p><p>{ORTrax}</p>",
+            "_eb_step_id": 5217,
+            "_eb_subject": "{FIRST_NAME}",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          },
+          {
+            "variation": "C",
+            "subject": "{FIRST_NAME}",
+            "name": "",
+            "body": "<p>{Hi|Hey|Hello} {FIRST_NAME},</p><p><br></p><p>Not sure if you have seen this yet, but when OR schedules shift, it usually turns into someone having to track down vendors to keep things moving.</p><p><br></p><p>It sounds small, but it is one of those things that quietly slows everything down.</p><p><br></p><p>We built a way to remove that entirely. Vendors get updated automatically in real time, no calls, no chasing.</p><p><br></p><p>The part most teams question is cost. Hospitals do not pay for it. Vendors cover it.</p><p><br></p><p>Curious if it would be useful to see how this actually works during a real schedule change?</p><p><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>{Partnership Lead|Strategic Partnerships|Partner Relations|Partnership Coordinator}</p><p>{ORTrax}</p>",
+            "_eb_step_id": 5218,
+            "_eb_subject": "{FIRST_NAME}",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          },
+          {
+            "variation": "D",
+            "subject": "for {FIRST_NAME}",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p>Reaching out because hospitals often run into vendor issues when schedules change.</p><p><br></p><p>OR Trax keeps vendor updates automated without new hardware or systems.</p><p><br></p><p>Your hospital is not charged either.</p><p><br></p><p>Tampa General, VA Hospitals, and hundreds of other facilities across the nation already use us.</p><p><br></p><p>{Want a quick look at how this works?|Should I send over a short breakdown?|Open to seeing how hospitals are using this?}</p><p dir=\"ltr\"><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 5219,
+            "_eb_subject": "for {FIRST_NAME}",
+            "_eb_active": true
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "wait_time": 2,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p>{Following up in case this got buried like a chart in Grey’s Anatomy|Just bumping this in case it got lost between shifts like in The Resident|Circling back before this disappears like a case file in New Amsterdam|Following up in case this got missed like a handoff in Chicago Med}</p><p><br></p><p>Vendor coordination usually becomes urgent only after something breaks.</p><p><br></p><p>That could be schedule changes, rep confusion, manual outreach, or unauthorized arrivals.</p><p><br></p><p>OR Trax keeps updates current and access tied to approved reps.</p><p><br></p><p>{Want me to show how hospitals avoid that scramble?|Open to a quick example of how this runs day to day?|Should I send a short walkthrough?}</p><p><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 5215,
+            "_eb_subject": "Re: {FIRST_NAME}",
+            "_eb_active": true
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p>Before I close this out.</p><p><br></p><p>Are you the right person for vendor coordination or vendor access workflows?</p><p><br></p><p>If so, happy to show how hospitals keep vendor access organized without extra work or cost.</p><p dir=\"ltr\"><br><a href=\"https://calendly.com/d/cvj5-hfn-kq8/intro-call-with-or-trax\" target=\"_blank\" rel=\"noreferrer noopener\">You can grab a time here,</a> or let me know who handles this on your team.</p><p><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 5216,
+            "_eb_subject": "Re: {FIRST_NAME}",
+            "_eb_active": true
+          }
+        ]
+      }
+    ],
+    "disable_variations": [],
+    "settings": {
+      "send_as_txt": "yes",
+      "is_emailopened_tracking": "no",
+      "is_unsubscribed_link": "no",
+      "stop_on_lead_replied": "yes",
+      "var_sel_type": "R_ROBIN"
+    },
+    "compat": {
+      "spintax_double": 0,
+      "spintax_single": 14,
+      "merge_tags": [
+        "{COMPANY}",
+        "{FIRST_NAME}",
+        "{SENDER_FULL_NAME}",
+        "{STATE}"
+      ],
+      "stale_calendly_month": 0
+    },
+    "_orphan_step_ids": [],
+    "_inferred_attachments": 2,
+    "_step_count_eb": 6,
+    "_variation_count_pv": 6
+  },
+  {
+    "source_campaign_id": 1025,
+    "camp_name": "V2 July- OR Trax USA Hospital [Hospital]",
+    "first_wait_time": null,
+    "sequences": [
+      {
+        "step": 1,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "{FIRST_NAME} ",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p>Noticed {COMPANY} while looking at hospitals in {STATE}, and figured I’d reach out.</p><p><br></p><p>Vendor access gets messy when schedules shift and reps miss updates.</p><p><br></p><p>OR Trax automates vendor coordination while keeping access tied to approved reps.</p><p><br></p><p>It is no costs for the hospital and there is no kiosk or bulky equipment to install.</p><p><br></p><p>Tampa General, VA Hospitals, and hundreds of other facilities across the nation already use us.</p><p><br></p><p>{Want to see how hospitals are reducing vendor confusion without adding work?|Should I send a quick breakdown of how this runs day to day?|Open to a short example of how teams handle this now?}</p><p dir=\"ltr\"><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 5193,
+            "_eb_subject": "{FIRST_NAME} ",
+            "_eb_active": true
+          },
+          {
+            "variation": "B",
+            "subject": "{FIRST_NAME}",
+            "name": "",
+            "body": "<p>{Hi|Hey|Hello} {FIRST_NAME},</p><p><br></p><p>I was curious, when schedules shift during the day, does someone on your team still have to make sure vendors were notified?</p><p><br></p><p>That small step is where things usually break. Delays, confusion, and staff pulled into coordination instead of staying focused on the room.</p><p><br></p><p>We remove that completely by automatically notifying vendors in real time when schedules change.</p><p><br></p><p>Also, hospitals do not pay for it. Vendors cover it because it keeps them aligned.</p><p><br></p><p>Want me to show you what that looks like in practice?</p><p><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>{Partnership Lead|Strategic Partnerships|Partner Relations|Partnership Coordinator}</p><p>{ORTrax}</p>",
+            "_eb_step_id": 5196,
+            "_eb_subject": "{FIRST_NAME}",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          },
+          {
+            "variation": "C",
+            "subject": "{FIRST_NAME}",
+            "name": "",
+            "body": "<p>{Hi|Hey|Hello} {FIRST_NAME},</p><p><br></p><p>Not sure if you have seen this yet, but when OR schedules shift, it usually turns into someone having to track down vendors to keep things moving.</p><p><br></p><p>It sounds small, but it is one of those things that quietly slows everything down.</p><p><br></p><p>We built a way to remove that entirely. Vendors get updated automatically in real time, no calls, no chasing.</p><p><br></p><p>The part most teams question is cost. Hospitals do not pay for it. Vendors cover it.</p><p><br></p><p>Curious if it would be useful to see how this actually works during a real schedule change?</p><p><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>{Partnership Lead|Strategic Partnerships|Partner Relations|Partnership Coordinator}</p><p>{ORTrax}</p>",
+            "_eb_step_id": 5197,
+            "_eb_subject": "{FIRST_NAME}",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          },
+          {
+            "variation": "D",
+            "subject": "for {FIRST_NAME}",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p>Reaching out because hospitals often run into vendor issues when schedules change.</p><p><br></p><p>OR Trax keeps vendor updates automated without new hardware or systems.</p><p><br></p><p>Your hospital is not charged either.</p><p><br></p><p>Tampa General, VA Hospitals, and hundreds of other facilities across the nation already use us.</p><p><br></p><p>{Want a quick look at how this works?|Should I send over a short breakdown?|Open to seeing how hospitals are using this?}</p><p dir=\"ltr\"><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 5198,
+            "_eb_subject": "for {FIRST_NAME}",
+            "_eb_active": true
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "wait_time": 2,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p>{Following up in case this got buried like a chart in Grey’s Anatomy|Just bumping this in case it got lost between shifts like in The Resident|Circling back before this disappears like a case file in New Amsterdam|Following up in case this got missed like a handoff in Chicago Med}</p><p><br></p><p>Vendor coordination usually becomes urgent only after something breaks.</p><p><br></p><p>That could be schedule changes, rep confusion, manual outreach, or unauthorized arrivals.</p><p><br></p><p>OR Trax keeps updates current and access tied to approved reps.</p><p><br></p><p>{Want me to show how hospitals avoid that scramble?|Open to a quick example of how this runs day to day?|Should I send a short walkthrough?}</p><p><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 5194,
+            "_eb_subject": "Re: {FIRST_NAME}",
+            "_eb_active": true
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p>Before I close this out.</p><p><br></p><p>Are you the right person for vendor coordination or vendor access workflows?</p><p><br></p><p>If so, happy to show how hospitals keep vendor access organized without extra work or cost.</p><p dir=\"ltr\"><br><a href=\"https://calendly.com/d/cvj5-hfn-kq8/intro-call-with-or-trax\" target=\"_blank\" rel=\"noreferrer noopener\">You can grab a time here,</a> or let me know who handles this on your team.</p><p><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 5195,
+            "_eb_subject": "Re: {FIRST_NAME}",
+            "_eb_active": true
+          }
+        ]
+      }
+    ],
+    "disable_variations": [],
+    "settings": {
+      "send_as_txt": "yes",
+      "is_emailopened_tracking": "no",
+      "is_unsubscribed_link": "no",
+      "stop_on_lead_replied": "yes",
+      "var_sel_type": "R_ROBIN"
+    },
+    "compat": {
+      "spintax_double": 0,
+      "spintax_single": 14,
+      "merge_tags": [
+        "{COMPANY}",
+        "{FIRST_NAME}",
+        "{SENDER_FULL_NAME}",
+        "{STATE}"
+      ],
+      "stale_calendly_month": 0
+    },
+    "_orphan_step_ids": [],
+    "_inferred_attachments": 2,
+    "_step_count_eb": 6,
+    "_variation_count_pv": 6
+  },
+  {
+    "source_campaign_id": 1010,
+    "camp_name": "July -  Recycle ASC List - NewScrapper - Generic",
+    "first_wait_time": null,
+    "sequences": [
+      {
+        "step": 1,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "{FIRST_NAME} scheduling",
+            "name": "",
+            "body": "<p dir=\"ltr\">{Hi|Hey|Hello},<br><br></p><p dir=\"ltr\">Noticed {COMPANY} while looking at ASCs in {STATE}, and figured I’d reach out.</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">Most audit flags we see are not from negligence. It is files quietly going out of date until someone catches it right before inspection.<br><br></p><p dir=\"ltr\">We built OR Trax to keep Joint Commission and AAAHC compliance handled in the background, including infection control, so teams are not scrambling last minute.</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">No added workload, and it is free for the facility since vendors cover it.</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">{Already live across Surgery Partners and USPI centers.|Teams at Surgery Partners and USPI are already running this.|This is already in place across Surgery Partners and USPI.}<br><br></p><p dir=\"ltr\">{Want to see how centers are staying audit ready without the scramble?|Should I send a quick breakdown of how this runs day to day?|Open to a short example of how teams are handling this now?}<br><br></p><p dir=\"ltr\">{Thanks|Cheers}</p><p dir=\"ltr\">{SENDER_FULL_NAME}</p><p dir=\"ltr\">OR Trax</p>",
+            "_eb_step_id": 5114,
+            "_eb_subject": "{FIRST_NAME} scheduling",
+            "_eb_active": true
+          },
+          {
+            "variation": "B",
+            "subject": "{FIRST_NAME} scheduling",
+            "name": "",
+            "body": "<p dir=\"ltr\">{Hi|Hey|Hello} {FIRST_NAME}<br><br></p><p dir=\"ltr\">Quick question, how is {COMPANY} currently keeping compliance files audit ready across vendors and staff in {STATE}?</p><p><br></p><p dir=\"ltr\">Most teams rely on periodic checks, which works until something slips and it turns into a fire drill.</p><p><br></p><p dir=\"ltr\">We automate that entire layer so everything stays current by default without extra admin work.</p><p dir=\"ltr\">Free for the facility since it is covered on the vendor side.</p><p><br></p><p dir=\"ltr\">{Already trusted across Surgery Partners and USPI.|Happy to share how similar ASCs are using it.|This is already running in Surgery Partners and USPI centers.}</p><p><br></p><p dir=\"ltr\">{Worth seeing how this removes the audit scramble?|Should I send a short example of how this works in practice?|Open to a quick look at how teams are handling this now?}</p><p><br></p><p dir=\"ltr\">{Thanks|Cheers}</p><p dir=\"ltr\">{SENDER_FULL_NAME}</p><p dir=\"ltr\">OR Trax</p>",
+            "_eb_step_id": 5117,
+            "_eb_subject": "{FIRST_NAME} scheduling",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          },
+          {
+            "variation": "C",
+            "subject": "{FIRST_NAME} scheduling",
+            "name": "",
+            "body": "<p dir=\"ltr\">{Hi|Hey|Hello} {FIRST_NAME},</p><p><br></p><p dir=\"ltr\">Not sure if you are running into this at {COMPANY}, but most compliance issues we see in ASCs across {STATE} come down to outdated files, not lack of effort.</p><p><br></p><p dir=\"ltr\">Everything looks fine until an audit forces a full review.</p><p><br></p><p dir=\"ltr\">We handle that automatically, keeping compliance and infection control up to date in the background.</p><p><br></p><p dir=\"ltr\">No new systems to manage and no cost to the ASC since vendors cover it.</p><p><br></p><p dir=\"ltr\">{Already rolling out across Surgery Partners and USPI.|Teams like Surgery Partners are already using this.|Happy to share a quick reference from similar centers.}</p><p><br></p><p dir=\"ltr\">{Curious to see how this runs without adding work?|Want a quick breakdown of how centers are handling this now?|Should I send a short example?}</p><p><br></p><p dir=\"ltr\">{Thanks|Cheers}</p><p dir=\"ltr\">{SENDER_FULL_NAME}</p><p dir=\"ltr\">OR Trax</p>",
+            "_eb_step_id": 5118,
+            "_eb_subject": "{FIRST_NAME} scheduling",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "wait_time": 2,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p dir=\"ltr\">{Hi|Hey|Hello},<br><br>{Following up in case this got buried like a chart in Grey’s Anatomy|Just bumping this in case it got lost between shifts like in The Resident|Circling back before this disappears like a case file in New Amsterdam|Following up in case this got missed like a handoff in Chicago Med}</p><p><br></p><p dir=\"ltr\">Most ASC teams only revisit compliance when audit pressure hits, which is where the scramble usually starts.</p><p><br></p><p dir=\"ltr\">This keeps everything current continuously so there is nothing to fix last minute.</p><p><br></p><p dir=\"ltr\">{Want me to show how centers are avoiding that scramble entirely?|Open to a quick example of how this runs day to day?|Should I send a short walkthrough?}<br><br>{Thanks|Cheers|Appreciate it}<br>{SENDER_FULL_NAME}<br>{Partnership Lead|Strategic Partnerships|Partner Relations|Partnership Coordinator}<br>{ORTrax}</p>",
+            "_eb_step_id": 5115,
+            "_eb_subject": "Re: Re: {FIRST_NAME} scheduling",
+            "_eb_active": true
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p dir=\"ltr\">{Hi|Hey|Hello},<br><br></p><p dir=\"ltr\">I might be off here.</p><p><br></p><p dir=\"ltr\">If compliance and vendor workflows are not something you own, just let me know and I will close this out.</p><p><br></p><p dir=\"ltr\">If they are, happy to show how teams stay audit-ready without extra work or cost. <br><br><a href=\"https://calendly.com/d/cvj5-hfn-kq8/intro-call-with-or-trax\" target=\"_blank\" rel=\"noreferrer noopener\">You can grab a time here,</a> or let me know who handles this on your team.</p><p><br></p><p dir=\"ltr\">{Thanks|Cheers}</p><p dir=\"ltr\">{SENDER_FULL_NAME}</p><p dir=\"ltr\">OR Trax</p>",
+            "_eb_step_id": 5116,
+            "_eb_subject": "Re: Re: {FIRST_NAME} scheduling",
+            "_eb_active": true
+          }
+        ]
+      }
+    ],
+    "disable_variations": [],
+    "settings": {
+      "send_as_txt": "yes",
+      "is_emailopened_tracking": "no",
+      "is_unsubscribed_link": "no",
+      "stop_on_lead_replied": "yes",
+      "var_sel_type": "R_ROBIN"
+    },
+    "compat": {
+      "spintax_double": 0,
+      "spintax_single": 19,
+      "merge_tags": [
+        "{COMPANY}",
+        "{FIRST_NAME}",
+        "{SENDER_FULL_NAME}",
+        "{STATE}"
+      ],
+      "stale_calendly_month": 0
+    },
+    "_orphan_step_ids": [],
+    "_inferred_attachments": 2,
+    "_step_count_eb": 5,
+    "_variation_count_pv": 5
+  },
+  {
+    "source_campaign_id": 995,
+    "camp_name": "July - OR Trax - Hospitals - Updated Titles - surgery and materials leaders",
+    "first_wait_time": null,
+    "sequences": [
+      {
+        "step": 1,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "{FIRST_NAME} ",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p>Noticed {COMPANY} while looking at hospitals in {STATE}, and figured I’d reach out.</p><p><br></p><p>Vendor access gets messy when schedules shift and reps miss updates.</p><p><br></p><p>OR Trax automates vendor coordination while keeping access tied to approved reps.</p><p><br></p><p>It is no costs for the hospital and there is no kiosk or bulky equipment to install.</p><p><br></p><p>Tampa General, VA Hospitals, and hundreds of other facilities across the nation already use us.</p><p><br></p><p>{Want to see how hospitals are reducing vendor confusion without adding work?|Should I send a quick breakdown of how this runs day to day?|Open to a short example of how teams handle this now?}</p><p dir=\"ltr\"><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 5033,
+            "_eb_subject": "{FIRST_NAME} ",
+            "_eb_active": true
+          },
+          {
+            "variation": "B",
+            "subject": "{FIRST_NAME}",
+            "name": "",
+            "body": "<p>{Hi|Hey|Hello} {FIRST_NAME},</p><p><br></p><p>I was curious, when schedules shift during the day, does someone on your team still have to make sure vendors were notified?</p><p><br></p><p>That small step is where things usually break. Delays, confusion, and staff pulled into coordination instead of staying focused on the room.</p><p><br></p><p>We remove that completely by automatically notifying vendors in real time when schedules change.</p><p><br></p><p>Also, hospitals do not pay for it. Vendors cover it because it keeps them aligned.</p><p><br></p><p>Want me to show you what that looks like in practice?</p><p><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>{Partnership Lead|Strategic Partnerships|Partner Relations|Partnership Coordinator}</p><p>{ORTrax}</p>",
+            "_eb_step_id": 5036,
+            "_eb_subject": "{FIRST_NAME}",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          },
+          {
+            "variation": "C",
+            "subject": "{FIRST_NAME}",
+            "name": "",
+            "body": "<p>{Hi|Hey|Hello} {FIRST_NAME},</p><p><br></p><p>Not sure if you have seen this yet, but when OR schedules shift, it usually turns into someone having to track down vendors to keep things moving.</p><p><br></p><p>It sounds small, but it is one of those things that quietly slows everything down.</p><p><br></p><p>We built a way to remove that entirely. Vendors get updated automatically in real time, no calls, no chasing.</p><p><br></p><p>The part most teams question is cost. Hospitals do not pay for it. Vendors cover it.</p><p><br></p><p>Curious if it would be useful to see how this actually works during a real schedule change?</p><p><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>{Partnership Lead|Strategic Partnerships|Partner Relations|Partnership Coordinator}</p><p>{ORTrax}</p>",
+            "_eb_step_id": 5037,
+            "_eb_subject": "{FIRST_NAME}",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          },
+          {
+            "variation": "D",
+            "subject": "for {FIRST_NAME}",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p>Reaching out because hospitals often run into vendor issues when schedules change.</p><p><br></p><p>OR Trax keeps vendor updates automated without new hardware or systems.</p><p><br></p><p>Your hospital is not charged either.</p><p><br></p><p>Tampa General, VA Hospitals, and hundreds of other facilities across the nation already use us.</p><p><br></p><p>{Want a quick look at how this works?|Should I send over a short breakdown?|Open to seeing how hospitals are using this?}</p><p dir=\"ltr\"><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 5038,
+            "_eb_subject": "for {FIRST_NAME}",
+            "_eb_active": true
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "wait_time": 2,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p>{Following up in case this got buried like a chart in Grey’s Anatomy|Just bumping this in case it got lost between shifts like in The Resident|Circling back before this disappears like a case file in New Amsterdam|Following up in case this got missed like a handoff in Chicago Med}</p><p><br></p><p>Vendor coordination usually becomes urgent only after something breaks.</p><p><br></p><p>That could be schedule changes, rep confusion, manual outreach, or unauthorized arrivals.</p><p><br></p><p>OR Trax keeps updates current and access tied to approved reps.</p><p><br></p><p>{Want me to show how hospitals avoid that scramble?|Open to a quick example of how this runs day to day?|Should I send a short walkthrough?}</p><p><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 5034,
+            "_eb_subject": "Re: {FIRST_NAME}",
+            "_eb_active": true
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p>Before I close this out.</p><p><br></p><p>Are you the right person for vendor coordination or vendor access workflows?</p><p><br></p><p>If so, happy to show how hospitals keep vendor access organized without extra work or cost.</p><p dir=\"ltr\"><br><a href=\"https://calendly.com/d/cvj5-hfn-kq8/intro-call-with-or-trax\" target=\"_blank\" rel=\"noreferrer noopener\">You can grab a time here,</a> or let me know who handles this on your team.</p><p><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 5035,
+            "_eb_subject": "Re: {FIRST_NAME}",
+            "_eb_active": true
+          }
+        ]
+      }
+    ],
+    "disable_variations": [],
+    "settings": {
+      "send_as_txt": "yes",
+      "is_emailopened_tracking": "no",
+      "is_unsubscribed_link": "no",
+      "stop_on_lead_replied": "yes",
+      "var_sel_type": "R_ROBIN"
+    },
+    "compat": {
+      "spintax_double": 0,
+      "spintax_single": 14,
+      "merge_tags": [
+        "{COMPANY}",
+        "{FIRST_NAME}",
+        "{SENDER_FULL_NAME}",
+        "{STATE}"
+      ],
+      "stale_calendly_month": 0
+    },
+    "_orphan_step_ids": [],
+    "_inferred_attachments": 2,
+    "_step_count_eb": 6,
+    "_variation_count_pv": 6
+  },
+  {
+    "source_campaign_id": 994,
+    "camp_name": "July -  Recycle ASC List - NewScrapper",
+    "first_wait_time": null,
+    "sequences": [
+      {
+        "step": 1,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "{FIRST_NAME} scheduling",
+            "name": "",
+            "body": "<p dir=\"ltr\">{Hi|Hey|Hello} {FIRST_NAME},<br><br></p><p dir=\"ltr\">Noticed {COMPANY} while looking at ASCs in {STATE}, and figured I’d reach out.</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">Most audit flags we see are not from negligence. It is files quietly going out of date until someone catches it right before inspection.<br><br></p><p dir=\"ltr\">We built OR Trax to keep Joint Commission and AAAHC compliance handled in the background, including infection control, so teams are not scrambling last minute.</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">No added workload, and it is free for the facility since vendors cover it.</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">{Already live across Surgery Partners and USPI centers.|Teams at Surgery Partners and USPI are already running this.|This is already in place across Surgery Partners and USPI.}<br><br></p><p dir=\"ltr\">{Want to see how centers are staying audit ready without the scramble?|Should I send a quick breakdown of how this runs day to day?|Open to a short example of how teams are handling this now?}<br><br></p><p dir=\"ltr\">{Thanks|Cheers}</p><p dir=\"ltr\">{SENDER_FULL_NAME}</p><p dir=\"ltr\">OR Trax</p>",
+            "_eb_step_id": 5028,
+            "_eb_subject": "{FIRST_NAME} scheduling",
+            "_eb_active": true
+          },
+          {
+            "variation": "B",
+            "subject": "{FIRST_NAME} scheduling",
+            "name": "",
+            "body": "<p dir=\"ltr\">{Hi|Hey|Hello} {FIRST_NAME}<br><br></p><p dir=\"ltr\">Quick question, how is {COMPANY} currently keeping compliance files audit ready across vendors and staff in {STATE}?</p><p><br></p><p dir=\"ltr\">Most teams rely on periodic checks, which works until something slips and it turns into a fire drill.</p><p><br></p><p dir=\"ltr\">We automate that entire layer so everything stays current by default without extra admin work.</p><p dir=\"ltr\">Free for the facility since it is covered on the vendor side.</p><p><br></p><p dir=\"ltr\">{Already trusted across Surgery Partners and USPI.|Happy to share how similar ASCs are using it.|This is already running in Surgery Partners and USPI centers.}</p><p><br></p><p dir=\"ltr\">{Worth seeing how this removes the audit scramble?|Should I send a short example of how this works in practice?|Open to a quick look at how teams are handling this now?}</p><p><br></p><p dir=\"ltr\">{Thanks|Cheers}</p><p dir=\"ltr\">{SENDER_FULL_NAME}</p><p dir=\"ltr\">OR Trax</p>",
+            "_eb_step_id": 5031,
+            "_eb_subject": "{FIRST_NAME} scheduling",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          },
+          {
+            "variation": "C",
+            "subject": "{FIRST_NAME} scheduling",
+            "name": "",
+            "body": "<p dir=\"ltr\">{Hi|Hey|Hello} {FIRST_NAME},</p><p><br></p><p dir=\"ltr\">Not sure if you are running into this at {COMPANY}, but most compliance issues we see in ASCs across {STATE} come down to outdated files, not lack of effort.</p><p><br></p><p dir=\"ltr\">Everything looks fine until an audit forces a full review.</p><p><br></p><p dir=\"ltr\">We handle that automatically, keeping compliance and infection control up to date in the background.</p><p><br></p><p dir=\"ltr\">No new systems to manage and no cost to the ASC since vendors cover it.</p><p><br></p><p dir=\"ltr\">{Already rolling out across Surgery Partners and USPI.|Teams like Surgery Partners are already using this.|Happy to share a quick reference from similar centers.}</p><p><br></p><p dir=\"ltr\">{Curious to see how this runs without adding work?|Want a quick breakdown of how centers are handling this now?|Should I send a short example?}</p><p><br></p><p dir=\"ltr\">{Thanks|Cheers}</p><p dir=\"ltr\">{SENDER_FULL_NAME}</p><p dir=\"ltr\">OR Trax</p>",
+            "_eb_step_id": 5032,
+            "_eb_subject": "{FIRST_NAME} scheduling",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "wait_time": 2,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p dir=\"ltr\">Hi {FIRST_NAME},<br><br>{Following up in case this got buried like a chart in Grey’s Anatomy|Just bumping this in case it got lost between shifts like in The Resident|Circling back before this disappears like a case file in New Amsterdam|Following up in case this got missed like a handoff in Chicago Med}</p><p><br></p><p dir=\"ltr\">Most ASC teams only revisit compliance when audit pressure hits, which is where the scramble usually starts.</p><p><br></p><p dir=\"ltr\">This keeps everything current continuously so there is nothing to fix last minute.</p><p><br></p><p dir=\"ltr\">{Want me to show how centers are avoiding that scramble entirely?|Open to a quick example of how this runs day to day?|Should I send a short walkthrough?}<br><br>{Thanks|Cheers|Appreciate it}<br>{SENDER_FULL_NAME}<br>{Partnership Lead|Strategic Partnerships|Partner Relations|Partnership Coordinator}<br>{ORTrax}</p>",
+            "_eb_step_id": 5029,
+            "_eb_subject": "Re: Re: {FIRST_NAME} scheduling",
+            "_eb_active": true
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p dir=\"ltr\">{Hi|Hey|Hello} {FIRST_NAME},<br><br></p><p dir=\"ltr\">I might be off here.</p><p><br></p><p dir=\"ltr\">If compliance and vendor workflows are not something you own, just let me know and I will close this out.</p><p><br></p><p dir=\"ltr\">If they are, happy to show how teams stay audit-ready without extra work or cost. <br><br><a href=\"https://calendly.com/d/cvj5-hfn-kq8/intro-call-with-or-trax\" target=\"_blank\" rel=\"noreferrer noopener\">You can grab a time here,</a> or let me know who handles this on your team.</p><p><br></p><p dir=\"ltr\">{Thanks|Cheers}</p><p dir=\"ltr\">{SENDER_FULL_NAME}</p><p dir=\"ltr\">OR Trax</p>",
+            "_eb_step_id": 5030,
+            "_eb_subject": "Re: Re: {FIRST_NAME} scheduling",
+            "_eb_active": true
+          }
+        ]
+      }
+    ],
+    "disable_variations": [],
+    "settings": {
+      "send_as_txt": "yes",
+      "is_emailopened_tracking": "no",
+      "is_unsubscribed_link": "no",
+      "stop_on_lead_replied": "yes",
+      "var_sel_type": "R_ROBIN"
+    },
+    "compat": {
+      "spintax_double": 0,
+      "spintax_single": 18,
+      "merge_tags": [
+        "{COMPANY}",
+        "{FIRST_NAME}",
+        "{SENDER_FULL_NAME}",
+        "{STATE}"
+      ],
+      "stale_calendly_month": 0
+    },
+    "_orphan_step_ids": [],
+    "_inferred_attachments": 2,
+    "_step_count_eb": 5,
+    "_variation_count_pv": 5
+  },
+  {
+    "source_campaign_id": 640,
+    "camp_name": "Jun e -OR Trax - USA Hospitals CSV Website - OR Leaders",
+    "first_wait_time": null,
+    "sequences": [
+      {
+        "step": 1,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "{FIRST_NAME} ",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p dir=\"ltr\">Might be off base. But we hear when OR schedules shift, staff often end up manually updating vendors and resolving rep confusion.</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">We help hospitals automate vendor coordination without adding more systems or hardware.</p><p dir=\"ltr\">No kiosks, printers, or tablets.</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">Setup usually takes a few hours and hospitals are not charged for it.</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">Open to learning more?</p><p dir=\"ltr\"><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 3333,
+            "_eb_subject": "{FIRST_NAME} ",
+            "_eb_active": true
+          },
+          {
+            "variation": "B",
+            "subject": "{FIRST_NAME}",
+            "name": "",
+            "body": "<p>{Hi|Hey|Hello} {FIRST_NAME},</p><p><br></p><p>I was curious, when schedules shift during the day, does someone on your team still have to make sure vendors were notified?</p><p><br></p><p>That small step is where things usually break. Delays, confusion, and staff pulled into coordination instead of staying focused on the room.</p><p><br></p><p>We remove that completely by automatically notifying vendors in real time when schedules change.</p><p><br></p><p>Also, hospitals do not pay for it. Vendors cover it because it keeps them aligned.</p><p><br></p><p>Want me to show you what that looks like in practice?</p><p><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>{Partnership Lead|Strategic Partnerships|Partner Relations|Partnership Coordinator}</p><p>{ORTrax}</p>",
+            "_eb_step_id": 3336,
+            "_eb_subject": "{FIRST_NAME}",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          },
+          {
+            "variation": "C",
+            "subject": "{FIRST_NAME}",
+            "name": "",
+            "body": "<p>{Hi|Hey|Hello} {FIRST_NAME},</p><p><br></p><p>Not sure if you have seen this yet, but when OR schedules shift, it usually turns into someone having to track down vendors to keep things moving.</p><p><br></p><p>It sounds small, but it is one of those things that quietly slows everything down.</p><p><br></p><p>We built a way to remove that entirely. Vendors get updated automatically in real time, no calls, no chasing.</p><p><br></p><p>The part most teams question is cost. Hospitals do not pay for it. Vendors cover it.</p><p><br></p><p>Curious if it would be useful to see how this actually works during a real schedule change?</p><p><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>{Partnership Lead|Strategic Partnerships|Partner Relations|Partnership Coordinator}</p><p>{ORTrax}</p>",
+            "_eb_step_id": 3337,
+            "_eb_subject": "{FIRST_NAME}",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          },
+          {
+            "variation": "D",
+            "subject": "{FIRST_NAME}",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p dir=\"ltr\">Might be off base. But we hear when OR schedules shift, staff often end up manually updating vendors and resolving rep confusion.</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">We help hospitals automate vendor coordination without adding more systems or hardware.</p><p dir=\"ltr\">No kiosks, printers, or tablets.</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">Setup usually takes a few hours and hospitals are not charged for it.</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">Open to learning more?</p><p dir=\"ltr\"><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 3338,
+            "_eb_subject": "{FIRST_NAME}",
+            "_eb_active": true
+          },
+          {
+            "variation": "E",
+            "subject": "{FIRST_NAME} ",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p dir=\"ltr\">One thing hospitals like about OR Trax is there is no equipment rollout attached to it.</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">No kiosks breaking, printers failing, or check-in stations to maintain.</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">Just centralized vendor coordination tied to approved schedules and reps.</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">Most vendors are already in the network too. And there’s no cost to your facility.</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">Worth a quick overview?</p><p dir=\"ltr\"><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 3339,
+            "_eb_subject": "{FIRST_NAME} ",
+            "_eb_active": true
+          },
+          {
+            "variation": "F",
+            "subject": "for {FIRST_NAME}",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p dir=\"ltr\">A lot of vendor coordination issues start after schedules change.</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">Staff end up manually updating reps, verifying approvals, and dealing with vendors showing up disconnected from the latest schedule.</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">We help automate that process without requiring hardware or another complicated rollout.</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">Hospitals do not pay for it either.</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">Open to seeing how it works?</p><p dir=\"ltr\"><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 3340,
+            "_eb_subject": "for {FIRST_NAME}",
+            "_eb_active": true
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "wait_time": 2,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p dir=\"ltr\">{{Following up before this gets buried somewhere between shifts like an episode of Grey’s Anatomy|Circling back before this disappears into the hospital chaos like a scene from The Resident|Just bumping this in case it got lost somewhere between rounds like an episode of House}}</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">Most hospitals only revisit vendor coordination once it starts creating operational disruption.</p><p dir=\"ltr\">Usually it is schedule changes, rep confusion, manual outreach, unauthorized arrivals, or staff chasing vendors down last minute.</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">This helps automate those updates while keeping vendor access tied to approved schedules and reps.</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">Open to a quick example of how teams are handling this today?</p><p dir=\"ltr\"><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 3334,
+            "_eb_subject": "Re: {FIRST_NAME}",
+            "_eb_active": true
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p>Hi {FIRST_NAME},</p><p><br></p><p dir=\"ltr\">I might be off here.</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">If vendor coordination or vendor access workflows are not something your team oversees, just let me know and I will close this out.</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">If it is relevant, happy to share how hospitals are reducing manual coordination work while keeping vendor access more controlled and centralized.<br><br><a href=\"https://calendly.com/d/cvj5-hfn-kq8/intro-call-with-or-trax\" target=\"_blank\" rel=\"noreferrer noopener\">You can grab a time here,</a> or let me know who handles this on your team.</p><p><br></p><p>{Thanks|Cheers|Appreciate it}</p><p>{SENDER_FULL_NAME}</p><p>ORTrax</p>",
+            "_eb_step_id": 3335,
+            "_eb_subject": "Re: {FIRST_NAME}",
+            "_eb_active": true
+          }
+        ]
+      }
+    ],
+    "disable_variations": [],
+    "settings": {
+      "send_as_txt": "yes",
+      "is_emailopened_tracking": "no",
+      "is_unsubscribed_link": "no",
+      "stop_on_lead_replied": "yes",
+      "var_sel_type": "R_ROBIN"
+    },
+    "compat": {
+      "spintax_double": 1,
+      "spintax_single": 12,
+      "merge_tags": [
+        "{FIRST_NAME}",
+        "{SENDER_FULL_NAME}"
+      ],
+      "stale_calendly_month": 0
+    },
+    "_orphan_step_ids": [],
+    "_inferred_attachments": 2,
+    "_step_count_eb": 8,
+    "_variation_count_pv": 8
+  },
+  {
+    "source_campaign_id": 627,
+    "camp_name": "June -  Recycle ASC List - NewScrapper",
+    "first_wait_time": null,
+    "sequences": [
+      {
+        "step": 1,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "{FIRST_NAME} scheduling",
+            "name": "",
+            "body": "<p dir=\"ltr\">{Hi|Hey|Hello} {FIRST_NAME},<br><br></p><p dir=\"ltr\">Noticed {COMPANY} while looking at ASCs in {STATE}, and figured I’d reach out.</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">Most audit flags we see are not from negligence. It is files quietly going out of date until someone catches it right before inspection.<br><br></p><p dir=\"ltr\">We built OR Trax to keep Joint Commission and AAAHC compliance handled in the background, including infection control, so teams are not scrambling last minute.</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">No added workload, and it is free for the facility since vendors cover it.</p><p dir=\"ltr\"><br></p><p dir=\"ltr\">{Already live across Surgery Partners and USPI centers.|Teams at Surgery Partners and USPI are already running this.|This is already in place across Surgery Partners and USPI.}<br><br></p><p dir=\"ltr\">{Want to see how centers are staying audit ready without the scramble?|Should I send a quick breakdown of how this runs day to day?|Open to a short example of how teams are handling this now?}<br><br></p><p dir=\"ltr\">{Thanks|Cheers}</p><p dir=\"ltr\">{SENDER_FULL_NAME}</p><p dir=\"ltr\">OR Trax</p>",
+            "_eb_step_id": 3258,
+            "_eb_subject": "{FIRST_NAME} scheduling",
+            "_eb_active": true
+          },
+          {
+            "variation": "B",
+            "subject": "{FIRST_NAME} scheduling",
+            "name": "",
+            "body": "<p dir=\"ltr\">{Hi|Hey|Hello} {FIRST_NAME}<br><br></p><p dir=\"ltr\">Quick question, how is {COMPANY} currently keeping compliance files audit ready across vendors and staff in {STATE}?</p><p><br></p><p dir=\"ltr\">Most teams rely on periodic checks, which works until something slips and it turns into a fire drill.</p><p><br></p><p dir=\"ltr\">We automate that entire layer so everything stays current by default without extra admin work.</p><p dir=\"ltr\">Free for the facility since it is covered on the vendor side.</p><p><br></p><p dir=\"ltr\">{Already trusted across Surgery Partners and USPI.|Happy to share how similar ASCs are using it.|This is already running in Surgery Partners and USPI centers.}</p><p><br></p><p dir=\"ltr\">{Worth seeing how this removes the audit scramble?|Should I send a short example of how this works in practice?|Open to a quick look at how teams are handling this now?}</p><p><br></p><p dir=\"ltr\">{Thanks|Cheers}</p><p dir=\"ltr\">{SENDER_FULL_NAME}</p><p dir=\"ltr\">OR Trax</p>",
+            "_eb_step_id": 3261,
+            "_eb_subject": "{FIRST_NAME} scheduling",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          },
+          {
+            "variation": "C",
+            "subject": "{FIRST_NAME} scheduling",
+            "name": "",
+            "body": "<p dir=\"ltr\">{Hi|Hey|Hello} {FIRST_NAME},</p><p><br></p><p dir=\"ltr\">Not sure if you are running into this at {COMPANY}, but most compliance issues we see in ASCs across {STATE} come down to outdated files, not lack of effort.</p><p><br></p><p dir=\"ltr\">Everything looks fine until an audit forces a full review.</p><p><br></p><p dir=\"ltr\">We handle that automatically, keeping compliance and infection control up to date in the background.</p><p><br></p><p dir=\"ltr\">No new systems to manage and no cost to the ASC since vendors cover it.</p><p><br></p><p dir=\"ltr\">{Already rolling out across Surgery Partners and USPI.|Teams like Surgery Partners are already using this.|Happy to share a quick reference from similar centers.}</p><p><br></p><p dir=\"ltr\">{Curious to see how this runs without adding work?|Want a quick breakdown of how centers are handling this now?|Should I send a short example?}</p><p><br></p><p dir=\"ltr\">{Thanks|Cheers}</p><p dir=\"ltr\">{SENDER_FULL_NAME}</p><p dir=\"ltr\">OR Trax</p>",
+            "_eb_step_id": 3262,
+            "_eb_subject": "{FIRST_NAME} scheduling",
+            "_eb_active": true,
+            "_inferred_attachment": true
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "wait_time": 2,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p dir=\"ltr\">Hi {FIRST_NAME},<br><br>{Following up in case this got buried like a chart in Grey’s Anatomy|Just bumping this in case it got lost between shifts like in The Resident|Circling back before this disappears like a case file in New Amsterdam|Following up in case this got missed like a handoff in Chicago Med}</p><p><br></p><p dir=\"ltr\">Most ASC teams only revisit compliance when audit pressure hits, which is where the scramble usually starts.</p><p><br></p><p dir=\"ltr\">This keeps everything current continuously so there is nothing to fix last minute.</p><p><br></p><p dir=\"ltr\">{Want me to show how centers are avoiding that scramble entirely?|Open to a quick example of how this runs day to day?|Should I send a short walkthrough?}<br><br>{Thanks|Cheers|Appreciate it}<br>{SENDER_FULL_NAME}<br>{Partnership Lead|Strategic Partnerships|Partner Relations|Partnership Coordinator}<br>{ORTrax}</p>",
+            "_eb_step_id": 3259,
+            "_eb_subject": "Re: Re: {FIRST_NAME} scheduling",
+            "_eb_active": true
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "wait_time": 1,
+        "variations": [
+          {
+            "variation": "A",
+            "subject": "",
+            "name": "",
+            "body": "<p dir=\"ltr\">{Hi|Hey|Hello} {FIRST_NAME},<br><br></p><p dir=\"ltr\">I might be off here.</p><p><br></p><p dir=\"ltr\">If compliance and vendor workflows are not something you own, just let me know and I will close this out.</p><p><br></p><p dir=\"ltr\">If they are, happy to show how teams stay audit-ready without extra work or cost. <br><br><a href=\"https://calendly.com/d/cvj5-hfn-kq8/intro-call-with-or-trax\" target=\"_blank\" rel=\"noreferrer noopener\">You can grab a time here,</a> or let me know who handles this on your team.</p><p><br></p><p dir=\"ltr\">{Thanks|Cheers}</p><p dir=\"ltr\">{SENDER_FULL_NAME}</p><p dir=\"ltr\">OR Trax</p>",
+            "_eb_step_id": 3260,
+            "_eb_subject": "Re: Re: {FIRST_NAME} scheduling",
+            "_eb_active": true
+          }
+        ]
+      }
+    ],
+    "disable_variations": [],
+    "settings": {
+      "send_as_txt": "yes",
+      "is_emailopened_tracking": "no",
+      "is_unsubscribed_link": "no",
+      "stop_on_lead_replied": "yes",
+      "var_sel_type": "R_ROBIN"
+    },
+    "compat": {
+      "spintax_double": 0,
+      "spintax_single": 18,
+      "merge_tags": [
+        "{COMPANY}",
+        "{FIRST_NAME}",
+        "{SENDER_FULL_NAME}",
+        "{STATE}"
+      ],
+      "stale_calendly_month": 0
+    },
+    "_orphan_step_ids": [],
+    "_inferred_attachments": 2,
+    "_step_count_eb": 5,
+    "_variation_count_pv": 5
+  }
+]
