@@ -22,13 +22,20 @@
 //   • GET /approvals/messages    requires ?view=pending|approved|scheduled
 //   • GET /analytics/overview    requires startDate + endDate + workspaceId
 //   • pagination envelope is { limit, offset, total, hasMore }
-import { cockpitSecret } from "./core.js";
+// Namespace import on purpose: core.js runs dotenv.config() on the repo-root
+// .env at import time (which is what makes VALLEY_API_KEY visible), but its
+// named exports differ between branches — cockpitSecret exists on some working
+// trees and not others. A namespace import tolerates either; a named import
+// would throw at load and take the whole MCP server down with it.
+import * as core from "./core.js";
 
 export const VALLEY_BASE =
   (process.env.VALLEY_API_BASE_URL || "https://api.joinvalley.co/public/v1").replace(/\/$/, "");
 
 const valleyKey = () =>
-  cockpitSecret("__global__", "valley") ?? process.env.VALLEY_API_KEY;
+  (typeof core.cockpitSecret === "function"
+    ? core.cockpitSecret("__global__", "valley")
+    : undefined) ?? process.env.VALLEY_API_KEY;
 
 const MAX_LIMIT = 100; // API caps limit at 100; higher values are silently clamped.
 
