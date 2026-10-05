@@ -337,3 +337,61 @@ export async function getInterestedReplies({ client_name } = {}) {
   }
   return results;
 }
+
+// ── Sequence steps ───────────────────────────────────────────────────────────
+// Read a campaign's sequence steps (subjects, bodies, wait days, variants).
+export async function getSequenceSteps({ client_name, campaign_id, instance }) {
+  return ebFetch("GET", `/campaigns/${campaign_id}/sequence-steps`, getClient(client_name), undefined, instance);
+}
+
+// Copy the sequence from one campaign to another — across instances if needed.
+// Copies steps only: no leads, no inboxes, no status change. Refuses to write
+// into a destination that already has steps unless allow_existing is true.
+export async function copyCampaignSequence({
+  client_name, source_campaign_id, source_instance,
+  dest_campaign_id, dest_instance, allow_existing = false, dry_run = false,
+}) {
+  const client = getClient(client_name);
+  const src = await ebFetch("GET", `/campaigns/${source_campaign_id}/sequence-steps`, client, undefined, source_instance);
+  const srcSteps = src?.data ?? [];
+  if (!Array.isArray(srcSteps) || !srcSteps.length) {
+    throw new Error(`Source campaign ${source_campaign_id} (${source_instance}) returned no sequence steps: ${JSON.stringify(src).slice(0, 300)}`);
+  }
+
+  const dst = await ebFetch("GET", `/campaigns/${dest_campaign_id}/sequence-steps`, client, undefined, dest_instance);
+  const dstSteps = Array.isArray(dst?.data) ? dst.data : [];
+  if (dstSteps.length && !allow_existing) {
+    throw new Error(`Destination campaign ${dest_campaign_id} (${dest_instance}) already has ${dstSteps.length} step(s). Pass allow_existing=true to append anyway.`);
+  }
+
+  // Map source step ids → order so variant_from_step can be re-pointed.
+  // Main steps by order first, variants (order null) after their parents.
+  const sorted = [...srcSteps].sort((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity));
+  const orderById = Object.fromEntries(sorted.map(s => [s.id, s.order]));
+  const sequence_steps = sorted.map(s => {
+    const step = {
+      // EmailBison prepends "Re: " to thread replies on write, so strip it to avoid "Re: Re:".
+      email_subject: s.thread_reply ? (s.email_subject ?? "").replace(/^(re:\s*)+/i, "") : (s.email_subject ?? ""),
+      email_body:    s.email_body ?? "",
+      wait_in_days:  s.wait_in_days ?? 1,
+      order:         s.order,
+      variant:       !!s.variant,
+      thread_reply:  !!s.thread_reply,
+    };
+    if (s.variant && s.variant_from_step != null) {
+      step.variant_from_step = orderById[s.variant_from_step] ?? s.variant_from_step;
+    }
+    return step;
+  });
+
+  const payload = { title: `Sequence copied from campaign ${source_campaign_id}`, sequence_steps };
+  if (dry_run) return { dry_run: true, steps: sequence_steps.length, payload };
+
+  const res = await ebFetch("POST", `/campaigns/${dest_campaign_id}/sequence-steps`, client, payload, dest_instance);
+  const after = await ebFetch("GET", `/campaigns/${dest_campaign_id}/sequence-steps`, client, undefined, dest_instance);
+  return {
+    source: { campaign_id: source_campaign_id, instance: source_instance, steps: srcSteps.length },
+    dest:   { campaign_id: dest_campaign_id, instance: dest_instance, steps_after: Array.isArray(after?.data) ? after.data.length : null },
+    response: res,
+  };
+}

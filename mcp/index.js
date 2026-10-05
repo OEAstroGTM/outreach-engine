@@ -96,6 +96,36 @@ server.tool("remove_inboxes_from_campaign",
 //    actions like register_domain, update_nameservers, inboxing_submit_domain
 //    stay agent-only so the "never register without an explicit go" rule and
 //    the agent's own review still gate anything that spends money.) ───────────
+server.tool("get_sequence_steps",
+  "Read a campaign's EmailBison sequence steps (subjects, bodies, wait days, variants).",
+  {
+    client_name: z.string(),
+    campaign_id: z.number(),
+    instance: z.enum(["eb_send", "eb_personal"]).optional(),
+  },
+  async (args) => {
+    try { return ok(await ops.getSequenceSteps(args)); }
+    catch (e) { return err(e); }
+  }
+);
+
+server.tool("copy_campaign_sequence",
+  "Copy the sequence steps from one EmailBison campaign to another (works across eb_send/eb_personal). Steps only — no leads, inboxes, or status changes. Refuses if the destination already has steps unless allow_existing=true. Use dry_run=true to preview.",
+  {
+    client_name: z.string(),
+    source_campaign_id: z.number(),
+    source_instance: z.enum(["eb_send", "eb_personal"]),
+    dest_campaign_id: z.number(),
+    dest_instance: z.enum(["eb_send", "eb_personal"]),
+    allow_existing: z.boolean().optional(),
+    dry_run: z.boolean().optional(),
+  },
+  async (args) => {
+    try { return ok(await ops.copyCampaignSequence(args)); }
+    catch (e) { return err(e); }
+  }
+);
+
 server.tool("get_domain",
   "Get a domain's registrar status + current nameservers (read-only).",
   { domain: z.string() },
