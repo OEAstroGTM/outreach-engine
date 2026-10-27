@@ -59,8 +59,10 @@ test("Streamable HTTP client sees only authorized tools and never receives clien
     });
     client = new Client({ name: "compatibility-test", version: "1.0.0" });
     await client.connect(transport);
-    const names = (await client.listTools()).tools.map(tool => tool.name);
+    const tools = (await client.listTools()).tools;
+    const names = tools.map(tool => tool.name);
     assert.deepEqual(names, ["list_clients", "get_client"]);
+    assert.equal(tools[0].annotations.readOnlyHint, true);
     const result = await client.callTool({ name: "get_client", arguments: { client_name: "Outreach Engine" } });
     const data = JSON.parse(result.content[0].text);
     assert.equal(data.name, "Outreach Engine");
