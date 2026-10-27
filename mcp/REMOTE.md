@@ -19,9 +19,9 @@ The scopes above are access boundaries for whole specialist agents. In particula
 
 ## Owner setup
 
-1. Choose a team-owned Railway workspace and create a service from `OEAstroGTM/outreach-engine`, with the repository root as the root directory. The Dockerfile and `railway.json` are at that root. Generate a Railway HTTPS service domain.
-2. Configure an OAuth 2.1 provider that supports MCP clients, OAuth discovery, PKCE, and Client ID Metadata Documents or dynamic client registration. Register the exact MCP URL as the API audience/resource. Configure JWT access tokens with the scopes above. Restrict sign-in to the team in the provider and issue refresh tokens for clients that need durable connections.
-3. Set these Railway variables before running the service:
+1. Use a team-owned Railway service connected to `OEAstroGTM/outreach-engine` on the `main` branch, with the repository root as its source directory. Railway detects the root `Dockerfile` automatically. Railway no longer enables legacy `railway.json` Config as Code on new services. Merge the MCP code, then set the service healthcheck path to `/health` in Railway's Deploy settings. The MCP process fails closed until its authentication variables are configured.
+2. Once the MCP image is deployed, generate a Railway HTTPS service domain. Configure an OAuth 2.1 provider that supports MCP clients, OAuth discovery, PKCE, and Client ID Metadata Documents or dynamic client registration. Register the exact MCP URL as the API audience/resource. Configure JWT access tokens with the scopes above. Restrict sign-in to the team in the provider and issue refresh tokens for clients that need durable connections.
+3. Set these Railway variables and redeploy:
 
    ```text
    MCP_RESOURCE_URL=https://<your Railway domain>/mcp
