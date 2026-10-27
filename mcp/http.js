@@ -3,7 +3,7 @@ import http from "node:http";
 import { fileURLToPath } from "node:url";
 import { resolve } from "node:path";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
-import { loadAuthConfig, verifyAccessToken } from "./auth.js";
+import { AccessDeniedError, loadAuthConfig, verifyAccessToken } from "./auth.js";
 import { buildServer } from "./server.js";
 
 const MAX_BODY_BYTES = 1_000_000;
@@ -65,7 +65,14 @@ export function createHttpServer(config) {
       if (!match) return json(res, 401, { error: "unauthorized" }, { "www-authenticate": challenge });
       let identity;
       try { identity = await verifyAccessToken(match[1], config); }
-      catch { return json(res, 401, { error: "unauthorized" }, { "www-authenticate": challenge }); }
+      catch (error) {
+        if (error instanceof AccessDeniedError) {
+          return json(res, 403, { error: "forbidden" }, {
+            "www-authenticate": `Bearer error="insufficient_scope", resource_metadata="${metadataUrl}"`,
+          });
+        }
+        return json(res, 401, { error: "unauthorized" }, { "www-authenticate": challenge });
+      }
 
       if (req.method !== "POST") {
         return json(res, 405, { error: "method not allowed" }, { allow: "POST" });

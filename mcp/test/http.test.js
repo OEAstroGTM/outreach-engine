@@ -51,6 +51,13 @@ test("Streamable HTTP client sees only authorized tools and never receives clien
     const unauth = await fetch(endpoint, { method: "POST", headers: { "content-type": "application/json" }, body: "{}" });
     assert.equal(unauth.status, 401);
     assert.match(unauth.headers.get("www-authenticate"), /oauth-protected-resource/);
+    const forbidden = await fetch(endpoint, {
+      method: "POST",
+      headers: { "content-type": "application/json", Authorization: `Bearer ${await token("reader", "research:run")}` },
+      body: "{}",
+    });
+    assert.equal(forbidden.status, 403);
+    assert.match(forbidden.headers.get("www-authenticate"), /insufficient_scope/);
     const metadata = await fetch(new URL("/.well-known/oauth-protected-resource/mcp", endpoint));
     assert.equal((await metadata.json()).resource, resourceUrl);
 

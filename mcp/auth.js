@@ -10,6 +10,8 @@ export const TOOL_SCOPES = Object.freeze({
 
 const KNOWN_SCOPES = new Set(Object.values(TOOL_SCOPES));
 
+export class AccessDeniedError extends Error {}
+
 function httpsUrl(value, name) {
   const url = new URL(value);
   if (url.protocol !== "https:" || url.username || url.password || url.search || url.hash) {
@@ -58,7 +60,7 @@ export async function verifyAccessToken(token, config) {
     requiredClaims: ["sub", "exp"],
   });
   const policyScopes = config.policy.get(payload.sub);
-  if (!policyScopes) throw new Error("Subject is not a team member");
+  if (!policyScopes) throw new AccessDeniedError("Subject is not a team member");
   const granted = new Set([
     ...(typeof payload.scope === "string" ? payload.scope.split(/\s+/) : []),
     ...(Array.isArray(payload.scp) ? payload.scp : []),
@@ -66,6 +68,6 @@ export async function verifyAccessToken(token, config) {
   const allowedTools = new Set(Object.entries(TOOL_SCOPES)
     .filter(([, scope]) => granted.has(scope) && policyScopes.has(scope))
     .map(([name]) => name));
-  if (!allowedTools.size) throw new Error("No permitted MCP scope");
+  if (!allowedTools.size) throw new AccessDeniedError("No permitted MCP scope");
   return { subject: payload.sub, allowedTools };
 }
