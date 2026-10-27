@@ -1,5 +1,7 @@
 # Outreach Engine MCP
 
+For team access through a hosted Streamable HTTP endpoint, see [REMOTE.md](REMOTE.md).
+
 Exposes Outreach Engine as a small **collection of delegating agents**. The
 operator hands an agent a goal in plain language; the agent runs its own
 tool-use loop and reports back.
