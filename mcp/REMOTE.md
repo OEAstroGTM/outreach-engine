@@ -6,7 +6,7 @@ The hosted endpoint is https://<your Railway domain>/mcp. It uses stateless MCP 
 
 For Claude Team, use one strong, random bearer token as a password-like shared credential. It grants only list_clients and get_client. Claude's organization connector stores the token as a fixed Authorization request header; everyone who enables that connector has the same read-only access. It does not identify individual users.
 
-For Claude Code operators, use a different random token per person. MCP_OPERATOR_TOKENS_JSON assigns each token a named identity and explicit scopes. Never put an operator token in the shared Claude connector. The server stores only SHA-256 token hashes in Railway variables and compares them using constant-time checks. Use at least 32 random bytes per token; a short, memorable password is too easy to guess on a public endpoint.
+For Claude Code operators, use a different random token per person. MCP_OPERATOR_TOKENS_JSON assigns each token a named identity and explicit scopes. Never put an operator token in the shared Claude connector. Operator tokens are stored only as SHA-256 hashes in Railway variables and compared using constant-time checks. Use at least 32 random bytes per token; a short, memorable password is too easy to guess on a public endpoint.
 
 | Scope | Remote tools | Access |
 | --- | --- | --- |
@@ -25,7 +25,7 @@ An OAuth 2.1 issuer remains supported for per-user sign-in in Claude or ChatGPT.
 
 1. Use a team-owned Railway service connected to OEAstroGTM/outreach-engine on main, with the repository root as its source directory. Railway detects the root Dockerfile automatically. New Railway services cannot enable legacy railway.json Config as Code. Merge the MCP code, then set the service healthcheck path to /health in Railway's Deploy settings. The MCP process fails closed until its authentication variables are configured.
 2. Once the MCP image is deployed, generate a Railway HTTPS service domain. Set MCP_RESOURCE_URL=https://<your Railway domain>/mcp.
-3. Generate a strong random token and its SHA-256 hash locally. Put the token in the team's secret manager and the hash in Railway as MCP_TEAM_READ_TOKEN_SHA256. Do not put the token in GitHub or chat. This shared token always grants read access only, regardless of operator settings.
+3. Generate a strong random password of at least 32 characters in a password manager. Set it as the secret Railway variable MCP_TEAM_READ_TOKEN and enter the same value in Claude's connector request header. The server hashes it at startup and never logs it. Alternatively, set only its SHA-256 hash as MCP_TEAM_READ_TOKEN_SHA256 if you prefer not to store the raw value in Railway. Do not set both variables. Do not put the password in GitHub or chat. This shared credential always grants read access only, regardless of operator settings.
 4. For each Claude Code operator, generate a different token. Put only its hash and scopes in Railway. Example:
 
    MCP_OPERATOR_TOKENS_JSON={"yusra":{"sha256":"<64-hex-character-token-hash>","scopes":["clients:read","research:run"]}}

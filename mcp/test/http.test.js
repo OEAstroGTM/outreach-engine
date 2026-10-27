@@ -90,9 +90,10 @@ test("fixed Claude tokens keep shared access read-only and separate operator pri
   const operator = "test-operator-token-with-at-least-32-characters";
   assert.throws(() => parseOperatorTokens('{"*":{"sha256":"x","scopes":["campaign:run"]}}'));
   assert.throws(() => loadAuthConfig({ MCP_RESOURCE_URL: resourceUrl, MCP_TEAM_READ_TOKEN_SHA256: "weak" }));
+  assert.throws(() => loadAuthConfig({ MCP_RESOURCE_URL: resourceUrl, MCP_TEAM_READ_TOKEN: "short" }));
   const staticConfig = loadAuthConfig({
     MCP_RESOURCE_URL: resourceUrl,
-    MCP_TEAM_READ_TOKEN_SHA256: hash(shared),
+    MCP_TEAM_READ_TOKEN: shared,
     MCP_OPERATOR_TOKENS_JSON: JSON.stringify({
       researcher: { sha256: hash(operator), scopes: ["clients:read", "research:run"] },
     }),

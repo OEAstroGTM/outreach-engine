@@ -88,8 +88,16 @@ export function loadAuthConfig(env = process.env) {
   const oauth = oauthValues.every(Boolean);
   const issuer = oauth ? httpsUrl(env.MCP_AUTH_ISSUER, "MCP_AUTH_ISSUER").toString() : null;
   const jwksUrl = oauth ? httpsUrl(env.MCP_AUTH_JWKS_URL, "MCP_AUTH_JWKS_URL") : null;
-  const sharedReadDigest = env.MCP_TEAM_READ_TOKEN_SHA256
-    ? tokenDigest(env.MCP_TEAM_READ_TOKEN_SHA256, "MCP_TEAM_READ_TOKEN_SHA256") : null;
+  if (env.MCP_TEAM_READ_TOKEN && env.MCP_TEAM_READ_TOKEN_SHA256) {
+    throw new Error("Set only one of MCP_TEAM_READ_TOKEN or MCP_TEAM_READ_TOKEN_SHA256");
+  }
+  if (env.MCP_TEAM_READ_TOKEN && env.MCP_TEAM_READ_TOKEN.length < 32) {
+    throw new Error("MCP_TEAM_READ_TOKEN must be at least 32 characters");
+  }
+  const sharedReadDigest = env.MCP_TEAM_READ_TOKEN
+    ? createHash("sha256").update(env.MCP_TEAM_READ_TOKEN).digest()
+    : env.MCP_TEAM_READ_TOKEN_SHA256
+      ? tokenDigest(env.MCP_TEAM_READ_TOKEN_SHA256, "MCP_TEAM_READ_TOKEN_SHA256") : null;
   const operators = parseOperatorTokens(env.MCP_OPERATOR_TOKENS_JSON);
   if (sharedReadDigest && operators.some(operator => timingSafeEqual(operator.digest, sharedReadDigest))) {
     throw new Error("Shared read token must differ from operator tokens");
