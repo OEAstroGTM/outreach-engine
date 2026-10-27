@@ -3,7 +3,7 @@ import http from "node:http";
 import { fileURLToPath } from "node:url";
 import { resolve } from "node:path";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
-import { AccessDeniedError, loadAuthConfig, verifyAccessToken } from "./auth.js";
+import { AccessDeniedError, loadAuthConfig, verifyBearerToken } from "./auth.js";
 import { buildServer } from "./server.js";
 
 const MAX_BODY_BYTES = 1_000_000;
@@ -41,7 +41,7 @@ async function readJson(req) {
 export function createHttpServer(config) {
   const metadataPath = "/.well-known/oauth-protected-resource/mcp";
   const metadataUrl = new URL(metadataPath, config.resourceUrl).toString();
-  const challenge = `Bearer resource_metadata="${metadataUrl}"`;
+  const challenge = config.jwks ? `Bearer resource_metadata="${metadataUrl}"` : 'Bearer realm="outreach-engine-mcp"';
   return http.createServer(async (req, res) => {
     const path = new URL(req.url || "/", config.resourceUrl).pathname;
     try {
@@ -49,6 +49,7 @@ export function createHttpServer(config) {
         return json(res, 200, { ok: true });
       }
       if (req.method === "GET" && (path === metadataPath || path === "/.well-known/oauth-protected-resource")) {
+        if (!config.jwks) return json(res, 404, { error: "not found" });
         return json(res, 200, {
           resource: config.resourceUrl,
           authorization_servers: [config.issuer],
@@ -64,11 +65,13 @@ export function createHttpServer(config) {
       const match = /^Bearer ([A-Za-z0-9._~+/-]+={0,2})$/.exec(req.headers.authorization || "");
       if (!match) return json(res, 401, { error: "unauthorized" }, { "www-authenticate": challenge });
       let identity;
-      try { identity = await verifyAccessToken(match[1], config); }
+      try { identity = await verifyBearerToken(match[1], config); }
       catch (error) {
         if (error instanceof AccessDeniedError) {
           return json(res, 403, { error: "forbidden" }, {
-            "www-authenticate": `Bearer error="insufficient_scope", resource_metadata="${metadataUrl}"`,
+            "www-authenticate": config.jwks
+              ? `Bearer error="insufficient_scope", resource_metadata="${metadataUrl}"`
+              : 'Bearer error="insufficient_scope"',
           });
         }
         return json(res, 401, { error: "unauthorized" }, { "www-authenticate": challenge });

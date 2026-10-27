@@ -1,40 +1,51 @@
 # Team remote MCP
 
-The hosted endpoint is `https://<your Railway domain>/mcp`. It uses stateless MCP Streamable HTTP. The local `node mcp/index.js` stdio server remains available separately.
+The hosted endpoint is https://<your Railway domain>/mcp. It uses stateless MCP Streamable HTTP. The local Node stdio server remains available separately.
 
 ## Authentication and permissions
 
-The HTTP service is an OAuth resource server. An external team identity provider handles sign-in and issues short-lived JWT access tokens. The server verifies the JWT signature against the provider's JWKS, exact issuer, exact audience, expiration, and subject on every request. It then intersects token scopes with the explicit server-side subject policy. Users absent from the policy cannot connect. No shared MCP bearer secret is supported.
+For Claude Team, use one strong, random bearer token as a password-like shared credential. It grants only list_clients and get_client. Claude's organization connector stores the token as a fixed Authorization request header; everyone who enables that connector has the same read-only access. It does not identify individual users.
+
+For Claude Code operators, use a different random token per person. MCP_OPERATOR_TOKENS_JSON assigns each token a named identity and explicit scopes. Never put an operator token in the shared Claude connector. The server stores only SHA-256 token hashes in Railway variables and compares them using constant-time checks. Use at least 32 random bytes per token; a short, memorable password is too easy to guess on a public endpoint.
 
 | Scope | Remote tools | Access |
 | --- | --- | --- |
-| `clients:read` | `list_clients`, `get_client` | Client routing metadata only; `get_client` omits keys and raw config. |
-| `research:run` | `run_research_agent` | Apollo research and credit-consuming contact pulls. |
-| `inbox:run` | `run_inbox_agent` | Reply reading and labeling. |
-| `campaign:run` | `run_campaign_agent` | Campaign creation, lead pushes, launch, and pause. |
+| clients:read | list_clients, get_client | Client routing metadata only; get_client omits keys and raw config. |
+| research:run | run_research_agent | Apollo research and credit-consuming contact pulls. |
+| inbox:run | run_inbox_agent | Reply reading and labeling. |
+| campaign:run | run_campaign_agent | Campaign creation, lead pushes, launch, and pause. |
 
-`run_infra_agent` and `run_orchestrator_agent` are never exposed by HTTP. The orchestrator can dispatch to infra, so it cannot safely be granted as a shortcut. No remote tool can register a domain. The remote endpoint does not load registrar keys as an access requirement; do not configure them for this service.
+run_infra_agent and run_orchestrator_agent are never exposed by HTTP. The orchestrator can dispatch to infra, so it cannot safely be granted as a shortcut. No remote tool can register a domain. Do not configure registrar keys for this service.
 
-The scopes above are access boundaries for whole specialist agents. In particular, `campaign:run` includes launch and `research:run` can spend Apollo credits. Grant them only to operators who need those capabilities. All authorized users can see all clients available to the service; client-specific isolation is not implemented.
+The specialist scopes cover whole agents. In particular, campaign:run includes launch and research:run can spend Apollo credits. Give them only to operators who need those actions. All authorized users can see all clients available to the service; client-specific isolation is not implemented.
 
-## Owner setup
+An OAuth 2.1 issuer remains supported for per-user sign-in in Claude or ChatGPT. When enabled, the server verifies the JWT signature, exact issuer and resource audience, expiration, subject, and the intersection of token scopes with MCP_TEAM_POLICY_JSON. Users absent from that policy cannot connect. Configure all three OAuth variables together.
 
-1. Use a team-owned Railway service connected to `OEAstroGTM/outreach-engine` on the `main` branch, with the repository root as its source directory. Railway detects the root `Dockerfile` automatically. Railway no longer enables legacy `railway.json` Config as Code on new services. Merge the MCP code, then set the service healthcheck path to `/health` in Railway's Deploy settings. The MCP process fails closed until its authentication variables are configured.
-2. Once the MCP image is deployed, generate a Railway HTTPS service domain. Configure an OAuth 2.1 provider that supports MCP clients, OAuth discovery, PKCE, and Client ID Metadata Documents or dynamic client registration. Register the exact MCP URL as the API audience/resource. Configure JWT access tokens with the scopes above. Restrict sign-in to the team in the provider and issue refresh tokens for clients that need durable connections.
-3. Set these Railway variables and redeploy:
+## Railway setup for Claude
 
-   ```text
-   MCP_RESOURCE_URL=https://<your Railway domain>/mcp
+1. Use a team-owned Railway service connected to OEAstroGTM/outreach-engine on main, with the repository root as its source directory. Railway detects the root Dockerfile automatically. New Railway services cannot enable legacy railway.json Config as Code. Merge the MCP code, then set the service healthcheck path to /health in Railway's Deploy settings. The MCP process fails closed until its authentication variables are configured.
+2. Once the MCP image is deployed, generate a Railway HTTPS service domain. Set MCP_RESOURCE_URL=https://<your Railway domain>/mcp.
+3. Generate a strong random token and its SHA-256 hash locally. Put the token in the team's secret manager and the hash in Railway as MCP_TEAM_READ_TOKEN_SHA256. Do not put the token in GitHub or chat. This shared token always grants read access only, regardless of operator settings.
+4. For each Claude Code operator, generate a different token. Put only its hash and scopes in Railway. Example:
+
+   MCP_OPERATOR_TOKENS_JSON={"yusra":{"sha256":"<64-hex-character-token-hash>","scopes":["clients:read","research:run"]}}
+
+   Store each raw token privately for its operator. Leave this variable unset if no operators need specialist tools. Add ANTHROPIC_API_KEY and only the provider credentials needed for the scopes granted. COCKPIT_URL and a narrowly scoped COCKPIT_API_KEY can supply provider keys through Cockpit. Do not add registrar credentials.
+5. Redeploy and confirm GET /health returns {"ok":true}, an unauthenticated POST /mcp returns 401, and a read-token MCP client sees only list_clients and get_client. Test each operator token's tool list before distributing it.
+6. A Claude Team or Enterprise owner adds a custom web connector with the MCP URL, selects No sign in, and sets a fixed request header Authorization: Bearer <shared-read-token>. Members then enable the connector. Claude Code operators configure the same MCP URL with their own token in the Authorization header. Keep tokens out of shared source files and shell history.
+
+MCP_ALLOWED_ORIGINS is optional if a browser-based client sends an Origin header; list only trusted HTTPS origins separated by commas.
+
+## Optional OAuth setup
+
+For individual Claude web or ChatGPT access, configure an OAuth 2.1 provider that supports MCP clients, discovery, PKCE, and Client ID Metadata Documents or dynamic client registration. Register the exact MCP URL as the API audience/resource. Configure JWT access tokens with the scopes above. Restrict sign-in to the team and issue refresh tokens for durable connections. Set these Railway variables:
+
    MCP_AUTH_ISSUER=https://<your identity provider issuer>/
    MCP_AUTH_JWKS_URL=https://<your identity provider>/.../jwks.json
    MCP_TEAM_POLICY_JSON={"<stable-subject-id>":["clients:read"],"<operator-subject-id>":["clients:read","inbox:run"]}
-   ```
 
-   The policy keys are OAuth `sub` values, not display names. Add each team member explicitly. The JWT must contain `aud` equal to `MCP_RESOURCE_URL` and a space-delimited `scope` claim (or an `scp` array). Both the token and policy must grant a scope. The service refuses to start with missing or malformed configuration. `MCP_ALLOWED_ORIGINS` is optional if a browser-based client sends an `Origin` header; list only trusted HTTPS origins separated by commas.
-4. For specialist agents, add `ANTHROPIC_API_KEY` and only the provider credentials needed for the scopes granted. `COCKPIT_URL` and a narrowly scoped `COCKPIT_API_KEY` can supply provider keys through Cockpit. Keep every credential in Railway variables or the identity provider, never in GitHub, connector URLs, screenshots, or chat.
-5. Deploy and confirm `GET /health` returns `{"ok":true}`, protected-resource metadata is available at `GET /.well-known/oauth-protected-resource/mcp`, and an unauthenticated `POST /mcp` returns `401` with a `WWW-Authenticate` discovery link. Then sign in as a read-only member and confirm only the two client tools appear. Test a separately authorized operator before granting specialist scopes to the rest of the team.
-6. A Claude Team or Enterprise owner can add a custom web connector using the MCP URL, select OAuth sign-in, and make it available to members. Members connect with their own accounts. A ChatGPT Business or Enterprise/Edu admin can create and publish the custom MCP connection and configure workspace access. Refresh the tool catalog after changing the server's advertised tools.
+The policy keys are OAuth sub values. The JWT must contain aud equal to MCP_RESOURCE_URL and a space-delimited scope claim (or an scp array). Both the token and policy must grant a scope. When OAuth is configured, the server publishes protected-resource metadata for client discovery.
 
 ## Local validation
 
-From `mcp/`, run `npm ci` and `npm test`. The integration test connects with the official MCP Streamable HTTP client and verifies token rejection, per-user tool discovery, and redaction. It uses generated test keys and no live provider calls.
+From mcp/, run npm ci and npm test. The integration tests connect with the official MCP Streamable HTTP client and verify both token and OAuth modes, per-user tool discovery, and credential redaction. They use generated test credentials and no live provider calls.

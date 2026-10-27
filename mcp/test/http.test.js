@@ -1,10 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { generateKeyPair, exportJWK, createLocalJWKSet, SignJWT } from "jose";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 import { createHttpServer } from "../http.js";
-import { parseTeamPolicy, verifyAccessToken } from "../auth.js";
+import { loadAuthConfig, parseOperatorTokens, parseTeamPolicy, verifyAccessToken, verifyBearerToken } from "../auth.js";
 
 const issuer = "https://identity.example.test/";
 const resourceUrl = "https://mcp.example.test/mcp";
@@ -80,5 +81,44 @@ test("Streamable HTTP client sees only authorized tools and never receives clien
   } finally {
     if (client) await client.close();
     await close();
+  }
+});
+
+test("fixed Claude tokens keep shared access read-only and separate operator privileges", async () => {
+  const hash = token => createHash("sha256").update(token).digest("hex");
+  const shared = "test-shared-token-with-at-least-32-characters";
+  const operator = "test-operator-token-with-at-least-32-characters";
+  assert.throws(() => parseOperatorTokens('{"*":{"sha256":"x","scopes":["campaign:run"]}}'));
+  assert.throws(() => loadAuthConfig({ MCP_RESOURCE_URL: resourceUrl, MCP_TEAM_READ_TOKEN_SHA256: "weak" }));
+  const staticConfig = loadAuthConfig({
+    MCP_RESOURCE_URL: resourceUrl,
+    MCP_TEAM_READ_TOKEN_SHA256: hash(shared),
+    MCP_OPERATOR_TOKENS_JSON: JSON.stringify({
+      researcher: { sha256: hash(operator), scopes: ["clients:read", "research:run"] },
+    }),
+  });
+  assert.deepEqual([...((await verifyBearerToken(shared, staticConfig)).allowedTools)], ["list_clients", "get_client"]);
+  assert.deepEqual([...((await verifyBearerToken(operator, staticConfig)).allowedTools)],
+    ["list_clients", "get_client", "run_research_agent"]);
+  await assert.rejects(verifyBearerToken("wrong", staticConfig));
+
+  const server = createHttpServer(staticConfig);
+  await new Promise(resolve => server.listen(0, "127.0.0.1", resolve));
+  const endpoint = new URL(`http://127.0.0.1:${server.address().port}/mcp`);
+  let client;
+  try {
+    const unauth = await fetch(endpoint, { method: "POST", headers: { "content-type": "application/json" }, body: "{}" });
+    assert.equal(unauth.status, 401);
+    assert.doesNotMatch(unauth.headers.get("www-authenticate"), /oauth-protected-resource/);
+    const metadata = await fetch(new URL("/.well-known/oauth-protected-resource/mcp", endpoint));
+    assert.equal(metadata.status, 404);
+    client = new Client({ name: "claude-token-test", version: "1.0.0" });
+    await client.connect(new StreamableHTTPClientTransport(endpoint, {
+      requestInit: { headers: { Authorization: `Bearer ${shared}` } },
+    }));
+    assert.deepEqual((await client.listTools()).tools.map(tool => tool.name), ["list_clients", "get_client"]);
+  } finally {
+    if (client) await client.close();
+    await new Promise(resolve => server.close(resolve));
   }
 });
