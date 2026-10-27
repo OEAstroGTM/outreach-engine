@@ -1,0 +1,7 @@
+*
+!clients.json
+!mcp/
+!mcp/**
+mcp/node_modules
+mcp/.env
+**/.env
