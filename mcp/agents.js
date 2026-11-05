@@ -11,7 +11,10 @@ import { runAgent } from "./lib/agent.js";
 const tool = (name, description, input_schema, handler) => ({ name, description, input_schema, handler });
 const obj = (properties, required = []) => ({ type: "object", properties, required });
 const S = { str: { type: "string" }, num: { type: "number" }, bool: { type: "boolean" },
-            arrStr: { type: "array", items: { type: "string" } } };
+            arrStr: { type: "array", items: { type: "string" } },
+            // Which EmailBison instance to act on. Omit to use the client default
+            // (its `sequencer`); name one only for a client live on both.
+            ebInstance: { type: "string", enum: ["eb_send", "eb_personal"] } };
 
 const list_clients_tool = tool(
   "list_clients",
@@ -58,27 +61,32 @@ const campaignAgent = {
   tools: [
     list_clients_tool,
     tool("list_campaigns", "List a client's campaigns (routes to EmailBison or Instantly). EmailBison paginates 15/page — pass all=true for the full list, or the count will be truncated. Filter with status.",
-      obj({ client_name: S.str, page: S.num, all: S.bool, max_pages: S.num, status: S.str }, ["client_name"]),
+      obj({ client_name: S.str, page: S.num, all: S.bool, max_pages: S.num, status: S.str, instance: S.ebInstance }, ["client_name"]),
       ops.listCampaigns),
     tool("get_campaign_stats", "Get open/reply/bounce stats for a campaign.",
-      obj({ client_name: S.str, campaign_id: S.str }, ["client_name", "campaign_id"]), ops.getCampaignStats),
+      obj({ client_name: S.str, campaign_id: S.str, instance: S.ebInstance }, ["client_name", "campaign_id"]), ops.getCampaignStats),
+    tool("get_campaign_senders", "Get the sender emails (mailboxes) currently attached to a campaign — use to measure mailbox load per campaign.",
+      obj({ client_name: S.str, campaign_id: S.str, instance: S.ebInstance }, ["client_name", "campaign_id"]), ops.getCampaignSenders),
     tool("create_campaign", "Create a new campaign for a client.",
-      obj({ client_name: S.str, name: S.str, subject: S.str, body: S.str }, ["client_name", "name", "subject", "body"]), ops.createCampaign),
+      obj({ client_name: S.str, name: S.str, subject: S.str, body: S.str, instance: S.ebInstance }, ["client_name", "name", "subject", "body"]), ops.createCampaign),
     tool("launch_campaign", "Launch or resume a campaign.",
-      obj({ client_name: S.str, campaign_id: S.str }, ["client_name", "campaign_id"]), ops.launchCampaign),
+      obj({ client_name: S.str, campaign_id: S.str, instance: S.ebInstance }, ["client_name", "campaign_id"]), ops.launchCampaign),
     tool("pause_campaign", "Pause an active campaign.",
-      obj({ client_name: S.str, campaign_id: S.str }, ["client_name", "campaign_id"]), ops.pauseCampaign),
+      obj({ client_name: S.str, campaign_id: S.str, instance: S.ebInstance }, ["client_name", "campaign_id"]), ops.pauseCampaign),
     tool("list_inboxes", "List the sender emails (inboxes) in a client's EmailBison workspace. Paginated 15/page; pass all=true to walk pages. Filter with status, e.g. 'connected'.",
-      obj({ client_name: S.str, page: S.num, all: S.bool, max_pages: S.num, status: S.str }, ["client_name"]),
+      obj({ client_name: S.str, page: S.num, all: S.bool, max_pages: S.num, status: S.str, instance: S.ebInstance }, ["client_name"]),
       ops.listInboxes),
+    tool("warmup_scores",
+      "Warmup scores per domain for a client's mailboxes over a window (default last 30 days). Use this rather than list_inboxes, which has no score.",
+      obj({ client_name: S.str, days: S.num, start_date: S.str, end_date: S.str, below: S.num, include_domains: S.bool, instance: S.ebInstance }, ["client_name"]), ops.warmupScores),
     tool("attach_inboxes_to_campaign", "Attach sender emails (inboxes) to a campaign so it can send. IDs come from list_inboxes.",
-      obj({ client_name: S.str, campaign_id: S.str, sender_email_ids: { type: "array", items: S.num } }, ["client_name", "campaign_id", "sender_email_ids"]),
+      obj({ client_name: S.str, campaign_id: S.str, sender_email_ids: { type: "array", items: S.num }, instance: S.ebInstance }, ["client_name", "campaign_id", "sender_email_ids"]),
       ops.attachInboxesToCampaign),
     tool("remove_inboxes_from_campaign", "Detach sender emails (inboxes) from a campaign.",
-      obj({ client_name: S.str, campaign_id: S.str, sender_email_ids: { type: "array", items: S.num } }, ["client_name", "campaign_id", "sender_email_ids"]),
+      obj({ client_name: S.str, campaign_id: S.str, sender_email_ids: { type: "array", items: S.num }, instance: S.ebInstance }, ["client_name", "campaign_id", "sender_email_ids"]),
       ops.removeInboxesFromCampaign),
     tool("bulk_push_to_campaign", "Create contacts as leads and attach them to a campaign in one pass.",
-      obj({ client_name: S.str, campaign_id: S.str, contacts: { type: "array", items: obj({ email: S.str, first_name: S.str, last_name: S.str, company: S.str, title: S.str, website: S.str }, ["email"]) } }, ["client_name", "campaign_id", "contacts"]),
+      obj({ client_name: S.str, campaign_id: S.str, instance: S.ebInstance, contacts: { type: "array", items: obj({ email: S.str, first_name: S.str, last_name: S.str, company: S.str, title: S.str, website: S.str }, ["email"]) } }, ["client_name", "campaign_id", "contacts"]),
       ops.bulkPushToCampaign),
   ],
 };
@@ -93,14 +101,18 @@ const inboxAgent = {
     "Summarize what matters; do not send outbound mail from here.",
   tools: [
     list_clients_tool,
-    tool("list_replies", "List recent replies for a client (optionally by label).",
-      obj({ client_name: S.str, limit: S.num, label: S.str }, ["client_name"]), ops.listReplies),
-    tool("get_thread", "Get the full conversation thread for a reply.",
-      obj({ client_name: S.str, thread_id: S.str }, ["client_name", "thread_id"]), ops.getThread),
-    tool("tag_reply", "Tag a reply thread with a label (e.g. interested, not_interested, follow_up).",
-      obj({ client_name: S.str, thread_id: S.str, label: S.str }, ["client_name", "thread_id", "label"]), ops.tagReply),
-    tool("get_interested_replies", "Get interested replies for one client, or all clients if omitted.",
+    tool("list_labels", "List the labels available in a client's MasterInbox workspace, with their label_id values.",
+      obj({ client_name: S.str }, ["client_name"]), ops.listLabels),
+    tool("list_replies", "List replies (prospects) for a client. Filter by label name or label_id; paginated.",
+      obj({ client_name: S.str, limit: S.num, page: S.num, label: S.str, label_id: S.num }, ["client_name"]), ops.listReplies),
+    tool("get_thread", "Get the full message thread for one prospect, by prospect_id or prospect_email (both come from list_replies).",
+      obj({ client_name: S.str, prospect_id: S.str, prospect_email: S.str }, ["client_name"]), ops.getThread),
+    tool("tag_reply", "Add a label to a prospect. Pass a label name or a label_id from list_labels.",
+      obj({ client_name: S.str, prospect_id: S.str, label: S.str, label_id: S.num }, ["client_name", "prospect_id"]), ops.tagReply),
+    tool("get_interested_replies", "Get interested replies for one client, or every active client if omitted.",
       obj({ client_name: S.str }), ops.getInterestedReplies),
+    tool("list_mi_workspaces", "List every MasterInbox workspace account-wide (id + name) — use to find a client's mi_ws_id.",
+      obj({}), ops.listMiWorkspaces),
   ],
 };
 
@@ -110,7 +122,10 @@ const infraAgent = {
   name: "infra",
   systemPrompt:
     "You are the Infra agent for Outreach Engine. You buy and provision cold-email sending " +
-    `infrastructure directly via the ${infra.INFRA_REGISTRAR} registrar + Inboxing. Standard flow: ` +
+    `infrastructure directly via a registrar (${infra.INFRA_REGISTRAR} by default; every registrar ` +
+    `tool takes an optional registrar of ${infra.REGISTRARS.join(" or ")}) + Inboxing. A domain only ` +
+    "exists at the registrar it was bought from, so use the SAME registrar for register_domain, " +
+    "update_nameservers and get_domain on a given domain. Standard flow: " +
     "1) check_domain_availability on variations; 2) confirm picks and check get_registrar_balance " +
     "before registering; 3) register_domain for throwaway lookalike domains (default .digital); " +
     "4) inboxing_submit_domain for each at 49 mailboxes with the client's tag and 49 sender names; " +
@@ -121,15 +136,15 @@ const infraAgent = {
     "an explicit go. Report exactly what you bought and provisioned.",
   tools: [
     tool("check_domain_availability", "Check if domains are available + pricing (via the configured registrar).",
-      obj({ domains: S.arrStr }, ["domains"]), infra.checkAvailability),
+      obj({ domains: S.arrStr, registrar: { type: "string", enum: ["namesilo", "porkbun", "dynadot"] } }, ["domains"]), infra.checkAvailability),
     tool("get_registrar_balance", "Get the registrar account balance before spending.",
-      obj({}), infra.getRegistrarBalance),
+      obj({ registrar: { type: "string", enum: ["namesilo", "porkbun", "dynadot"] } }), infra.getRegistrarBalance),
     tool("register_domain", "Register a domain via the configured registrar (spends funds).",
-      obj({ domain: S.str, years: S.num }, ["domain"]), infra.registerDomain),
+      obj({ domain: S.str, years: S.num, registrar: { type: "string", enum: ["namesilo", "porkbun", "dynadot"] } }, ["domain"]), infra.registerDomain),
     tool("update_nameservers", "Point a domain's registrar nameservers to the given pair.",
-      obj({ domain: S.str, nameservers: S.arrStr }, ["domain", "nameservers"]), infra.updateNameservers),
+      obj({ domain: S.str, nameservers: S.arrStr, registrar: { type: "string", enum: ["namesilo", "porkbun", "dynadot"] } }, ["domain", "nameservers"]), infra.updateNameservers),
     tool("get_domain", "Get a domain's registrar status + current nameservers.",
-      obj({ domain: S.str }, ["domain"]), infra.getDomain),
+      obj({ domain: S.str, registrar: { type: "string", enum: ["namesilo", "porkbun", "dynadot"] } }, ["domain"]), infra.getDomain),
     tool("inboxing_submit_domain", "Provision mailboxes for a domain on Inboxing (user_count 25/49/99).",
       obj({ domain: S.str, user_count: S.num, tags: S.arrStr, names: { type: "array", items: nameObj } }, ["domain"]),
       infra.inboxingSubmitDomain),
