@@ -96,20 +96,26 @@ const inboxAgent = {
   name: "inbox",
   systemPrompt:
     "You are the Inbox agent for Outreach Engine. You triage replies in MasterInbox: list " +
-    "recent/interested replies, read threads, and tag them. Resolve the client first. When " +
-    "asked for interested replies across the book, use get_interested_replies with no client. " +
-    "Summarize what matters; do not send outbound mail from here.",
+    "recent/interested replies, read conversations, and label them. Resolve the client first. " +
+    "The unit is a PROSPECT, not a thread — list_replies returns prospect_id values, and " +
+    "get_thread and tag_reply both take a prospect_id from that list. Labels are per-workspace: " +
+    "call list_labels to see the client's own label names and IDs; tag_reply accepts either a " +
+    "label name or a label_id. When asked for interested replies across the book, use " +
+    "get_interested_replies with no client. Summarize what matters; do not send outbound mail " +
+    "from here.",
   tools: [
     list_clients_tool,
-    tool("list_labels", "List the labels available in a client's MasterInbox workspace, with their label_id values.",
+    tool("list_labels", "List a client's MasterInbox labels with their IDs. Label IDs differ per workspace.",
       obj({ client_name: S.str }, ["client_name"]), ops.listLabels),
-    tool("list_replies", "List replies (prospects) for a client. Filter by label name or label_id; paginated.",
-      obj({ client_name: S.str, limit: S.num, page: S.num, label: S.str, label_id: S.num }, ["client_name"]), ops.listReplies),
-    tool("get_thread", "Get the full message thread for one prospect, by prospect_id or prospect_email (both come from list_replies).",
+    tool("list_replies", "List prospects with replies for a client. Filter by label name or label_id, or search by name/email. Paginated — pass all=true to walk pages.",
+      obj({ client_name: S.str, label: S.str, label_id: S.num, search: S.str, page: S.num, limit: S.num, all: S.bool, max_pages: S.num }, ["client_name"]),
+      ops.listReplies),
+    tool("get_thread", "Get the full conversation for a prospect, by prospect_id or prospect_email (from list_replies).",
       obj({ client_name: S.str, prospect_id: S.str, prospect_email: S.str }, ["client_name"]), ops.getThread),
-    tool("tag_reply", "Add a label to a prospect. Pass a label name or a label_id from list_labels.",
-      obj({ client_name: S.str, prospect_id: S.str, label: S.str, label_id: S.num }, ["client_name", "prospect_id"]), ops.tagReply),
-    tool("get_interested_replies", "Get interested replies for one client, or every active client if omitted.",
+    tool("tag_reply", "Apply a label to a prospect. Takes a label name or label_id (see list_labels).",
+      obj({ client_name: S.str, prospect_id: S.str, label: S.str, label_id: S.num }, ["client_name", "prospect_id"]),
+      ops.tagReply),
+    tool("get_interested_replies", "Get prospects labelled Interested for one client, or all clients if omitted.",
       obj({ client_name: S.str }), ops.getInterestedReplies),
     tool("list_mi_workspaces", "List every MasterInbox workspace account-wide (id + name) — use to find a client's mi_ws_id.",
       obj({}), ops.listMiWorkspaces),

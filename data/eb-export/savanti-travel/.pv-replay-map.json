@@ -1,0 +1,37 @@
+{
+  "771": {
+    "pv_campaign_id": "6a75f8129f08eb98e6535bce",
+    "pv_name": "New Copy July Apollo+Clay Savanti Lookalike VC New Search Wndr / Caffeinated",
+    "steps": 3,
+    "variations": 4,
+    "disabled": 0
+  },
+  "797": {
+    "pv_campaign_id": "6a75f812d80eb8df86800e17",
+    "pv_name": "July- Savanti Lookalike Real Estate",
+    "steps": 3,
+    "variations": 4,
+    "disabled": 0
+  },
+  "924": {
+    "pv_campaign_id": "6a75f811a7eba1f1bba7a595",
+    "pv_name": "July- Savanti Lookalike Real Estate [Hospital]",
+    "steps": 3,
+    "variations": 4,
+    "disabled": 0
+  },
+  "1203": {
+    "pv_campaign_id": "6a75f81190ed9d1603205bac",
+    "pv_name": "August - Savanti - SaaS Lookalike",
+    "steps": 3,
+    "variations": 4,
+    "disabled": 0
+  },
+  "1263": {
+    "pv_campaign_id": "6a75f8109f08eb98e6535bcd",
+    "pv_name": "Updated Copy August - Savanti - SaaS Lookalike",
+    "steps": 3,
+    "variations": 6,
+    "disabled": 0
+  }
+}

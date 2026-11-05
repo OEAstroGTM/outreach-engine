@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Nightly DNC reconciler: MasterInbox "Meeting Booked" → EmailBison blocklist.
+
+  Install:
+    cp mcp/scripts/co.outreachengine.dnc-sync.plist ~/Library/LaunchAgents/
+    launchctl unload ~/Library/LaunchAgents/co.outreachengine.dnc-sync.plist 2>/dev/null
+    launchctl load  ~/Library/LaunchAgents/co.outreachengine.dnc-sync.plist
+
+  Run it once, now, without waiting for 23:00:
+    launchctl start co.outreachengine.dnc-sync
+
+  Check it is registered:
+    launchctl list | grep dnc-sync        # cols are: PID  LastExitCode  Label
+
+  Stop it:
+    launchctl unload ~/Library/LaunchAgents/co.outreachengine.dnc-sync.plist
+
+  StartCalendarInterval is LOCAL time. If the Mac is asleep at 23:00 the job runs
+  at the next wake rather than being skipped. If the Mac is fully powered off it
+  is missed entirely — the reconciler is designed for that: the next run catches up.
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>co.outreachengine.dnc-sync</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/felipesoza/dev/oe/mcp/scripts/dnc-nightly.sh</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/felipesoza/dev/oe</string>
+
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>23</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+
+    <!-- Do not fire on login/reload: a live write should happen on schedule only. -->
+    <key>RunAtLoad</key>
+    <false/>
+
+    <!-- The wrapper writes structured output to data/dnc-runs.log. These two
+         catch anything that escapes it (a bash-level failure, a stray warning). -->
+    <key>StandardOutPath</key>
+    <string>/Users/felipesoza/dev/oe/data/launchd.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/felipesoza/dev/oe/data/launchd.err.log</string>
+
+    <key>ProcessType</key>
+    <string>Background</string>
+</dict>
+</plist>

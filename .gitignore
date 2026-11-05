@@ -223,4 +223,31 @@ __marimo__/
 # Keep MCP agent lib (JS, not the Python lib/ this rule targets)
 !mcp/lib/
 
+# Keep observability lib (JS, not the Python lib/ this rule targets)
+!observability/lib/
+
+# Observability: measurements are machine-appended every weekday and would churn
+# the repo daily. Config is tracked (config.json); measurements are not.
+observability/data/series.json
+observability/data/baseline-scan.txt
+observability/dashboard/build/
+
 mcp/smoketest.mjs
+
+# DNC reconciler: local ledger + nightly run logs
+data/dnc-ledger.json
+data/dnc-runs.log
+data/launchd.out.log
+data/launchd.err.log
+data/dnc-last-run.json
+mcp/mi-check.mjs
+mcp/label-probe.mjs
+mcp/inboxing-check.mjs
+mcp/cockpit-check.mjs
+mcp/oe-domain-probe.mjs
+
+# pw.sh: raw per-client mailbox roster dumps (names + emails) — PII, never git
+warmup-*.json
+
+# Ad-hoc backup files — .env.bak-dnc carried live API keys, never git these
+*.bak-*

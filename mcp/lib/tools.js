@@ -4,7 +4,7 @@
 // delegating agents (agents.js), so business logic lives in exactly one place.
 import {
   CLIENTS, MI_KEYS, INSTANTLY_KEYS, APOLLO_THROTTLE_MS,
-  getClient, ebConfig, ebFetch, ebPaginate, ebSwitchWorkspace, ebSenderFetch, apolloFetch, miFetch,
+  getClient, ebConfig, ebFetch, ebPaginate, ebSwitchWorkspace, ebSenderFetch, apolloFetch, miFetch, miFetchMaster,
   ebDefaultInstance, ebConfiguredInstances, miWorkspaceId, miListWorkspaces,
 } from "./core.js";
 
@@ -498,106 +498,125 @@ export async function deleteSenderEmail({ instance, sender_email_id, client_name
 }
 
 // ── Inbox (MasterInbox) ──────────────────────────────────────────────────────
-// Routes are get-prospects / get-messages / add-prospect-label / get-labels.
-// Workspace selection is by workspace_id in the body — the key does not carry it.
+// The unit here is a PROSPECT, not a thread. /get-prospects lists them,
+// /get-messages returns one prospect's conversation, and labels are applied by
+// numeric label_id from /get-labels.
+//
+// The previous implementation posted to /get-threads, /get-thread and
+// /update-thread — none of which exist; every call 404'd. The working contract
+// is the one in tools/inbox.py, which this now mirrors.
+const MI_API = "/api/api-webhook/v1/api";
+
+function miCheck(res, what) {
+  if (res?.status && res.status !== "success") {
+    throw new Error(`MasterInbox ${what} failed: ${JSON.stringify(res.message ?? res).slice(0, 200)}`);
+  }
+  return res;
+}
+
+const shapeProspect = p => ({
+  prospect_id: p._id,
+  email: p.email,
+  name: p.name ?? [p.first_name, p.last_name].filter(Boolean).join(" ").trim() ?? null,
+  subject: p.subject ?? null,
+  snippet: String(p.last_message ?? p.body ?? "").replace(/\s+/g, " ").slice(0, 200),
+  labels: p.label_names ?? [],
+  replied: !!p.is_replied,
+  reply_count: p.reply_count ?? 0,
+  last_received_at: p.last_received_at ?? p.time ?? null,
+  deal_status: p.deal_status ?? null,
+  thread_url: p.thread_url ?? null,
+});
 
 export async function listLabels({ client_name }) {
-  const data = await miFetch("GET", "/get-labels", getClient(client_name));
-  return data?.data ?? data;
+  const client = getClient(client_name);
+  const r = miCheck(await miFetch("GET", `${MI_API}/get-labels`, client), "get-labels");
+  return (r?.data ?? []).map(l => ({ label_id: l.label_id, name: l.label_name, color: l.label_color }));
 }
 
-// Labels are addressed by numeric label_id. Accept a human label name too and
-// resolve it, so callers are not forced to look ids up first.
-async function resolveLabelId(client, label, label_id) {
-  if (label_id != null) return label_id;
-  if (!label) return undefined;
-  const data = await miFetch("GET", "/get-labels", client);
-  const labels = data?.data ?? [];
-  const hit = labels.find(l => String(l.label_name).toLowerCase() === String(label).toLowerCase());
+// Accept either a numeric label_id or a human label name, and validate it
+// against the client's own label set — label IDs differ per workspace.
+async function resolveLabel(client_name, { label_id, label }) {
+  if (label_id == null && !label) return null;
+  const labels = await listLabels({ client_name });
+  const hit = label_id != null
+    ? labels.find(l => String(l.label_id) === String(label_id))
+    : labels.find(l => l.name.toLowerCase() === String(label).toLowerCase());
   if (!hit) {
     throw new Error(
-      `No MasterInbox label named "${label}" for ${client.name}. ` +
-      `Available: ${labels.map(l => l.label_name).join(", ") || "(none)"}`
+      `No MasterInbox label ${label_id != null ? `with id ${label_id}` : `named "${label}"`} ` +
+      `for ${client_name}. Available: ${labels.map(l => `${l.name} (${l.label_id})`).join(", ")}`
     );
   }
-  return hit.label_id;
+  return hit;
 }
 
-export async function listReplies({ client_name, limit, page, label, label_id }) {
-  const client = getClient(client_name);
-  const resolved = await resolveLabelId(client, label, label_id);
-  return miFetch("POST", "/get-prospects", client, {
-    workspace_id: miWorkspaceId(client),
-    label_id: resolved,
-    page: page ?? 1,
-    limit: limit ?? 20,
-  });
-}
+export async function listReplies({ client_name, label, label_id, search, page, limit, all, max_pages }) {
+  const client  = getClient(client_name);
+  const wanted  = await resolveLabel(client_name, { label_id, label });
+  const perPage = limit ?? 20;
 
-// A thread is looked up by prospect, not by an opaque thread id.
-export async function getThread({ client_name, prospect_id, prospect_email }) {
-  if (!prospect_id && !prospect_email) {
-    throw new Error("getThread needs prospect_id or prospect_email (see list_replies).");
-  }
-  return miFetch("POST", "/get-messages", getClient(client_name), { prospect_id, prospect_email });
-}
+  const fetchPage = async p => miCheck(await miFetch("POST", `${MI_API}/get-prospects`, client, {
+    workspace_id: String(client.mi_ws_id),
+    label_id: wanted?.label_id,
+    search,
+    page: p,
+    limit: perPage,
+  }), "get-prospects");
 
-export async function tagReply({ client_name, prospect_id, label, label_id }) {
-  const client = getClient(client_name);
-  const resolved = await resolveLabelId(client, label, label_id);
-  if (resolved == null) throw new Error("tagReply needs label or label_id (see list_labels).");
-  return miFetch("POST", "/add-prospect-label", client, { prospect_id, label_id: resolved });
-}
+  const first = await fetchPage(page ?? 1);
+  const total = first?.metadata?.total ?? null;
+  const rows  = [...(first?.data ?? [])];
+  let pagesFetched = 1;
 
-export async function listMiWorkspaces() {
-  return miListWorkspaces();
-}
-
-// ── Mailbox connect links (MasterInbox) ──────────────────────────────────────
-// There is no credential-based mailbox upload. GET /add-account/{type} accepts
-// only "google" or "outlook" (imap and smtp both 400 with
-// 'type must be "google" or "outlook"') and returns an OAuth URL a PERSON
-// completes. A CSV of mailbox passwords has nowhere to go: the API never takes
-// a password, so bulk "upload" means bulk consent, one human click per mailbox.
-//
-// This mints one fresh URL per mailbox and tags it with login_hint so Google
-// preselects that account — turning a 10-click wizard into one click each.
-// Each URL carries a single-use state (workspace__timestamp__nonce), so they
-// go stale: generate them when you are ready to click, not hours ahead.
-export async function mailboxConnectUrls({ client_name, emails, provider = "google" }) {
-  if (!["google", "outlook"].includes(provider)) {
-    throw new Error(`provider must be "google" or "outlook" (got "${provider}")`);
-  }
-  if (!Array.isArray(emails) || !emails.length) throw new Error("emails must be a non-empty array");
-
-  const client = getClient(client_name);
-  const workspace_id = miWorkspaceId(client);
-  const results = [];
-
-  for (const email of emails) {
-    try {
-      const r = await miFetch("GET", `/add-account/${provider}?workspace_id=${workspace_id}`, client);
-      const url = r?.oauthUrl ?? r?.data?.oauthUrl;
-      if (!url) throw new Error(`no oauthUrl in response: ${JSON.stringify(r).slice(0, 120)}`);
-      const u = new URL(url);
-      u.searchParams.set("login_hint", email);   // preselect the account on Google's screen
-      results.push({ email, connect_url: u.toString() });
-    } catch (e) {
-      results.push({ email, error: String(e).slice(0, 180) });
+  if (all && total != null) {
+    const cap = Math.min(Math.ceil(total / perPage), max_pages ?? 20);
+    for (let p = (page ?? 1) + 1; p <= cap; p++) {
+      rows.push(...((await fetchPage(p))?.data ?? []));
+      pagesFetched++;
     }
-    await new Promise(r => setTimeout(r, 200));
+  }
+
+  let prospects = rows.map(shapeProspect);
+
+  // observability/README documents that this endpoint ignores label_id, so the
+  // server-side filter cannot be trusted — filter locally as well.
+  if (wanted) {
+    prospects = prospects.filter(p =>
+      (p.labels ?? []).some(n => String(n).toLowerCase() === wanted.name.toLowerCase()));
   }
 
   return {
     client: client.name,
-    workspace_id,
-    provider,
-    requested: emails.length,
-    generated: results.filter(r => r.connect_url).length,
-    failed: results.filter(r => r.error).length,
-    note: "Each URL needs a human to complete Google/Microsoft consent. URLs are single-use and short-lived.",
-    results,
+    workspace_id: client.mi_ws_id,
+    total_in_workspace: total,
+    pages_fetched: pagesFetched,
+    returned: prospects.length,
+    ...(wanted && { filtered_by: { label: wanted.name, label_id: wanted.label_id } }),
+    prospects,
   };
+}
+
+export async function getThread({ client_name, prospect_id, prospect_email }) {
+  if (!prospect_id && !prospect_email) {
+    throw new Error("get_thread needs prospect_id or prospect_email (both come from list_replies).");
+  }
+  return miCheck(
+    await miFetch("POST", `${MI_API}/get-messages`, getClient(client_name), { prospect_id, prospect_email }),
+    "get-messages"
+  );
+}
+
+export async function tagReply({ client_name, prospect_id, label, label_id }) {
+  if (!prospect_id) throw new Error("tag_reply needs prospect_id (from list_replies).");
+  const wanted = await resolveLabel(client_name, { label_id, label });
+  if (!wanted) throw new Error("tag_reply needs label or label_id — see list_labels.");
+  const res = miCheck(
+    await miFetch("POST", `${MI_API}/add-prospect-label`, getClient(client_name),
+      { prospect_id, label_id: wanted.label_id }),
+    "add-prospect-label"
+  );
+  return { prospect_id, label: wanted.name, label_id: wanted.label_id, response: res };
 }
 
 export async function getInterestedReplies({ client_name } = {}) {
@@ -612,13 +631,8 @@ export async function getInterestedReplies({ client_name } = {}) {
   const results = [];
   for (const client of targets) {
     try {
-      const c = { ...client, mi_pk: MI_KEYS[client.name] };
-      const label_id = await resolveLabelId(c, "Interested");
-      const data = await miFetch("POST", "/get-prospects", c, {
-        workspace_id: miWorkspaceId(c), label_id, page: 1, limit: 50,
-      });
-      const threads = data?.data ?? [];
-      if (threads.length) results.push({ client: client.name, count: threads.length, threads });
+      const r = await listReplies({ client_name: client.name, label: "Interested", limit: 50 });
+      if (r.returned) results.push({ client: client.name, count: r.returned, prospects: r.prospects });
     } catch (e) {
       results.push({ client: client.name, error: e.message });
     }
@@ -817,4 +831,54 @@ export async function replaceCampaignSequence({ client_name, campaign_id, instan
   }
   const after = (await call("GET", `/campaigns/${campaign_id}/sequence-steps`)).json?.data ?? [];
   return { campaign_id, deleted, failed_deletes: failed, write_status: post.status, steps_after: after.length };
+}
+
+export async function listMiWorkspaces() {
+  return miListWorkspaces();
+}
+// ── Mailbox connect links (MasterInbox) ──────────────────────────────────────
+// There is no credential-based mailbox upload. GET /add-account/{type} accepts
+// only "google" or "outlook" (imap and smtp both 400 with
+// 'type must be "google" or "outlook"') and returns an OAuth URL a PERSON
+// completes. A CSV of mailbox passwords has nowhere to go: the API never takes
+// a password, so bulk "upload" means bulk consent, one human click per mailbox.
+//
+// This mints one fresh URL per mailbox and tags it with login_hint so Google
+// preselects that account — turning a 10-click wizard into one click each.
+// Each URL carries a single-use state (workspace__timestamp__nonce), so they
+// go stale: generate them when you are ready to click, not hours ahead.
+export async function mailboxConnectUrls({ client_name, emails, provider = "google" }) {
+  if (!["google", "outlook"].includes(provider)) {
+    throw new Error(`provider must be "google" or "outlook" (got "${provider}")`);
+  }
+  if (!Array.isArray(emails) || !emails.length) throw new Error("emails must be a non-empty array");
+
+  const client = getClient(client_name);
+  const workspace_id = miWorkspaceId(client);
+  const results = [];
+
+  for (const email of emails) {
+    try {
+      const r = await miFetchMaster("GET", `${MI_API}/add-account/${provider}?workspace_id=${workspace_id}`, client);
+      const url = r?.oauthUrl ?? r?.data?.oauthUrl;
+      if (!url) throw new Error(`no oauthUrl in response: ${JSON.stringify(r).slice(0, 120)}`);
+      const u = new URL(url);
+      u.searchParams.set("login_hint", email);   // preselect the account on Google's screen
+      results.push({ email, connect_url: u.toString() });
+    } catch (e) {
+      results.push({ email, error: String(e).slice(0, 180) });
+    }
+    await new Promise(r => setTimeout(r, 200));
+  }
+
+  return {
+    client: client.name,
+    workspace_id,
+    provider,
+    requested: emails.length,
+    generated: results.filter(r => r.connect_url).length,
+    failed: results.filter(r => r.error).length,
+    note: "Each URL needs a human to complete Google/Microsoft consent. URLs are single-use and short-lived.",
+    results,
+  };
 }

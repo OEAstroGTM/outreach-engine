@@ -1,0 +1,205 @@
+{
+  "653": {
+    "pv_campaign_id": "6a79feca0c20a6394055534a",
+    "pv_name": "New Search June- Intellectible - Gov Con - All Titles",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 1
+  },
+  "657": {
+    "pv_campaign_id": "6a79fec9a2de89cbdb6eb02a",
+    "pv_name": "Copy of May - Intellectible - Gov Con - All Titles",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 1
+  },
+  "691": {
+    "pv_campaign_id": "6a79fec9a2de89cbdb6eb029",
+    "pv_name": "June - Intellectible - Capture/Proposal leaders - No Signal",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 1
+  },
+  "704": {
+    "pv_campaign_id": "6a79fec861b92fff169c6c0a",
+    "pv_name": "June - Intellectible - USA Spending Domains - Capture and Proposal",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 1
+  },
+  "705": {
+    "pv_campaign_id": "6a79fec77629ffc997a7d807",
+    "pv_name": "June - Intellectible - USA Spending Domains - New Titles",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 2
+  },
+  "713": {
+    "pv_campaign_id": "6a79fec60468ae8263674f01",
+    "pv_name": "June - Intellectible - USA Spending Domains - CEO/Founder",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 1
+  },
+  "714": {
+    "pv_campaign_id": "6a79fec5797b2f5dd4dd5f5c",
+    "pv_name": "June - Intellectible - USA Spending Domains - BD",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 2
+  },
+  "725": {
+    "pv_campaign_id": "6a79fec4955fe5627fe00453",
+    "pv_name": "Autoscraper June - Intellectible Provided Domains - CEO/Founder",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 1
+  },
+  "733": {
+    "pv_campaign_id": "6a79fec30c20a63940555349",
+    "pv_name": "Autoscraper June - Intellectible Provided Domains - CRO/BD",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 2
+  },
+  "734": {
+    "pv_campaign_id": "6a79fec361b92fff169c6c09",
+    "pv_name": "Autoscraper June - Intellectible Provided Domains - Capture and Proposal",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 1
+  },
+  "739": {
+    "pv_campaign_id": "6a79fec2797b2f5dd4dd5f5b",
+    "pv_name": "July - Intellectible - Client List All Companies/Domains - Capture and Proposal",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 1
+  },
+  "740": {
+    "pv_campaign_id": "6a79fec1b9037fd59477108c",
+    "pv_name": "July - Intellectible - Client List All Companies/Domains - BD",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 2
+  },
+  "741": {
+    "pv_campaign_id": "6a79fec083624eeb65a41f97",
+    "pv_name": "July - Intellectible - Client List All Companies/Domains - CEO/Founder",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 1
+  },
+  "746": {
+    "pv_campaign_id": "6a79febf035d236e5ac4734f",
+    "pv_name": "V2 July - Intellectible - Client List All Companies/Domains - BD + Capture",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 1
+  },
+  "757": {
+    "pv_campaign_id": "6a79febeae0fa4fe6bf636ae",
+    "pv_name": "V2 July - Intellectible - Client List All Companies/Domains CEO/Founder ",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 1
+  },
+  "787": {
+    "pv_campaign_id": "6a79febea41b9687872546c4",
+    "pv_name": "V2 July - Intellectible - Client List All Companies/Domains - BD",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 1
+  },
+  "791": {
+    "pv_campaign_id": "6a79febd83624eeb65a41f96",
+    "pv_name": "V2 July - Intellectible - Client List All Companies/Domains - Capture",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 1
+  },
+  "796": {
+    "pv_campaign_id": "6a79febc4b03e37f10563625",
+    "pv_name": "Autoscraper June - Intellectible Provided Domains - CEO/Founder [Hospital]",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 1
+  },
+  "838": {
+    "pv_campaign_id": "6a79febb035d236e5ac4734e",
+    "pv_name": "V2 July - Intellectible - Client List All Companies/Domains - BD [Hospital]",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 2
+  },
+  "839": {
+    "pv_campaign_id": "6a79feba0468ae8263674eff",
+    "pv_name": "V2 July - Intellectible - Client List All Companies/Domains - Capture [Hospital]",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 2
+  },
+  "963": {
+    "pv_campaign_id": "6a79feba4ca76665d423cf23",
+    "pv_name": "V2 July - Intellectible - Commercial - CEO",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 0
+  },
+  "964": {
+    "pv_campaign_id": "6a79feb9f33c21df9e4e8129",
+    "pv_name": "V2 July - Intellectible - Commercial - Proposal/Capture",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 0
+  },
+  "1078": {
+    "pv_campaign_id": "6a79feb8d77a193725da9112",
+    "pv_name": "Aug - Intellectible Sales Leaders",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 0
+  },
+  "1087": {
+    "pv_campaign_id": "6a79feb74b03e37f10563624",
+    "pv_name": "August - Intellectible - Client List All Companies/Domains - BD",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 2
+  },
+  "1152": {
+    "pv_campaign_id": "6a79feb761b92fff169c6c07",
+    "pv_name": "Updated Search Aug - Intellectible Sales Leaders",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 0
+  },
+  "1202": {
+    "pv_campaign_id": "6a79feb6f6556e5103cd81e9",
+    "pv_name": " v2 Aug - Intellectible Sales Leaders -2",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 0
+  },
+  "1226": {
+    "pv_campaign_id": "6a79feb6d77a193725da9111",
+    "pv_name": "v2 Aug - Intellectible Sales Leaders - updated titles",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 1
+  },
+  "1255": {
+    "pv_campaign_id": "6a79feb50c20a63940555347",
+    "pv_name": "2 v2 Aug - Intellectible Sales Leaders - updated titles",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 1
+  },
+  "1264": {
+    "pv_campaign_id": "6a79feb461b92fff169c6c06",
+    "pv_name": "3 v2 Aug - Intellectible Sales Leaders - updated titles",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 1
+  }
+}

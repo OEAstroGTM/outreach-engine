@@ -1,0 +1,19 @@
+name = "oe-slack-bot"
+main = "src/index.js"
+compatibility_date = "2024-11-01"
+compatibility_flags = ["nodejs_compat"]
+account_id = "ace78577055052658d251b6983927897"
+
+[vars]
+EMAILBISON_SEND_URL = "https://send.outreachenginedashboard.co"
+EMAILBISON_PERSONAL_URL = "https://personal.outreachenginedashboard.co"
+
+# Secrets (set via `wrangler secret put`):
+# SLACK_BOT_TOKEN
+# SLACK_SIGNING_SECRET
+# ANTHROPIC_API_KEY
+# PORKBUN_API_KEY
+# PORKBUN_SECRET_API_KEY
+# INBOXING_API_KEY
+# INBOXING_CONN_SEND
+# EMAILBISON_SEND_API_KEY

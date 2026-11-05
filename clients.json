@@ -1,7 +1,6 @@
 [
   {
     "name": "AskTuring",
-    "status": "churned",
     "sequencer": "eb_send",
     "eb_ws_id": 31,
     "eb_send_key_env": "EB_SEND_KEY_ASKTURING",
@@ -9,18 +8,20 @@
     "mi_key_env": "MI_KEY_ASKTURING",
     "inboxing_tags": [
       "AskTuring"
-    ]
+    ],
+    "status": "churned",
+    "churned_at": "2026-09-01"
   },
   {
     "name": "Aunalytics",
-    "status": "churned",
     "sequencer": "none",
     "eb_ws_id": null,
     "mi_ws_id": null,
     "mi_key_env": null,
     "inboxing_tags": [
       "Aunalytics"
-    ]
+    ],
+    "status": "churned"
   },
   {
     "name": "Braintracks",
@@ -46,7 +47,6 @@
   },
   {
     "name": "Chalktalk",
-    "status": "churned",
     "sequencer": "eb_send",
     "eb_ws_id": 26,
     "eb_send_key_env": "EB_SEND_KEY_CHALKTALK",
@@ -54,7 +54,9 @@
     "mi_key_env": "MI_KEY_CHALKTALK",
     "inboxing_tags": [
       "Chalktalk"
-    ]
+    ],
+    "status": "churned",
+    "churned_at": "2026-09-04"
   },
   {
     "name": "Coffee & Contracts",
@@ -95,6 +97,7 @@
     "sequencer": "eb_send",
     "eb_ws_id": 28,
     "eb_send_key_env": "EB_SEND_KEY_INTELLECTIBLE",
+    "pv_ws_id": "6a79e1077c6a5951cb620fd5",
     "mi_ws_id": 1058,
     "mi_key_env": "MI_KEY_INTELLECTIBLE",
     "inboxing_tags": [
@@ -117,7 +120,6 @@
   },
   {
     "name": "Nuvo Bath",
-    "status": "churned",
     "sequencer": "eb_personal",
     "eb_ws_id": 6,
     "eb_personal_key_env": "EB_PERSONAL_KEY_NUVO_BATH",
@@ -125,13 +127,17 @@
     "mi_key_env": "MI_KEY_NUVO_BATH",
     "inboxing_tags": [
       "Nuvo Bath"
-    ]
+    ],
+    "status": "churned",
+    "churned_at": "2026-09-01"
   },
   {
     "name": "OR Trax",
     "sequencer": "eb_send",
     "eb_ws_id": 23,
     "eb_send_key_env": "EB_SEND_KEY_OR_TRAX",
+    "pv_ws_id": "6a74072efc0a6c4ee4122704",
+    "pv_key_env": "PV_KEY_OR_TRAX",
     "mi_ws_id": 1057,
     "mi_key_env": "MI_KEY_OR_TRAX",
     "inboxing_tags": [
@@ -143,16 +149,17 @@
     "name": "Outreach Engine",
     "sequencer": "eb_personal",
     "eb_ws_id": null,
-    "eb_send_ws_id": 5,
     "eb_send_key_env": "EB_SEND_KEY_OUTREACH_ENGINE",
-    "eb_personal_ws_id": 20,
-    "eb_personal_key_env": "EB_PERSONAL_KEY_OUTREACH_ENGINE",
+    "pv_ws_id": "6a725c9094b3cfd96a9e5a22",
     "mi_ws_id": 1013,
     "mi_key_env": "MI_KEY_OUTREACH_ENGINE",
     "inboxing_tags": [
       "Outreach Engine",
       "outreachengine"
-    ]
+    ],
+    "eb_send_ws_id": 5,
+    "eb_personal_ws_id": 20,
+    "eb_personal_key_env": "EB_PERSONAL_KEY_OUTREACH_ENGINE"
   },
   {
     "name": "ParGo",
@@ -171,6 +178,7 @@
     "sequencer": "eb_send",
     "eb_ws_id": 7,
     "eb_send_key_env": "EB_SEND_KEY_SAVANTI_TRAVEL",
+    "pv_ws_id": "6a74aba12db966271dbc98f4",
     "mi_ws_id": 121,
     "mi_key_env": "MI_KEY_SAVANTI_TRAVEL",
     "inboxing_tags": [
@@ -179,7 +187,6 @@
   },
   {
     "name": "Simplexity",
-    "status": "churned",
     "sequencer": "instantly",
     "eb_ws_id": null,
     "mi_ws_id": 1061,
@@ -187,20 +194,23 @@
     "instantly_ws": "simplexity",
     "inboxing_tags": [
       "Simplexity"
-    ]
+    ],
+    "status": "churned",
+    "churned_at": "2026-09-01"
   },
   {
     "name": "Supply Wisdom",
     "sequencer": "eb_send",
     "eb_ws_id": null,
-    "eb_send_ws_id": 83,
-    "eb_send_key_env": "EB_SEND_KEY_SUPPLY_WISDOM",
     "mi_ws_id": 1059,
     "mi_key_env": "MI_KEY_SUPPLY_WISDOM",
     "instantly_ws": "supply_wisdom",
+    "pv_ws_id": "6a73946b6f52daf49a4cb2e4",
     "inboxing_tags": [
       "SupplyWisdom"
-    ]
+    ],
+    "eb_send_ws_id": 83,
+    "eb_send_key_env": "EB_SEND_KEY_SUPPLY_WISDOM"
   },
   {
     "name": "True Dial",
@@ -241,7 +251,7 @@
     "sequencer": "eb_send",
     "eb_ws_id": 48,
     "eb_send_key_env": "EB_SEND_KEY_CLININTELL",
-    "mi_ws_id": 61,
+    "mi_ws_id": 2858,
     "mi_key_env": "MI_KEY_CLININTELL",
     "inboxing_tags": [
       "clinintell"
@@ -251,19 +261,18 @@
     "name": "Abra",
     "sequencer": "eb_send",
     "eb_ws_id": null,
-    "eb_send_ws_id": 50,
     "eb_send_key_env": "EB_SEND_KEY_ABRA",
-    "eb_personal_ws_id": 9,
-    "eb_personal_key_env": "EB_PERSONAL_KEY_ABRA",
     "mi_ws_id": 393,
     "mi_key_env": "MI_KEY_ABRA",
     "inboxing_tags": [
       "Abra"
-    ]
+    ],
+    "eb_send_ws_id": 50,
+    "eb_personal_ws_id": 9,
+    "eb_personal_key_env": "EB_PERSONAL_KEY_ABRA"
   },
   {
     "name": "Revo.ai",
-    "status": "churned",
     "sequencer": "eb_send",
     "eb_ws_id": 49,
     "eb_send_key_env": "EB_SEND_KEY_REVO",
@@ -271,7 +280,9 @@
     "mi_key_env": "MI_KEY_REVO",
     "inboxing_tags": [
       "Revo.ai"
-    ]
+    ],
+    "status": "churned",
+    "churned_at": "2026-09-04"
   },
   {
     "name": "Private Pargo",
@@ -282,11 +293,12 @@
     "mi_key_env": null,
     "inboxing_tags": [
       "Private Pargo"
-    ]
+    ],
+    "eb_send_ws_id": 45,
+    "eb_personal_ws_id": 19
   },
   {
     "name": "Arnon River Partners",
-    "status": "churned",
     "sequencer": "eb_send",
     "eb_ws_id": 59,
     "eb_send_key_env": "EB_SEND_KEY_ARNON_RIVER_PARTNERS",
@@ -296,7 +308,9 @@
       "Arnon River Partners",
       "Arnon Rivers Partners",
       "ARP"
-    ]
+    ],
+    "status": "churned",
+    "churned_at": "2026-09-01"
   },
   {
     "name": "Campaygn",
@@ -321,7 +335,8 @@
       "Union Omaha",
       "union"
     ],
-    "eb_personal_ws_id": 23,
+    "eb_send_ws_id": 54,
+    "eb_personal_ws_id": 17,
     "eb_personal_key_env": "EB_PERSONAL_KEY_UNION_OMAHA"
   },
   {
@@ -334,6 +349,68 @@
     "inboxing_tags": [
       "Ujet"
     ]
+  },
+  {
+    "name": "Built Right",
+    "sequencer": "eb_personal",
+    "eb_ws_id": null,
+    "mi_ws_id": 1579,
+    "mi_key_env": "MI_KEY_BUILT_RIGHT",
+    "inboxing_tags": [
+      "Built Right",
+      "builtright"
+    ],
+    "eb_personal_ws_id": 11,
+    "eb_personal_key_env": "EB_PERSONAL_KEY_BUILT_RIGHT"
+  },
+  {
+    "name": "Geek Power Studios",
+    "sequencer": "none",
+    "eb_ws_id": null,
+    "mi_ws_id": 2698,
+    "mi_key_env": "MI_KEY_GEEK_POWER_STUDIOS",
+    "inboxing_tags": [
+      "Geek Power Studios"
+    ],
+    "eb_personal_ws_id": 21,
+    "eb_personal_key_env": "EB_PERSONAL_KEY_GEEK_POWER_STUDIOS",
+    "eb_send_ws_id": 221,
+    "eb_send_key_env": "EB_SEND_KEY_GEEK_POWER_STUDIOS"
+  },
+  {
+    "name": "Bynd.com",
+    "sequencer": "eb_send",
+    "eb_ws_id": 82,
+    "mi_ws_id": 2907,
+    "mi_key_env": "MI_KEY_BYND_COM",
+    "inboxing_tags": [
+      "bynd"
+    ],
+    "eb_send_key_env": "EB_SEND_KEY_BYND_COM"
+  },
+  {
+    "name": "Meter.com",
+    "sequencer": "eb_send",
+    "eb_ws_id": null,
+    "mi_ws_id": 2717,
+    "mi_key_env": "MI_KEY_METER_COM",
+    "inboxing_tags": [
+      "Meter.com"
+    ],
+    "eb_send_ws_id": 225,
+    "eb_send_key_env": "EB_SEND_KEY_METER_COM"
+  },
+  {
+    "name": "iShift",
+    "sequencer": "eb_send",
+    "eb_ws_id": 84,
+    "mi_ws_id": 2970,
+    "mi_key_env": "MI_KEY_ISHIFT",
+    "inboxing_tags": [
+      "iShift"
+    ],
+    "eb_send_key_env": "EB_SEND_KEY_ISHIFT",
+    "eb_send_ws_id": 84
   },
   {
     "name": "Geek Powered Studio",
@@ -366,19 +443,6 @@
     ]
   },
   {
-    "name": "Built Right",
-    "sequencer": "eb_personal",
-    "eb_ws_id": null,
-    "eb_personal_ws_id": 11,
-    "eb_personal_key_env": "EB_PERSONAL_KEY_BUILT_RIGHT",
-    "mi_ws_id": null,
-    "mi_key_env": null,
-    "inboxing_tags": [
-      "Built Right",
-      "builtright"
-    ]
-  },
-  {
     "name": "Beyond",
     "sequencer": "eb_send",
     "eb_ws_id": null,
@@ -391,18 +455,6 @@
     "inboxing_tags": [
       "Beyond"
     ]
-  },
-  {
-    "name": "iShift",
-    "sequencer": "eb_send",
-    "eb_ws_id": null,
-    "eb_send_ws_id": 84,
-    "mi_ws_id": 2970,
-    "mi_key_env": "MI_KEY_ISHIFT",
-    "inboxing_tags": [
-      "iShift"
-    ],
-    "eb_send_key_env": "EB_SEND_KEY_ISHIFT"
   },
   {
     "name": "G2",

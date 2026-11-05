@@ -1,0 +1,256 @@
+{
+  "f5cad34d-f9f0-4ad2-b024-f2c9974723c4": {
+    "pv_campaign_id": "6a7f623a6afdf799fc236644",
+    "pv_name": "July - US - Pharma",
+    "steps": 3,
+    "variations": 4,
+    "disabled": 0
+  },
+  "f448608b-8640-40af-9121-27309d3a4824": {
+    "pv_campaign_id": "6a7f623b5e3831268c4197fc",
+    "pv_name": "EU RIsk Titles BFSI-NO SIGNAL - Apr - Supply WIsdom ",
+    "steps": 3,
+    "variations": 11,
+    "disabled": 8
+  },
+  "f3da2112-b8b9-4df4-8778-1d1906ba8ecd": {
+    "pv_campaign_id": "6a7f6243bb23409ae51493fc",
+    "pv_name": "NCONTRACTS - Competitor Followers (copy)",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 0
+  },
+  "f2019c7a-5401-4588-89c6-46ea59702006": {
+    "pv_campaign_id": "6a7f62443db0f7cff9dca0a0",
+    "pv_name": "US Procurement Titles BFSI - NO SIGNAL - Apr - Supply WIsdom",
+    "steps": 3,
+    "variations": 10,
+    "disabled": 5
+  },
+  "f10fa56c-1588-425a-90bd-b0a60f2c0b8d": {
+    "pv_campaign_id": "6a7f624abb23409ae51493fd",
+    "pv_name": "April - SW - BFSI - USA",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 0
+  },
+  "ed06684c-eec4-4ac8-b3b2-e6fed604b2ee": {
+    "pv_campaign_id": "6a7f624c5f93ac59ed00d766",
+    "pv_name": "Manf from Solwey 50+ employee",
+    "steps": 3,
+    "variations": 7,
+    "disabled": 3
+  },
+  "d214a680-f61b-4d10-981d-6af3653fa8ec": {
+    "pv_campaign_id": "6a7f624f6a0304acaa23714a",
+    "pv_name": "Feb - SW - Banks COO/VP Procurement",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 0
+  },
+  "d213562a-7648-4596-8e95-16d845e8ce43": {
+    "pv_campaign_id": "6a7f6251fde7aef4851518c0",
+    "pv_name": "Finance - Risk Assmt",
+    "steps": 3,
+    "variations": 9,
+    "disabled": 5
+  },
+  "cec690b3-e099-4a9c-a9fb-9f83424b6b40": {
+    "pv_campaign_id": "6a7f62563b9b568820ede62f",
+    "pv_name": "July - EU - Pharma",
+    "steps": 3,
+    "variations": 4,
+    "disabled": 0
+  },
+  "c0f89711-c9ba-4ac0-ad1e-f78c2d4bf596": {
+    "pv_campaign_id": "6a7f6257da477e21c9e95629",
+    "pv_name": "Healthcare - Procurement Officers",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 2
+  },
+  "bf2316c3-173d-4ce5-9c39-e2052310e071": {
+    "pv_campaign_id": "6a7f625aea68896c4a9ea33c",
+    "pv_name": "V2 USA RIsk Titles BFSI - NO SIGNAL",
+    "steps": 3,
+    "variations": 10,
+    "disabled": 7
+  },
+  "ba8d632a-b8e0-4532-ac73-4589c0aae776": {
+    "pv_campaign_id": "6a7f62616a0304acaa23714b",
+    "pv_name": "UK Finance - Risk Assmt",
+    "steps": 3,
+    "variations": 7,
+    "disabled": 3
+  },
+  "b929d60d-27ea-49b4-ba96-58c07834dec1": {
+    "pv_campaign_id": "6a7f62649fe493e0ca68c42f",
+    "pv_name": "Feb / SupplyWIsdom / Risk Management / BFSI List 2",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 0
+  },
+  "b06798b7-9b93-41ca-9b3d-da740f6b6395": {
+    "pv_campaign_id": "6a7f62665f93ac59ed00d768",
+    "pv_name": "UK Healthcare - Risk Assmt",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 0
+  },
+  "aa82f68b-915e-4ab0-843b-d2e6e0cd7bec": {
+    "pv_campaign_id": "6a7f6267fde7aef4851518c1",
+    "pv_name": "Finance - Procurement Officers",
+    "steps": 3,
+    "variations": 9,
+    "disabled": 5
+  },
+  "9d3518ff-8e06-4513-a79c-eca6bffcd7f2": {
+    "pv_campaign_id": "6a7f626c75c284e4fec4a8d5",
+    "pv_name": "Dec - Manf from ThomasNet",
+    "steps": 3,
+    "variations": 7,
+    "disabled": 3
+  },
+  "9b136440-32f5-4233-a810-db510860d248": {
+    "pv_campaign_id": "6a74af0a5601bb6eccef73dc",
+    "pv_name": "V2 USA RIsk Titles BFSI - NO SIGNAL (copy)",
+    "steps": 3,
+    "variations": 10,
+    "disabled": 7,
+    "adopted": true
+  },
+  "9a2f9679-895a-48de-8043-af1116efcdfb": {
+    "pv_campaign_id": "6a7f62763db0f7cff9dca0a2",
+    "pv_name": "Feb - SW - BFSI Risk TItles",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 0
+  },
+  "9617ce3c-49ab-4696-85d8-db6d277c2763": {
+    "pv_campaign_id": "6a7f62789179209e4168f3af",
+    "pv_name": "January - AutoS - Banks - Risk and Procurement titles",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 0
+  },
+  "8783b343-66e5-4ff7-9ba8-5b064e1db573": {
+    "pv_campaign_id": "6a7f627abb23409ae51493fe",
+    "pv_name": "SW - March - Finance - Risk Asst List 1",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 0
+  },
+  "835d6422-5d15-4839-9058-cd05b6644eae": {
+    "pv_campaign_id": "6a7f627b24f5d9d01379e894",
+    "pv_name": "SW - March - Finance - Risk Asst List 2",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 0
+  },
+  "7a97c5e3-68f8-4fbd-acc8-345de53353c7": {
+    "pv_campaign_id": "6a7f627d5e3831268c4197fe",
+    "pv_name": "EU Procurement Titles BFSI - NO SIGNAL - Apr - Supply WIsdom ",
+    "steps": 3,
+    "variations": 10,
+    "disabled": 6
+  },
+  "784edc7e-3439-4de5-baf1-ad91f642d91a": {
+    "pv_campaign_id": "6a7f62833b9b568820ede630",
+    "pv_name": "UK Healthcare - Procurement Officers",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 2
+  },
+  "5627e442-e852-4205-969d-32f74196f136": {
+    "pv_campaign_id": "6a7f62859fe493e0ca68c430",
+    "pv_name": "USA RIsk Titles BFSI - NO SIGNAL - Apr - Supply WIsdom ",
+    "steps": 3,
+    "variations": 10,
+    "disabled": 7
+  },
+  "5580157e-618b-4767-b874-9d364eec56ee": {
+    "pv_campaign_id": "6a7f628cea68896c4a9ea33e",
+    "pv_name": "Event RISK EURO",
+    "steps": 3,
+    "variations": 3,
+    "disabled": 0
+  },
+  "3d352acb-bc13-485a-96be-fbebbc5fc565": {
+    "pv_campaign_id": "6a7f628d75c284e4fec4a8d6",
+    "pv_name": "Feb / SupplyWIsdom / Procurement Titles / BFSI",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 0
+  },
+  "3c1e9b6b-3c5c-40f9-97eb-ff91004c9b45": {
+    "pv_campaign_id": "6a7f628e9179209e4168f3b0",
+    "pv_name": "January - Apollo - EU PR Campaign",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 0
+  },
+  "321acf23-1c13-48c8-988e-4a71ff4b09f5": {
+    "pv_campaign_id": "6a7f62906a0304acaa23714c",
+    "pv_name": "Supply Wisdom - November - 1 - 10k - BANKTAM",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 0
+  },
+  "179b7f21-ae2c-42f7-ab4c-3a1a5a81f988": {
+    "pv_campaign_id": "6a7f6291ea68896c4a9ea33f",
+    "pv_name": "Apr - SW - BFSI - EU",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 0
+  },
+  "130a01ff-f71f-4f3d-8b10-0ea313bbc6ca": {
+    "pv_campaign_id": "6a7f62930cdf5b11ea229d97",
+    "pv_name": "Jan - Security Scorecard Event",
+    "steps": 3,
+    "variations": 3,
+    "disabled": 0
+  },
+  "10f08574-bbd7-4054-b9ee-f6de716dd79e": {
+    "pv_campaign_id": "6a7f6294ea68896c4a9ea340",
+    "pv_name": "INTEROS - Competitor Followers",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 0
+  },
+  "10112d8a-300b-42cf-bcdb-e3356d8f5921": {
+    "pv_campaign_id": "6a7f62970cdf5b11ea229d98",
+    "pv_name": "UK Finance - Procurement Officers",
+    "steps": 3,
+    "variations": 6,
+    "disabled": 2
+  },
+  "10094a4f-5be0-4e98-a804-bb648289719b": {
+    "pv_campaign_id": "6a7f629a37345fc357c915ec",
+    "pv_name": "V2 EU Risk Titles BFSI-NO SIGNAL",
+    "steps": 3,
+    "variations": 11,
+    "disabled": 8
+  },
+  "0a03cef0-6980-4fa7-b944-10200278b5fb": {
+    "pv_campaign_id": "6a7f62a19fe493e0ca68c431",
+    "pv_name": "Clay Data - November - 1 - 10k - BANKTAM (copy)",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 0
+  },
+  "03465778-6f57-450c-a8ab-bae6cff5325b": {
+    "pv_campaign_id": "6a7f62a23b9b568820ede632",
+    "pv_name": "Clay Data - November - 1 - 10k - BANKTAM (January)",
+    "steps": 3,
+    "variations": 5,
+    "disabled": 0
+  },
+  "10bbf711-822b-4fc1-9316-f0f6eba7159d": {
+    "pv_campaign_id": "6a7f6295c6cef9076950a171",
+    "pv_name": "Healthcare - Risk Assmt",
+    "steps": 3,
+    "variations": 7,
+    "disabled": 3,
+    "adopted": true
+  }
+}

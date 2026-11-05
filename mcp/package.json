@@ -1,10 +1,12 @@
 {
   "name": "outreach-engine-mcp",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "MCP server exposing Outreach Engine as delegating operator agents (research, campaign, inbox, infra)",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node http.js",
+    "start:stdio": "node index.js",
+    "test": "node --test test/*.test.js"
   },
   "keywords": [],
   "author": "Outreach Engine",
@@ -14,6 +16,8 @@
     "@anthropic-ai/sdk": "^0.115.0",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "dotenv": "^17.4.2",
+    "jose": "^6.1.3",
     "zod": "^4.4.3"
-  }
+  },
+  "engines": { "node": ">=20" }
 }

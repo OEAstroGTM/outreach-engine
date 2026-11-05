@@ -27,21 +27,90 @@ export const EB_PERSONAL_BASE = "https://personal.outreachenginedashboard.co/api
 // add-prospect-label/get-labels), verified against the live API; the previous
 // get-threads/get-thread/update-thread names did not exist and 404'd for every
 // client, which made every MasterInbox tool silently useless.
-export const MI_BASE          = "https://api.masterinbox.com/api/api-webhook/v1/api";
+export const MI_BASE          = "https://api.masterinbox.com";
 export const APOLLO_THROTTLE_MS = 300;
 
-// ── Keys ───────────────────────────────────────────────────────────────────
-export const APOLLO_KEY     = process.env.APOLLO_API_KEY;
-export const EB_SEND_KEY     = process.env.EMAILBISON_SEND_API_KEY;
-export const EB_PERSONAL_KEY = process.env.EMAILBISON_PERSONAL_API_KEY;
-// Account-level MasterInbox key. Per-client public keys are preferred; this is
-// the fallback and the only key that can list workspaces account-wide.
-export const MI_MASTER_KEY   = process.env.MASTERINBOX_API_KEY;
+// ── Cockpit secrets API ──────────────────────────────────────────────────────
+// Cockpit's keychain is the place keys are managed now — notably, keys it
+// creates itself (Add Client's live EmailBison workspace + token provisioning)
+// never land in this repo's .env at all. Per docs/connecting-to-secrets-api.md:
+// fetch once at startup, cache in memory, fall back to env vars, and never let
+// a Cockpit outage take this process down.
+const COCKPIT_URL     = process.env.COCKPIT_URL?.replace(/\/$/, "");
+const COCKPIT_API_KEY = process.env.COCKPIT_API_KEY;
 
-// MasterInbox per-client public keys, derived from clients.json (single source
-// of truth). New clients only need a clients.json edit — never a code change.
+async function loadCockpitSecrets() {
+  if (!COCKPIT_URL || !COCKPIT_API_KEY) return {};
+  try {
+    const headers = { "x-api-key": COCKPIT_API_KEY };
+    // Vercel Deployment Protection sits in front of the app and answers with an
+    // SSO page before Cockpit ever sees the request. This token lets automated
+    // callers through without disabling protection for humans.
+    if (process.env.COCKPIT_VERCEL_BYPASS) {
+      headers["x-vercel-protection-bypass"] = process.env.COCKPIT_VERCEL_BYPASS;
+      headers["x-vercel-set-bypass-cookie"] = "false";
+    }
+    const res = await fetch(`${COCKPIT_URL}/api/secrets`, {
+      headers,
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!res.ok) {
+      const hint = res.status === 403 ? " (key has no secret_scopes — check /api-keys)"
+                 : res.status === 401 ? " (key missing, invalid, or revoked)" : "";
+      throw new Error(`HTTP ${res.status}${hint}`);
+    }
+    const text = await res.text();
+    if (text.trimStart().startsWith("<")) {
+      // A 200 carrying HTML means something in front of the app answered — on
+      // Vercel that's Deployment Protection serving an SSO page. The API key is
+      // irrelevant here; the request never reached Cockpit.
+      throw new Error(
+        `${COCKPIT_URL} returned HTML, not JSON — the request is being intercepted before it ` +
+        `reaches Cockpit (on Vercel this is Deployment Protection on a preview deployment). ` +
+        `Use the production URL, disable protection, or set a bypass token.`
+      );
+    }
+    const { secrets } = JSON.parse(text);
+    return secrets ?? {};
+  } catch (e) {
+    // stderr only — stdout is the MCP stdio channel and must stay clean.
+    console.error(`[cockpit] /api/secrets failed, falling back to .env: ${e.message}`);
+    return {};
+  }
+}
+
+export const COCKPIT_SECRETS = await loadCockpitSecrets();
+
+const slugify = n => String(n).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+// Cockpit keys its response by client_name; its own examples look slugified, so
+// accept either rather than silently missing every lookup.
+export function cockpitSecret(clientName, system) {
+  const s = COCKPIT_SECRETS;
+  if (!s) return undefined;
+  return s[clientName]?.[system] ?? s[slugify(clientName)]?.[system] ?? undefined;
+}
+
+const globalSecret = system => COCKPIT_SECRETS?.__global__?.[system];
+
+// ── Keys ───────────────────────────────────────────────────────────────────
+export const APOLLO_KEY      = process.env.APOLLO_API_KEY;
+export const EB_SEND_KEY     = globalSecret("emailbison_send_master")     ?? process.env.EMAILBISON_SEND_API_KEY;
+export const EB_PERSONAL_KEY = globalSecret("emailbison_personal_master") ?? process.env.EMAILBISON_PERSONAL_API_KEY;
+
+// Which store each account-level key actually came from, so key_source doesn't
+// claim ".env" for something Cockpit supplied.
+const MASTER_SOURCE = {
+  send:     globalSecret("emailbison_send_master")     ? "cockpit:emailbison_send_master"     : "EMAILBISON_SEND_API_KEY",
+  personal: globalSecret("emailbison_personal_master") ? "cockpit:emailbison_personal_master" : "EMAILBISON_PERSONAL_API_KEY",
+};
+
+// MasterInbox per-client public keys: Cockpit's keychain first, then the env
+// var named in clients.json. New clients need no code change either way.
 export const MI_KEYS = Object.fromEntries(
-  CLIENTS.filter(c => c.mi_key_env).map(c => [c.name, process.env[c.mi_key_env]])
+  CLIENTS
+    .filter(c => c.mi_key_env || cockpitSecret(c.name, "masterinbox"))
+    .map(c => [c.name, cockpitSecret(c.name, "masterinbox") ?? (c.mi_key_env ? process.env[c.mi_key_env] : undefined)])
 );
 
 export const INSTANTLY_KEYS = {
@@ -110,15 +179,22 @@ export function ebConfig(client, instance) {
       `EmailBison instance. Pass instance ("eb_send" or "eb_personal") to target one explicitly.`
     );
   }
-  const inst = instance ?? fallback;
+  // Accept the short "send"/"personal" names used on main as well.
+  const alias = { send: "eb_send", personal: "eb_personal" };
+  const inst = alias[instance] ?? instance ?? fallback;
   if (!EB_INSTANCES.includes(inst)) {
     throw new Error(`Unknown EmailBison instance "${inst}". Expected one of: ${EB_INSTANCES.join(", ")}.`);
   }
 
   const isPersonal = inst === "eb_personal";
   const envName    = isPersonal ? client.eb_personal_key_env : client.eb_send_key_env;
-  const scopedKey  = envName ? process.env[envName] : undefined;
-  const masterName = isPersonal ? "EMAILBISON_PERSONAL_API_KEY" : "EMAILBISON_SEND_API_KEY";
+  const system     = isPersonal ? "emailbison_personal" : "emailbison_send";
+
+  // Cockpit keychain → clients.json's env var → account-level master key.
+  const vaultKey   = cockpitSecret(client.name, system);
+  const envKey     = envName ? process.env[envName] : undefined;
+  const scopedKey  = vaultKey ?? envKey;
+  const masterName = isPersonal ? MASTER_SOURCE.personal : MASTER_SOURCE.send;
   const masterKey  = isPersonal ? EB_PERSONAL_KEY : EB_SEND_KEY;
   const key        = scopedKey || masterKey;
 
@@ -141,7 +217,7 @@ export function ebConfig(client, instance) {
     instance:       inst,
     is_default:     inst === fallback,
     scoped:         !!scopedKey,
-    key_source:     scopedKey ? envName : masterName,
+    key_source:     vaultKey ? `cockpit:${system}` : envKey ? envName : masterName,
     declared_env:   envName ?? null,
     scoped_missing: !!(envName && !scopedKey),
   };
@@ -362,22 +438,14 @@ export async function apolloFetch(path, body) {
   return res.json();
 }
 
-// The workspace is selected by workspace_id in the body, not by the key.
-//
-// Prefer the account-level master key: a client's public key authenticates fine
-// on unscoped routes like /get-labels but is rejected on workspace-scoped ones
-// unless it belongs to that exact workspace, so a slightly-off per-client key
-// fails with a misleading "Invalid API credentials". The master key reaches every
-// workspace, which is why tools/inbox.py uses it for all calls. The client key
-// remains the fallback for when no master key is configured.
-export async function miFetch(method, path, client, body) {
-  const key = MI_MASTER_KEY || client?.mi_pk;
-  if (!key) {
-    throw new Error(
-      `No MasterInbox key for ${client?.name ?? "request"}: ` +
-      `neither the client key nor MASTERINBOX_API_KEY is set in .env.`
-    );
-  }
+// Cockpit names this slot masterinbox_master (the per-client slot is plain
+// "masterinbox") — accept both rather than depending on that distinction.
+export const MI_MASTER_KEY =
+  globalSecret("masterinbox_master") ?? globalSecret("masterinbox") ?? process.env.MASTERINBOX_API_KEY;
+export const MI_MASTER_SOURCE =
+  globalSecret("masterinbox_master") || globalSecret("masterinbox") ? "cockpit" : "MASTERINBOX_API_KEY";
+
+async function miCall(key, method, path, body) {
   const res = await fetch(`${MI_BASE}${path}`, {
     method,
     headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
@@ -406,11 +474,55 @@ export function miWorkspaceId(client) {
 // List every MasterInbox workspace (account-level master key).
 export async function miListWorkspaces() {
   if (!MI_MASTER_KEY) throw new Error("MASTERINBOX_API_KEY is not set in .env");
-  const res = await fetch(`${MI_BASE}/get-all-workspaces`, {
+  const res = await fetch(`${MI_BASE}/api/api-webhook/v1/api/get-all-workspaces`, {
     headers: { Authorization: `Bearer ${MI_MASTER_KEY}`, "Content-Type": "application/json" },
   });
   const data = await res.json();
   return data?.data ?? data;
+}
+
+const MI_AUTH_REJECTED = /invalid api credentials|unauthori[sz]ed/i;
+
+// Try the client's workspace-scoped pk_ key first. Several of those keys have
+// been rotated on MasterInbox's side and now return "Invalid API credentials";
+// when that happens, fall back to the account-level key WITH an explicit
+// workspace_id. Verified that the master key honours workspace_id — it returns
+// prospect IDs prefixed with the requested workspace, not a default one.
+//
+// The fallback is deliberately refused when it cannot be scoped, because an
+// unscoped master-key call would hand back some other client's inbox.
+export async function miFetch(method, path, client, body) {
+  const scoped = client.mi_pk;
+
+  if (!scoped && !MI_MASTER_KEY) {
+    throw new Error(
+      `No MasterInbox credentials for ${client.name}: ` +
+      `${client.mi_key_env ?? "mi_key_env"} is not set in .env, and neither is MASTERINBOX_API_KEY.`
+    );
+  }
+
+  if (scoped) {
+    const r = await miCall(scoped, method, path, body);
+    if (!MI_AUTH_REJECTED.test(String(r?.message ?? ""))) return r;
+    if (!MI_MASTER_KEY) return r;
+  }
+
+  if (client.mi_ws_id == null) {
+    throw new Error(
+      `MasterInbox rejected the key for ${client.name} and no mi_ws_id is set in clients.json, ` +
+      `so the master key cannot be scoped safely. Re-issue ${client.mi_key_env ?? "the client key"}.`
+    );
+  }
+
+  if (!body) {
+    throw new Error(
+      `MasterInbox rejected ${client.mi_key_env ?? "the client key"} for ${client.name}. ` +
+      `The master-key fallback needs a request body carrying workspace_id, and ${path} takes none — ` +
+      `re-issue this client's key in MasterInbox.`
+    );
+  }
+
+  return miCall(MI_MASTER_KEY, method, path, { ...body, workspace_id: String(client.mi_ws_id) });
 }
 
 // ── MCP response shapers ─────────────────────────────────────────────────────
@@ -420,4 +532,20 @@ export function ok(data) {
 
 export function err(e) {
   return { content: [{ type: "text", text: `Error: ${e.message}` }], isError: true };
+}
+
+// Master-key-first MasterInbox call (the account key reaches every workspace).
+// Used by mailbox connect links, where a per-client key is often rejected on
+// workspace-scoped routes and the GET has no body for miFetch's fallback.
+export async function miFetchMaster(method, path, client) {
+  const key = MI_MASTER_KEY || client?.mi_pk;
+  if (!key) throw new Error(`No MasterInbox key for ${client?.name ?? "request"} (MASTERINBOX_API_KEY not set).`);
+  const res = await fetch(`${MI_BASE}${path}`, {
+    method,
+    headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+  });
+  const text = await res.text();
+  let data; try { data = JSON.parse(text); } catch { data = { raw: text }; }
+  if (!res.ok) throw new Error(`MasterInbox ${method} ${path} -> HTTP ${res.status}: ${data?.message || text.slice(0, 200)}`);
+  return data;
 }
