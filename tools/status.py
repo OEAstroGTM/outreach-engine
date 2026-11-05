@@ -155,6 +155,14 @@ def build_client_status() -> list[dict]:
 
         # EmailBison
         eb_instance  = sequencer if sequencer in ("eb_send", "eb_personal") else None
+        # Workspace ids are per-instance (eb_send_ws_id / eb_personal_ws_id) for
+        # clients live on both. The legacy eb_ws_id applies only to the client's
+        # default instance and must never be reused across instances.
+        _per_instance = client.get(
+            "eb_personal_ws_id" if eb_instance == "eb_personal" else "eb_send_ws_id"
+        )
+        if _per_instance is not None:
+            eb_ws_id = _per_instance
         eb_ws_map    = eb_send_ws if sequencer == "eb_send" else eb_personal_ws
         eb_connected = eb_ws_id is not None and eb_ws_id in eb_ws_map
         eb_mailboxes = fetch_eb_mailboxes(eb_instance, eb_ws_id) if eb_connected else []

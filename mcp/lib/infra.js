@@ -39,6 +39,7 @@ const namesiloRegistrar = {
     return {
       available: avail.map(d => (typeof d === "string" ? { domain: d } : { domain: d.domain, price: d.price, renew: d.renew })),
       unavailable: unavail.map(d => (typeof d === "string" ? d : d.domain)),
+      errors: [],   // NameSilo checks the batch in one call: it throws on failure rather than per-domain
     };
   },
   async registerDomain({ domain, years = 1, nameservers }) {
@@ -60,6 +61,8 @@ const namesiloRegistrar = {
     return {
       domain, registrar: "namesilo", status: reply.status, expires: reply.expires,
       traffic_type: reply.traffic_type,
+      // Portfolios are a NameSilo-only concept; "N/A" means unassigned.
+      portfolio: reply.portfolio && reply.portfolio !== "N/A" ? reply.portfolio : null,
       nameservers: ns.map(n => (typeof n === "string" ? n : n.nameserver ?? n["#text"] ?? n)),
     };
   },
@@ -92,7 +95,10 @@ const porkbunRegistrar = {
   name: "porkbun",
   // Porkbun checks one domain per call (rate-limited); loop and normalize.
   async checkAvailability(domains) {
-    const available = [], unavailable = [];
+    // A failed request must NOT be reported as "unavailable" — that made a bad
+    // key, a rate limit, or a network blip indistinguishable from "taken", so
+    // a caller sourcing domains would silently skip ones that are actually free.
+    const available = [], unavailable = [], errors = [];
     for (const domain of domains) {
       try {
         const d = await porkbun(`/domain/checkDomain/${domain}`);
@@ -102,9 +108,19 @@ const porkbunRegistrar = {
         } else {
           unavailable.push(domain);
         }
-      } catch { unavailable.push(domain); }
+      } catch (e) {
+        errors.push({ domain, error: e.message });
+      }
     }
-    return { available, unavailable };
+    // Every lookup failing is a credential/connectivity problem, not a result.
+    // Throwing beats handing back an empty list that reads like "nothing free".
+    if (errors.length === domains.length && domains.length > 0) {
+      throw new Error(
+        `Porkbun availability check failed for all ${domains.length} domain(s) — ` +
+        `likely credentials or rate limiting. First error: ${errors[0].error}`
+      );
+    }
+    return { available, unavailable, errors };
   },
   async registerDomain({ domain, whoisPrivacy = true }) {
     // Porkbun requires the exact current price (pennies) — fetch it first.
@@ -133,16 +149,194 @@ const porkbunRegistrar = {
   },
 };
 
-// ── Registrar dispatch (unified interface) ───────────────────────────────────
-export function registrar() {
-  return INFRA_REGISTRAR === "porkbun" ? porkbunRegistrar : namesiloRegistrar;
+// ── Dynadot (RESTful v1 — Bearer key + HMAC-SHA256 X-Signature) ──────────────
+// Unlike NameSilo/Porkbun, every request is signed: X-Signature is
+// base64(HMAC-SHA256(secret, apiKey \n pathAndQuery \n requestId \n body)).
+// Each request also needs a UNIQUE X-Request-ID — Dynadot rejects a reused one
+// with "this request ID has been assigned to another request already".
+// Base is /restful/v1: the documented v2 rejects production keys today.
+// Dynadot also serves one request at a time; concurrency earns a 10-min ban,
+// so callers must stay sequential.
+const DYNADOT_BASE = (process.env.DYNADOT_API_BASE_URL || "https://api.dynadot.com/restful/v1")
+  .replace(/\/$/, "");
+const DYNADOT_HOST = DYNADOT_BASE.replace(/\/restful\/v\d+$/, "");
+const DYNADOT_PREFIX = DYNADOT_BASE.slice(DYNADOT_HOST.length);
+
+async function dynadot(path, { method = "GET", body } = {}) {
+  const key = process.env.DYNADOT_API_KEY;
+  const secret = process.env.DYNADOT_API_SECRET;
+  if (!key || !secret) throw new Error("DYNADOT_API_KEY / DYNADOT_API_SECRET not set");
+
+  const { randomUUID, createHmac } = await import("crypto");
+  const fullPath = `${DYNADOT_PREFIX}${path}`;
+  const requestId = randomUUID();
+  const payload = body ? JSON.stringify(body) : "";
+  const signature = createHmac("sha256", secret)
+    .update([key, fullPath, requestId, payload].join("\n"), "utf8")
+    .digest("base64");
+
+  const res = await fetch(`${DYNADOT_HOST}${fullPath}`, {
+    method,
+    headers: {
+      Authorization: `Bearer ${key}`,
+      "X-Signature": signature,
+      "X-Request-ID": requestId,
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: payload || undefined,
+  });
+
+  const text = await res.text();
+  let data; try { data = JSON.parse(text); } catch { data = { raw: text.slice(0, 200) }; }
+  // Dynadot returns HTTP 200 with the real status in the body, so the HTTP
+  // code alone is not a success signal — check data.code too.
+  const code = data?.code ?? res.status;
+  if (code !== 200) {
+    throw new Error(`Dynadot ${method} ${path} → ${code}: ${data?.error?.description ?? data?.message ?? text.slice(0, 160)}`);
+  }
+  return data.data ?? data;
 }
 
-export const checkAvailability   = (args) => registrar().checkAvailability(args.domains);
-export const registerDomain      = (args) => registrar().registerDomain(args);
-export const updateNameservers   = (args) => registrar().updateNameservers(args);
-export const getDomain           = (args) => registrar().getDomain(args.domain);
-export const getRegistrarBalance = ()     => registrar().getBalance();
+const dynadotRegistrar = {
+  name: "dynadot",
+  // One domain per call, like Porkbun. Errors are kept separate from
+  // "unavailable" so a failure never reads as "taken".
+  async checkAvailability(domains) {
+    const available = [], unavailable = [], errors = [];
+    for (const domain of domains) {
+      try {
+        const d = await dynadot(`/domains/${encodeURIComponent(domain)}/search`);
+        const avail = String(d?.available ?? "").toLowerCase() === "yes";
+        if (avail) available.push({ domain, price: d.price ?? null, renew: d.renew ?? null });
+        else unavailable.push(domain);
+      } catch (e) {
+        errors.push({ domain, error: e.message });
+      }
+    }
+    if (errors.length === domains.length && domains.length > 0) {
+      throw new Error(`Dynadot availability check failed for all ${domains.length} domain(s). First error: ${errors[0].error}`);
+    }
+    return { available, unavailable, errors };
+  },
+  async registerDomain({ domain, years = 1 }) {
+    const d = await dynadot(`/domains/${encodeURIComponent(domain)}/register`, {
+      method: "POST", body: { duration: String(years) },
+    });
+    return { domain, registrar: "dynadot", amount: d?.price ?? d?.amount ?? null, message: d?.message ?? "registered" };
+  },
+  async updateNameservers({ domain, nameservers }) {
+    if (!nameservers || nameservers.length < 2) throw new Error("Dynadot requires at least 2 nameservers");
+    // Verified against the live API: method is PUT (POST answers "command not
+    // recognized") and the body key is `nameserver_list` holding PLAIN STRINGS
+    // (an array of {host} objects is rejected: "Expected a string value, but
+    // received an object"). The GET on this same path returns {host, ns_name}
+    // objects, which is what made the write shape easy to get wrong.
+    await dynadot(`/domains/${encodeURIComponent(domain)}/nameservers`, {
+      method: "PUT",
+      body: { nameserver_list: nameservers.map(n => (typeof n === "string" ? n : n.host ?? n.server_name)) },
+    });
+    return { domain, registrar: "dynadot", nameservers, updated: true };
+  },
+  async getDomain(domain) {
+    // There is no /domains/{d}/info route (it answers "command not recognized").
+    // Nameservers come from /domains/{d}/nameservers, which returns
+    // { name_servers: [{ host, ns_name }] }; status/expiry only appear in the
+    // account-wide /domains listing, so fetch that and pick this domain out.
+    const ns = await dynadot(`/domains/${encodeURIComponent(domain)}/nameservers`);
+    const hosts = (ns?.name_servers ?? []).map(n => n.host ?? n.server_name ?? n).filter(Boolean);
+
+    let status, expires;
+    try {
+      const list = await dynadot("/domains");
+      const rec = (list?.domainInfo ?? []).find(
+        d => String(d.domainName ?? "").toLowerCase() === domain.toLowerCase()
+      );
+      if (rec) { status = rec.status ?? "Active"; expires = rec.expiration ?? null; }
+    } catch { /* nameservers already retrieved; listing is best-effort */ }
+
+    return { domain, registrar: "dynadot", status, expires, nameservers: hosts };
+  },
+  async getBalance() {
+    // Dynadot exposes no balance endpoint; prove credentials instead.
+    await dynadot("/domains");
+    return { registrar: "dynadot", balance: "not exposed via API (see dynadot.com account)" };
+  },
+};
+
+// ── NameSilo portfolios (NameSilo-only — no Porkbun/Dynadot equivalent) ──────
+// Portfolios group DOMAINS for organisation. They do not affect DNS, mailboxes
+// or billing, and a domain can sit in at most one.
+export async function listPortfolios() {
+  const reply = await namesilo("portfolioList");
+  const p = reply.portfolios;
+  const names = Array.isArray(p) ? p : (p ? [p] : []);
+  return { portfolios: names.flatMap(x => (typeof x === "string" ? [x] : Object.values(x))) };
+}
+
+// NameSilo takes a comma-separated list, so this is a handful of calls rather
+// than one per domain. Re-assigning a domain that is already in the portfolio
+// is a no-op, which is why there is no "find the unassigned ones" step —
+// listDomains does not return the portfolio field, so filtering first would
+// cost one lookup per domain (1000+ on this account).
+const PORTFOLIO_CHUNK = 100;
+
+export async function assignPortfolio({ portfolio, domains, verify_sample = 3 }) {
+  if (!portfolio) throw new Error("portfolio is required");
+  if (!Array.isArray(domains) || !domains.length) throw new Error("domains must be a non-empty array");
+
+  const batches = [];
+  for (let i = 0; i < domains.length; i += PORTFOLIO_CHUNK) {
+    const chunk = domains.slice(i, i + PORTFOLIO_CHUNK);
+    try {
+      const reply = await namesilo("portfolioDomainAssociate", { portfolio, domains: chunk.join(",") });
+      batches.push({ count: chunk.length, ok: true, message: reply.message ?? reply.detail });
+    } catch (e) {
+      batches.push({ count: chunk.length, ok: false, error: e.message, domains: chunk.slice(0, 10) });
+    }
+  }
+
+  // NameSilo answers "all supplied domains belonging to your account have been
+  // updated" even when a name is not on the account, so the message alone does
+  // not prove anything landed — read a few back.
+  const verified = [];
+  for (const d of domains.slice(0, Math.max(0, verify_sample))) {
+    try {
+      const info = await getDomain({ domain: d, registrar: "namesilo" });
+      verified.push({ domain: d, portfolio: info.portfolio, matches: info.portfolio === portfolio });
+    } catch (e) { verified.push({ domain: d, error: e.message }); }
+  }
+
+  return {
+    portfolio,
+    requested: domains.length,
+    batches,
+    failed_batches: batches.filter(b => !b.ok).length,
+    verified,
+  };
+}
+
+// ── Registrar dispatch (unified interface) ───────────────────────────────────
+// INFRA_REGISTRAR is only the DEFAULT. Every call may name a registrar instead,
+// so both can be used in one server run — previously the env var was read once
+// at module load, which locked the whole process to a single registrar.
+export const REGISTRARS = ["namesilo", "porkbun", "dynadot"];
+
+export function registrar(name) {
+  const which = (name ?? INFRA_REGISTRAR ?? "namesilo").toLowerCase();
+  if (!REGISTRARS.includes(which)) {
+    throw new Error(`Unknown registrar "${which}". Expected one of: ${REGISTRARS.join(", ")}.`);
+  }
+  if (which === "porkbun") return porkbunRegistrar;
+  if (which === "dynadot") return dynadotRegistrar;
+  return namesiloRegistrar;
+}
+
+export const checkAvailability   = (args) => registrar(args?.registrar).checkAvailability(args.domains);
+export const registerDomain      = (args) => registrar(args?.registrar).registerDomain(args);
+export const updateNameservers   = (args) => registrar(args?.registrar).updateNameservers(args);
+export const getDomain           = (args) => registrar(args?.registrar).getDomain(args.domain);
+export const getRegistrarBalance = (args) => registrar(args?.registrar).getBalance();
 
 // ── Inboxing (mailbox provisioning — Inboxing API v2) ────────────────────────
 // Auth: X-API-Key header. Base includes /api/v2. Set INBOXING_API_BASE_URL to
@@ -195,8 +389,31 @@ export async function inboxingSubmitDomain({ domain, user_count = 49, names, tag
 export async function inboxingCheckStatus({ domain_id }) {
   return inboxing("GET", `/domains/${encodeURIComponent(domain_id)}/status`);
 }
-export async function inboxingListDomains() {
-  return inboxing("GET", "/domains");
+// Inboxing paginates /domains (per_page default 50). Pass page to fetch a
+// specific page, or all:true to walk every page (guarded by maxPages) and
+// return the combined list plus a truncated flag.
+export async function inboxingListDomains({ page, all, maxPages = 20 } = {}) {
+  if (!all) {
+    const qs = page ? `?page=${page}` : "";
+    return inboxing("GET", `/domains${qs}`);
+  }
+  const first = await inboxing("GET", `/domains?page=${page || 1}`);
+  const rows = [...(first?.data ?? [])];
+  const totalPages = first?.pagination?.pages ?? 1;
+  const startPage = page || 1;
+  const stopAt = Math.min(totalPages, startPage + maxPages - 1);
+  let pagesFetched = 1;
+  for (let p = startPage + 1; p <= stopAt; p++) {
+    const r = await inboxing("GET", `/domains?page=${p}`);
+    rows.push(...(r?.data ?? []));
+    pagesFetched++;
+  }
+  return {
+    data: rows,
+    pagination: first?.pagination ?? null,
+    pages_fetched: pagesFetched,
+    truncated: totalPages > stopAt,
+  };
 }
 // GET /slots — { slots:{total,used,remaining,...}, system:{can_provision}, subscription_status }
 export async function inboxingGetSlots() {

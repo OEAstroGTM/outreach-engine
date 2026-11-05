@@ -147,8 +147,8 @@
   },
   {
     "name": "Outreach Engine",
-    "sequencer": "eb_send",
-    "eb_ws_id": 5,
+    "sequencer": "eb_personal",
+    "eb_ws_id": null,
     "eb_send_key_env": "EB_SEND_KEY_OUTREACH_ENGINE",
     "pv_ws_id": "6a725c9094b3cfd96a9e5a22",
     "mi_ws_id": 1013,
@@ -200,7 +200,7 @@
   },
   {
     "name": "Supply Wisdom",
-    "sequencer": "instantly",
+    "sequencer": "eb_send",
     "eb_ws_id": null,
     "mi_ws_id": 1059,
     "mi_key_env": "MI_KEY_SUPPLY_WISDOM",
@@ -208,7 +208,9 @@
     "pv_ws_id": "6a73946b6f52daf49a4cb2e4",
     "inboxing_tags": [
       "SupplyWisdom"
-    ]
+    ],
+    "eb_send_ws_id": 83,
+    "eb_send_key_env": "EB_SEND_KEY_SUPPLY_WISDOM"
   },
   {
     "name": "True Dial",
@@ -258,7 +260,7 @@
   {
     "name": "Abra",
     "sequencer": "eb_send",
-    "eb_ws_id": 50,
+    "eb_ws_id": null,
     "eb_send_key_env": "EB_SEND_KEY_ABRA",
     "mi_ws_id": 393,
     "mi_key_env": "MI_KEY_ABRA",
@@ -266,7 +268,8 @@
       "Abra"
     ],
     "eb_send_ws_id": 50,
-    "eb_personal_ws_id": 9
+    "eb_personal_ws_id": 9,
+    "eb_personal_key_env": "EB_PERSONAL_KEY_ABRA"
   },
   {
     "name": "Revo.ai",
@@ -333,7 +336,8 @@
       "union"
     ],
     "eb_send_ws_id": 54,
-    "eb_personal_ws_id": 17
+    "eb_personal_ws_id": 17,
+    "eb_personal_key_env": "EB_PERSONAL_KEY_UNION_OMAHA"
   },
   {
     "name": "Ujet",
@@ -348,12 +352,13 @@
   },
   {
     "name": "Built Right",
-    "sequencer": "none",
+    "sequencer": "eb_personal",
     "eb_ws_id": null,
     "mi_ws_id": 1579,
     "mi_key_env": "MI_KEY_BUILT_RIGHT",
     "inboxing_tags": [
-      "Built Right"
+      "Built Right",
+      "builtright"
     ],
     "eb_personal_ws_id": 11,
     "eb_personal_key_env": "EB_PERSONAL_KEY_BUILT_RIGHT"
@@ -404,6 +409,88 @@
     "inboxing_tags": [
       "iShift"
     ],
-    "eb_send_key_env": "EB_SEND_KEY_ISHIFT"
+    "eb_send_key_env": "EB_SEND_KEY_ISHIFT",
+    "eb_send_ws_id": 84
+  },
+  {
+    "name": "Geek Powered Studio",
+    "sequencer": "eb_send",
+    "eb_ws_id": null,
+    "eb_send_ws_id": 79,
+    "eb_send_key_env": "EB_SEND_KEY_GEEK_POWERED_STUDIO",
+    "eb_personal_ws_id": 21,
+    "eb_personal_key_env": "EB_PERSONAL_KEY_GEEK_POWERED_STUDIO",
+    "mi_ws_id": 2698,
+    "mi_key_env": "MI_KEY_GEEK_POWERED_STUDIO",
+    "inboxing_tags": [
+      "Geek Powered Studio",
+      "Geek Powered Studios"
+    ]
+  },
+  {
+    "name": "Meter",
+    "sequencer": "eb_send",
+    "eb_ws_id": null,
+    "eb_send_ws_id": 80,
+    "eb_send_key_env": "EB_SEND_KEY_METER",
+    "eb_personal_ws_id": null,
+    "eb_personal_key_env": "EB_PERSONAL_KEY_METER",
+    "mi_ws_id": 2717,
+    "mi_key_env": "MI_KEY_METER",
+    "inboxing_tags": [
+      "Meter",
+      "vanilla"
+    ]
+  },
+  {
+    "name": "Beyond",
+    "sequencer": "eb_send",
+    "eb_ws_id": null,
+    "eb_send_ws_id": 82,
+    "eb_send_key_env": "EB_SEND_KEY_BEYOND",
+    "eb_personal_ws_id": null,
+    "eb_personal_key_env": "EB_PERSONAL_KEY_BEYOND",
+    "mi_ws_id": 2907,
+    "mi_key_env": "MI_KEY_BEYOND",
+    "inboxing_tags": [
+      "Beyond"
+    ]
+  },
+  {
+    "name": "G2",
+    "sequencer": "eb_send",
+    "eb_ws_id": null,
+    "eb_send_ws_id": 85,
+    "eb_send_key_env": "EB_SEND_KEY_G2",
+    "mi_ws_id": 3073,
+    "mi_key_env": "MI_KEY_G2",
+    "inboxing_tags": [
+      "G2"
+    ]
+  },
+  {
+    "name": "Inboxing Uploads",
+    "sequencer": "eb_send",
+    "eb_ws_id": null,
+    "eb_send_ws_id": 25,
+    "eb_personal_ws_id": null,
+    "mi_ws_id": null,
+    "mi_key_env": null,
+    "inboxing_tags": [],
+    "eb_send_key_env": "EB_SEND_KEY_INBOXING_UPLOADS"
+  },
+  {
+    "name": "Bimini Health",
+    "sequencer": "eb_send",
+    "eb_ws_id": null,
+    "eb_send_ws_id": 86,
+    "eb_send_key_env": "EB_SEND_KEY_BIMINI_HEALTH",
+    "mi_ws_id": 3541,
+    "mi_key_env": "MI_KEY_BIMINI_HEALTH",
+    "inboxing_tags": [
+      "Bimini Health"
+    ],
+    "eb_personal_ws_id": 24,
+    "eb_personal_key_env": "EB_PERSONAL_KEY_BIMINI_HEALTH"
   }
 ]
