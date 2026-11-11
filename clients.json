@@ -386,7 +386,9 @@
     "inboxing_tags": [
       "bynd"
     ],
-    "eb_send_key_env": "EB_SEND_KEY_BYND_COM"
+    "eb_send_key_env": "EB_SEND_KEY_BYND_COM",
+    "status": "churned",
+    "churned_at": "2026-11-11"
   },
   {
     "name": "Meter.com",
