@@ -454,7 +454,9 @@
     "mi_key_env": "MI_KEY_BEYOND",
     "inboxing_tags": [
       "Beyond"
-    ]
+    ],
+    "status": "churned",
+    "churned_at": "2026-11-11"
   },
   {
     "name": "G2",
