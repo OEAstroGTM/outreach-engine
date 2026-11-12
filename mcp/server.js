@@ -7,6 +7,7 @@ import * as valley from "./lib/valley.js";
 import * as cheap from "./lib/cheapinboxes.js";
 import * as cf from "./lib/cloudflare.js";
 import * as hospital from "./lib/hospital.js";
+import * as ice from "./lib/icemail.js";
 import { registerAgents } from "./agents.js";
 
 const REMOTE_ANNOTATIONS = {
@@ -823,6 +824,355 @@ export function buildServer({ allowedTools = null, remote = false } = {}) {
       dry_run: z.boolean().optional(),
     },
     async (a) => { try { return ok(await cf.deleteEmailRecord(a)); } catch (e) { return err(e); } }
+  );
+
+  server.tool("copy_campaign_settings",
+    "Copy campaign settings (daily limits, plain text, tracking, unsubscribe, prioritization, per-domain cap) and the sending schedule from one EmailBison campaign to another on the same instance. Sequence, leads and inboxes untouched. Use dry_run=true to see what would be copied.",
+    {
+      client_name: z.string(),
+      source_campaign_id: z.number(),
+      dest_campaign_id: z.number(),
+      instance: z.enum(["eb_send", "eb_personal"]).optional(),
+      dry_run: z.boolean().optional(),
+    },
+    async (args) => {
+      try { return ok(await ops.copyCampaignSettings(args)); }
+      catch (e) { return err(e); }
+    }
+  );
+
+  server.tool("set_nameservers",
+    "Set custom nameservers on domains at a registrar (default NameSilo). Accepts ANY nameservers — e.g. the pair Cheap Inboxes assigns — unlike cloudflare_add_domain, which only points at our own Cloudflare pair. Updates each domain in turn (NameSilo changeNameServers is per-domain) and reports per-domain success/failure. A domain only exists at the registrar it was bought from.",
+    {
+      domains: z.array(z.string()).nonempty().describe("Domain names to update"),
+      nameservers: z.array(z.string()).min(2).describe("Nameservers to set (registrar requires at least 2)"),
+      registrar: vRegistrar,
+    },
+    async ({ domains, nameservers, registrar }) => {
+      const results = [];
+      for (const domain of domains) {
+        try {
+          const r = await infra.updateNameservers({ domain, nameservers, registrar });
+          results.push({ domain, ok: true, ...r });
+        } catch (e) {
+          results.push({ domain, ok: false, error: String(e).slice(0, 180) });
+        }
+      }
+      return ok({
+        requested: domains.length,
+        updated: results.filter(r => r.ok).length,
+        failed: results.filter(r => !r.ok).length,
+        nameservers, results,
+      });
+    }
+  );
+
+  server.tool("cheapinboxes_sync_nameservers",
+    "For every Cheap Inboxes domain waiting on nameservers (status pending_ns_verification), set the pair Cheap Inboxes assigned to it at the domain's own registrar. The assigned pair differs per domain. Pass dry_run:true to see what it would change without changing anything, or a `domains` list to limit it to those. Never buys, renews, or touches Inboxing. Paused between registrar calls for NameSilo's rate limits.",
+    {
+      domains: z.array(z.string()).optional().describe("Limit to these domains; omit to handle every pending one"),
+      dry_run: z.boolean().optional().describe("True = report planned changes, write nothing"),
+    },
+    async ({ domains, dry_run }) => {
+      const sleep = ms => new Promise(r => setTimeout(r, ms));
+      const REGS = ["namesilo", "porkbun", "dynadot"];
+      try {
+        // 1) every CheapInboxes domain waiting on nameservers
+        const pending = (await cheap.listDomains({ status: "pending_ns_verification", all: true })).domains || [];
+        // 2) narrow to the requested names, if any
+        let targets = pending, requested_not_pending = [];
+        if (Array.isArray(domains) && domains.length) {
+          const want = new Set(domains.map(d => d.toLowerCase()));
+          targets = pending.filter(d => want.has(String(d.domain).toLowerCase()));
+          const have = new Set(pending.map(d => String(d.domain).toLowerCase()));
+          requested_not_pending = domains.filter(d => !have.has(d.toLowerCase()));
+        }
+
+        const results = [];
+        for (const d of targets) {
+          // 3) the pair CheapInboxes assigned this domain
+          const ns = d.readiness?.next_action?.nameservers ?? d.nameservers ?? [];
+          const row = { domain: d.domain, registrar: null, nameservers: ns, status: null };
+          if (!Array.isArray(ns) || ns.length < 2) {
+            row.status = "failed"; row.error = "no assigned nameserver pair on this domain";
+            results.push(row); continue;
+          }
+          // 4) which registrar is it at? probe NameSilo, then Porkbun, then Dynadot.
+          for (const r of REGS) {
+            try { await infra.getDomain({ domain: d.domain, registrar: r }); row.registrar = r; break; }
+            catch { /* not at this registrar */ }
+            await sleep(600);
+          }
+          if (!row.registrar) { row.status = "skipped"; row.error = "not found at NameSilo/Porkbun/Dynadot"; results.push(row); continue; }
+          // 5) set them, unless this is a dry run
+          if (dry_run) { row.status = "would_update"; results.push(row); await sleep(400); continue; }
+          try { await infra.updateNameservers({ domain: d.domain, nameservers: ns, registrar: row.registrar }); row.status = "updated"; }
+          catch (e) { row.status = "failed"; row.error = String(e).slice(0, 180); }
+          results.push(row);
+          await sleep(800);   // NameSilo rate limit between writes
+        }
+
+        return ok({
+          pending_total: pending.length,
+          processed: targets.length,
+          dry_run: !!dry_run,
+          updated: results.filter(r => r.status === "updated").length,
+          would_update: results.filter(r => r.status === "would_update").length,
+          skipped: results.filter(r => r.status === "skipped").length,
+          failed: results.filter(r => r.status === "failed").length,
+          ...(requested_not_pending.length ? { requested_not_pending } : {}),
+          results,
+        });
+      } catch (e) { return err(e); }
+    }
+  );
+
+  // ── Cheap Inboxes — buying mailboxes (cost-gated) ────────────────────────────
+  // A quote is free; a checkout spends. The buy tool enforces, every call: a live
+  // re-quote, a hard max-spend ceiling (env CHEAPINBOXES_MAX_SPEND_CENTS, default
+  // $200), and an explicit confirmation of the exact amount. No silent spend.
+  server.tool("cheapinboxes_quote",
+    "Get a Cheap Inboxes price quote for buying mailboxes — FREE, no charge, no order placed. One entry per domain with provider + count. Returns line items and quote.totals.total_today_cents.",
+    {
+      domains: z.array(z.object({
+        domain: z.string().describe("Full domain, e.g. example.com or example.digital"),
+        provider: z.enum(["google", "microsoft"]).optional().describe("Default google"),
+        count: z.number().int().positive().describe("Mailboxes to price on this domain"),
+        isExisting: z.boolean().optional().describe("Default true — a domain already in the account"),
+        staged_import_id: z.string().optional(),
+      })),
+      promo_code: z.string().optional(),
+    },
+    async (a) => { try { return ok(await cheap.quoteOrder(a)); } catch (e) { return err(e); } }
+  );
+
+  server.tool("cheapinboxes_buy_mailboxes",
+    "BUY mailboxes on Cheap Inboxes — SPENDS REAL MONEY. Guarded: always re-quotes live, refuses if the total exceeds the max-spend cap, and refuses unless confirm:true AND confirm_total_cents equals the live quote. Flow: call once WITHOUT confirm to get the quote + exact total, then call again with the SAME args plus confirm:true and confirm_total_cents set to that total. Provide names per domain (\"First Last\") — each becomes one mailbox.",
+    {
+      domains: z.array(z.object({
+        domain: z.string().describe("Full domain, e.g. example.com"),
+        provider: z.enum(["google", "microsoft"]).optional().describe("Default google"),
+        isExisting: z.boolean().optional().describe("Default true"),
+        staged_import_id: z.string().optional(),
+        names: z.array(z.string()).nonempty().describe('Mailbox owners as "First Last"; mailbox count = names.length'),
+      })),
+      confirm: z.boolean().optional().describe("Must be true to actually place the order"),
+      confirm_total_cents: z.number().optional().describe("Must equal the live quote's total_today_cents"),
+      max_spend_usd: z.number().optional().describe("Tighten the cap for THIS call; cannot exceed the env ceiling"),
+      order_name: z.string().optional(),
+      integration_id: z.string().optional(),
+      fulfillment: z.enum(["diy", "dfy"]).optional().describe("Default diy"),
+      promo_code: z.string().optional(),
+    },
+    async ({ domains, confirm, confirm_total_cents, max_spend_usd, order_name, integration_id, fulfillment, promo_code }) => {
+      try {
+        if (!Array.isArray(domains) || !domains.length) throw new Error("domains must be a non-empty array");
+        // Build accounts from names; count is derived, never taken on faith.
+        const prepared = domains.map(d => {
+          const accounts = (d.names || []).map(cheap.nameToAccount);
+          if (!accounts.length) throw new Error(`domain ${d.domain}: provide at least one name`);
+          return { ...d, accounts, count: accounts.length };
+        });
+
+        // 1) live re-quote — the charge is always computed fresh, never trusted from input.
+        const quote = await cheap.quoteOrder({
+          domains: prepared.map(d => ({ domain: d.domain, provider: d.provider, count: d.count, isExisting: d.isExisting, staged_import_id: d.staged_import_id })),
+          promo_code,
+        });
+        const total = quote?.totals?.total_today_cents;
+        if (typeof total !== "number") throw new Error("could not read total_today_cents from the quote");
+
+        // 2) cap — env ceiling is absolute; max_spend_usd can only tighten it.
+        const envCeiling = Number(process.env.CHEAPINBOXES_MAX_SPEND_CENTS ?? 20000);
+        const cap = Math.min(envCeiling, max_spend_usd != null ? Math.round(max_spend_usd * 100) : Infinity);
+        if (total > cap) {
+          return ok({ blocked: true, reason: "exceeds_max_spend",
+            total_today_cents: total, total_usd: (total / 100).toFixed(2),
+            cap_cents: cap, cap_usd: (cap / 100).toFixed(2), quote,
+            note: `Refusing: $${(total / 100).toFixed(2)} exceeds the cap of $${(cap / 100).toFixed(2)}. Lower the order, raise max_spend_usd (up to the env ceiling), or raise CHEAPINBOXES_MAX_SPEND_CENTS.` });
+        }
+
+        // 3) confirmation gate — no confirm, no spend. Return the quote to confirm against.
+        if (confirm !== true) {
+          return ok({ requires_confirmation: true,
+            total_today_cents: total, total_usd: (total / 100).toFixed(2),
+            cap_usd: (cap / 100).toFixed(2), mailboxes: prepared.reduce((n, d) => n + d.count, 0), quote,
+            next_step: `Re-call cheapinboxes_buy_mailboxes with the SAME args plus confirm:true and confirm_total_cents:${total}` });
+        }
+        if (confirm_total_cents !== total) {
+          return ok({ blocked: true, reason: "amount_mismatch",
+            confirm_total_cents, live_total_cents: total,
+            note: `Live quote is ${total} cents; you confirmed ${confirm_total_cents}. Re-confirm with confirm_total_cents:${total}.` });
+        }
+
+        // 4) checkout — spends exactly the confirmed, capped, re-quoted amount.
+        const result = await cheap.checkoutOrder({
+          domains: prepared.map(d => ({ domain: d.domain, provider: d.provider, isExisting: d.isExisting, staged_import_id: d.staged_import_id, accounts: d.accounts })),
+          promo_code, integration_id, name: order_name, fulfillment,
+        });
+        return ok({ purchased: true, charged_cents: total, charged_usd: (total / 100).toFixed(2), order: result?.data ?? result });
+      } catch (e) { return err(e); }
+    }
+  );
+
+  // ── Cheap Inboxes — import → checkout → nameservers → order (pipeline) ────────
+  server.tool("cheapinboxes_import_domains",
+    "Register domains you already own with Cheap Inboxes (FREE — stages them for import, no charge). Returns an import record per domain; its id is the staged_import_id you pass to cheapinboxes_checkout. Use source_provider \"manual\" or \"external\" for a domain registered elsewhere (e.g. NameSilo).",
+    {
+      domains: z.array(z.string()).nonempty().describe("Domain names to stage, e.g. [\"brand01.com\", ...]"),
+      source_provider: z.enum(["manual", "external", "namecheap", "godaddy", "porkbun", "cloudflare", "DIY_import", "DFY_import", "migration"]).optional().describe("Default manual"),
+      metadata: z.record(z.any()).optional(),
+    },
+    async (a) => { try { return ok(await cheap.importDomains(a)); } catch (e) { return err(e); } }
+  );
+
+  server.tool("cheapinboxes_checkout",
+    "Place a Cheap Inboxes order for staged/imported domains — SPENDS REAL MONEY (charges the saved card). Guarded exactly like cheapinboxes_buy_mailboxes: pass dry_run:true (or omit confirm) to get the total with NO charge; then re-call with confirm:true and confirm_total_cents equal to that total. Enforces the max-spend cap (env CHEAPINBOXES_MAX_SPEND_CENTS, default $200). An Idempotency-Key is sent so a retry can never double-charge — reuse the idempotency_key returned by the preview on the committing call.",
+    {
+      domains: z.array(z.object({
+        domain: z.string().describe("Full domain, e.g. brand01.com"),
+        staged_import_id: z.string().optional().describe("The import id from cheapinboxes_import_domains"),
+        isExisting: z.boolean().optional().describe("Default true"),
+        provider: z.enum(["google", "microsoft"]).optional().describe("Default google"),
+        accounts: z.array(z.object({
+          first_name: z.string(), last_name: z.string(), email_prefix: z.string(),
+        })).nonempty().describe("One per mailbox"),
+      })).nonempty(),
+      name: z.string().optional().describe("Order name"),
+      fulfillment: z.enum(["diy", "dfy"]).optional().describe("Default diy"),
+      preferred_mailbox_password: z.string().optional(),
+      integration_id: z.string().optional(),
+      promo_code: z.string().optional(),
+      dry_run: z.boolean().optional().describe("True = return the total only, never charge"),
+      confirm: z.boolean().optional().describe("Must be true to actually charge"),
+      confirm_total_cents: z.number().optional().describe("Must equal the live quote's total_today_cents"),
+      max_spend_usd: z.number().optional().describe("Tighten the cap for THIS call; cannot exceed the env ceiling"),
+      idempotency_key: z.string().optional().describe("Reuse the one from the preview so a retry can't double-charge"),
+    },
+    async (args) => {
+      try {
+        const { domains, name, fulfillment, preferred_mailbox_password, integration_id, promo_code,
+                dry_run, confirm, confirm_total_cents, max_spend_usd } = args;
+        const idk = args.idempotency_key || (globalThis.crypto?.randomUUID?.() ?? `idk_${Date.now()}_${Math.random().toString(36).slice(2)}`);
+
+        // live re-quote — charge is always computed fresh from the real cart
+        const quote = await cheap.quoteOrder({
+          domains: domains.map(d => ({ domain: d.domain, provider: d.provider, count: d.accounts.length, isExisting: d.isExisting, staged_import_id: d.staged_import_id })),
+          promo_code,
+        });
+        const total = quote?.totals?.total_today_cents;
+        if (typeof total !== "number") throw new Error("could not read total_today_cents from the quote");
+        const base = { total_today_cents: total, total_usd: (total / 100).toFixed(2), mailboxes: domains.reduce((n, d) => n + d.accounts.length, 0), idempotency_key: idk };
+
+        // dry run: price only, no charge
+        if (dry_run) return ok({ dry_run: true, ...base, quote });
+
+        // cap
+        const envCeiling = Number(process.env.CHEAPINBOXES_MAX_SPEND_CENTS ?? 20000);
+        const cap = Math.min(envCeiling, max_spend_usd != null ? Math.round(max_spend_usd * 100) : Infinity);
+        if (total > cap) {
+          return ok({ blocked: true, reason: "exceeds_max_spend", ...base, cap_cents: cap, cap_usd: (cap / 100).toFixed(2), quote,
+            note: `Refusing: $${(total / 100).toFixed(2)} exceeds the cap of $${(cap / 100).toFixed(2)}. Lower the order, raise max_spend_usd (up to the env ceiling), or raise CHEAPINBOXES_MAX_SPEND_CENTS.` });
+        }
+
+        // confirmation
+        if (confirm !== true) {
+          return ok({ requires_confirmation: true, ...base, cap_usd: cap === Infinity ? null : (cap / 100).toFixed(2), quote,
+            next_step: `Re-call cheapinboxes_checkout with the SAME args plus confirm:true, confirm_total_cents:${total}, idempotency_key:"${idk}"` });
+        }
+        if (confirm_total_cents !== total) {
+          return ok({ blocked: true, reason: "amount_mismatch", confirm_total_cents, live_total_cents: total, idempotency_key: idk,
+            note: `Live quote is ${total} cents; you confirmed ${confirm_total_cents}. Re-confirm with confirm_total_cents:${total}.` });
+        }
+
+        // commit
+        const result = await cheap.checkoutOrder({
+          domains, name, fulfillment, preferred_mailbox_password, integration_id, promo_code, idempotency_key: idk,
+        });
+        return ok({ purchased: true, charged_cents: total, charged_usd: (total / 100).toFixed(2), idempotency_key: idk, order: result?.data ?? result });
+      } catch (e) { return err(e); }
+    }
+  );
+
+  server.tool("cheapinboxes_get_nameservers",
+    "Get the 2 nameservers Cheap Inboxes assigns to an imported domain after its order is paid (read — no charge). Point the registrar at these with set_nameservers. Keyed on the domain id.",
+    { id: z.string().describe("Cheap Inboxes domain id") },
+    async (a) => { try { return ok(await cheap.getImportNameservers(a)); } catch (e) { return err(e); } }
+  );
+
+  server.tool("cheapinboxes_get_order",
+    "Check a Cheap Inboxes order's progress by id (read-only), including its `readiness` status. Use to confirm mailboxes went live after checkout.",
+    { id: z.string().describe("Order id from cheapinboxes_checkout") },
+    async (a) => { try { return ok(await cheap.getOrder(a)); } catch (e) { return err(e); } }
+  );
+
+  // ── Icemail (read-only) ──────────────────────────────────────────────────────
+  // Reseller like Inboxing / Cheap Inboxes. Spend + mutation endpoints (orders,
+  // wallet top-up, prewarm buy, export, and every DNS / mailbox / domain write)
+  // are deliberately not exposed — read surfaces only.
+  server.tool("icemail_list_domains",
+    "List Icemail domains (read-only). Pages through everything by default (API returns ≤50/page). Optional `search` filters by name.",
+    { search: z.string().optional(), all: z.boolean().optional().describe("Page through everything (default true)"), max: z.number().optional() },
+    async (a) => { try { return ok(await ice.listDomains(a)); } catch (e) { return err(e); } }
+  );
+
+  server.tool("icemail_get_domain",
+    "Get one Icemail domain by id (read-only).",
+    { id: z.string() },
+    async (a) => { try { return ok(await ice.getDomain(a)); } catch (e) { return err(e); } }
+  );
+
+  server.tool("icemail_domain_dns",
+    "Get an Icemail domain's DNS records by domain id (read-only).",
+    { id: z.string() },
+    async (a) => { try { return ok(await ice.getDomainDnsRecords(a)); } catch (e) { return err(e); } }
+  );
+
+  server.tool("icemail_check_domain",
+    "Check domain availability at Icemail (read-only lookup — a quote, not a purchase). `search` is the domain to check.",
+    { search: z.string().describe("Domain to check, e.g. example.com") },
+    async (a) => { try { return ok(await ice.checkDomainAvailable(a)); } catch (e) { return err(e); } }
+  );
+
+  server.tool("icemail_list_mailboxes",
+    "List Icemail mailboxes (read-only). Pages through everything by default. Optional `search` filter.",
+    { search: z.string().optional(), all: z.boolean().optional().describe("Page through everything (default true)"), max: z.number().optional() },
+    async (a) => { try { return ok(await ice.listMailboxes(a)); } catch (e) { return err(e); } }
+  );
+
+  server.tool("icemail_mailboxes_by_domain",
+    "List Icemail mailboxes under one domain id (read-only).",
+    { id: z.string() },
+    async (a) => { try { return ok(await ice.getMailboxesByDomain(a)); } catch (e) { return err(e); } }
+  );
+
+  server.tool("icemail_get_mailbox",
+    "Get one Icemail mailbox by id (read-only). Set include_credentials to also fetch its auth + app-password — treat that output as secret.",
+    { id: z.string(), include_credentials: z.boolean().optional().describe("Default false") },
+    async ({ id, include_credentials }) => {
+      try {
+        const mailbox = await ice.getMailbox({ id });
+        if (!include_credentials) return ok(mailbox);
+        const [auth, app_password] = await Promise.all([
+          ice.getMailboxAuth({ id }).catch(e => ({ error: String(e).slice(0, 120) })),
+          ice.getMailboxAppPassword({ id }).catch(e => ({ error: String(e).slice(0, 120) })),
+        ]);
+        return ok({ mailbox, auth, app_password });
+      } catch (e) { return err(e); }
+    }
+  );
+
+  server.tool("icemail_account",
+    "Icemail account-level reads: workspaces, wallet balance, mailbox pricing, prewarm status, domain/mailbox tags, nameserver records, or webhooks. A balance or price read is not a spend.",
+    { view: z.enum(["workspaces", "wallet", "mailbox_price", "prewarm", "domain_tags", "mailbox_tags", "ns_records", "webhooks"]) },
+    async ({ view }) => {
+      try {
+        const fn = { workspaces: ice.listWorkspaces, wallet: ice.getWallet, mailbox_price: ice.mailboxPrice,
+                     prewarm: ice.listPrewarm, domain_tags: ice.listDomainTags, mailbox_tags: ice.listMailboxTags,
+                     ns_records: ice.getDomainNsRecords, webhooks: ice.listWebhooks }[view];
+        return ok(await fn({}));
+      } catch (e) { return err(e); }
+    }
   );
 
   registerAgents(server);

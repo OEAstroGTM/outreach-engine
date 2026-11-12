@@ -2,11 +2,16 @@
 // Cheap Inboxes (https://cheapinboxes.com) — mailbox reseller, same role as
 // Inboxing. Auth: Authorization: Bearer ci_live_*.
 //
-// READ-ONLY BY DESIGN. The API can place orders, provision mailboxes, pay
-// invoices, edit DNS and cancel paid resources; none of that is implemented
-// here. Spending stays a human decision, so the write calls are deliberately
-// absent rather than present-but-guarded — a function that does not exist
-// cannot be invoked by an agent loop.
+// READ-ONLY, with ONE cost-gated exception: buying mailboxes.
+//
+// Everything else that spends or mutates (wallet, pay-now, DNS edits, cancels,
+// transfers, integrations) stays unimplemented — absent, not present-but-
+// guarded, so an agent loop cannot invoke it. The single exception, added
+// 2026-11-12 at the user's explicit request, is the quote→checkout pair at the
+// bottom of this file. It is deliberately built so the free `quoteOrder` gates
+// the paid `checkoutOrder`, and the index.js tool enforces three things the
+// user asked for: a live re-quote, a hard max-spend ceiling, and an explicit
+// per-call confirmation of the exact charge. No silent spend is possible.
 //
 // Verified against the live API 2026-10-27: org resolves, 886 domains and
 // 4,185 mailboxes on the account.
@@ -99,3 +104,106 @@ export const listInvoices = (opts = {}) => paginate("/v1/billing/invoices", "inv
 // ── Discovery / pricing (read — a quote is not a purchase) ───────────────────
 export const mailboxPricing = () => ci("/v1/discovery/pricing/mailboxes");
 export const tldPricing = () => ci("/v1/discovery/tlds");
+
+// ── Writes: domain import (free) + buying mailboxes (cost-gated) ──────────────
+// POST helper, kept separate from the GET `ci()` so the write path is obvious.
+// `extraHeaders` carries the checkout Idempotency-Key. A body of undefined
+// sends no JSON body (setup/nameservers is a bodyless POST).
+async function ciWrite(method, path, body, extraHeaders = {}) {
+  const k = key();
+  if (!k) throw new Error("CHEAPINBOXES_API_KEY is not set");
+  const res = await fetch(`${CHEAPINBOXES_BASE}${path}`, {
+    method,
+    headers: { Authorization: `Bearer ${k}`, "Content-Type": "application/json", Accept: "application/json", ...extraHeaders },
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+  });
+  const text = await res.text();
+  let data; try { data = JSON.parse(text); } catch { data = { raw: text.slice(0, 300) }; }
+  if (res.status === 429) throw new Error("Cheap Inboxes rate limited (429) — back off before retrying");
+  if (!res.ok || data?.error) {
+    const msg = data?.error?.message ?? data?.message ?? data?.raw ?? "";
+    throw new Error(`Cheap Inboxes ${method} ${path} → HTTP ${res.status}: ${msg}`);
+  }
+  return data;
+}
+
+// FREE. Stage domains we own for import. source_provider is an enum; "manual"
+// or "external" fit a domain we registered elsewhere (e.g. NameSilo). Returns
+// an import record per domain (its id becomes staged_import_id at checkout).
+export async function importDomains({ domains, source_provider = "manual", metadata } = {}) {
+  if (!Array.isArray(domains) || !domains.length) throw new Error("domains must be a non-empty array");
+  return ciWrite("POST", "/v1/domain-imports/bulk", { domains, source_provider, ...(metadata ? { metadata } : {}) });
+}
+
+// After an order is paid, the 2 nameservers CheapInboxes assigns to an imported
+// domain (point the registrar at these). Bodyless POST keyed on domain id.
+export const getImportNameservers = ({ id }) => ciWrite("POST", `/v1/domains/${encodeURIComponent(id)}/setup/nameservers`);
+// Order progress incl. `readiness` is the existing getOrder() in the reads section.
+
+// Split "example.digital" → { name: "example", tld: "digital" }. The API wants
+// the bare label and the TLD as separate fields.
+function splitDomain(d) {
+  if (d.tld && d.domain && !d.domain.includes(".")) return { name: d.domain, tld: d.tld };
+  const full = String(d.domain || "").trim().toLowerCase();
+  const i = full.lastIndexOf(".");
+  if (i < 0) throw new Error(`domain "${full}" needs a TLD (e.g. example.com)`);
+  return { name: full.slice(0, i), tld: full.slice(i + 1) };
+}
+
+// "Jane Doe" → { first_name:"Jane", last_name:"Doe", email_prefix:"jane.doe" }.
+export function nameToAccount(name) {
+  const parts = String(name).trim().split(/\s+/);
+  if (parts.length < 2) throw new Error(`name "${name}" must be "First Last"`);
+  const first = parts[0], last = parts.slice(1).join(" ");
+  const prefix = `${first}.${last}`.toLowerCase().replace(/[^a-z0-9.]/g, "");
+  return { first_name: first, last_name: last, email_prefix: prefix };
+}
+
+// FREE. Maps a friendly [{domain, isExisting?, provider?, count}] into the
+// quote cart and returns the quote. quote.totals.total_today_cents is the
+// number that gates the purchase.
+export async function quoteOrder({ domains, promo_code } = {}) {
+  if (!Array.isArray(domains) || !domains.length) throw new Error("domains must be a non-empty array");
+  const cart = {
+    domains: domains.map(d => {
+      const { name, tld } = splitDomain(d);
+      return {
+        domain: name, tld,
+        isExisting: d.isExisting ?? true,
+        ...(d.staged_import_id ? { staged_import_id: d.staged_import_id } : {}),
+        mailboxes: { provider: d.provider ?? "google", count: Number(d.count) },
+      };
+    }),
+  };
+  const r = await ciWrite("POST", "/v1/orders/quote", { cart, promo_code: promo_code ?? null });
+  return r.quote ?? r;
+}
+
+// SPENDS MONEY. Takes the same friendly domain shape as quoteOrder, but each
+// domain carries `accounts` (from nameToAccount) instead of a bare count. The
+// cost gate (re-quote, cap, confirmation) lives in the index.js tool and is
+// the only caller — this just builds the API payload and sends it.
+export async function checkoutOrder({ domains, promo_code, integration_id, name, fulfillment, preferred_mailbox_password, idempotency_key } = {}) {
+  if (!Array.isArray(domains) || !domains.length) throw new Error("domains must be a non-empty array");
+  const payload = {
+    domains: domains.map(d => {
+      const { name: dn, tld } = splitDomain(d);
+      if (!Array.isArray(d.accounts) || !d.accounts.length) throw new Error(`domain ${dn}.${tld}: accounts required`);
+      return {
+        domain: dn, tld,
+        isExisting: d.isExisting ?? true,
+        ...(d.staged_import_id ? { staged_import_id: d.staged_import_id } : {}),
+        mailboxes: { provider: d.provider ?? "google", accounts: d.accounts },
+      };
+    }),
+    ...(promo_code ? { promo_code } : {}),
+    ...(integration_id ? { integration_id } : {}),
+    ...(name ? { name } : {}),
+    ...(preferred_mailbox_password ? { preferred_mailbox_password } : {}),
+    fulfillment: fulfillment ?? "diy",
+  };
+  // Idempotency-Key makes a retried checkout a no-op server-side instead of a
+  // second charge. The tool reuses one key across its preview and its commit.
+  const headers = idempotency_key ? { "Idempotency-Key": String(idempotency_key) } : {};
+  return ciWrite("POST", "/v1/orders/checkout", payload, headers);
+}

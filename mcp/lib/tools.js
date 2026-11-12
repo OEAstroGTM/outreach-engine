@@ -882,3 +882,52 @@ export async function mailboxConnectUrls({ client_name, emails, provider = "goog
     results,
   };
 }
+
+// Copy campaign settings and sending schedule from one campaign to another in
+// the same client/instance. Sequence, leads and inboxes are untouched.
+export async function copyCampaignSettings({ client_name, source_campaign_id, dest_campaign_id, instance, dry_run = false }) {
+  const client = getClient(client_name);
+  const cfg = ebConfig(client, instance);
+  await ebSwitchWorkspace(cfg, client);
+  const call = async (method, path, body) => {
+    const res = await fetch(`${cfg.base}${path}`, {
+      method,
+      headers: { Authorization: `Bearer ${cfg.key}`, "Content-Type": "application/json", Accept: "application/json" },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    const text = await res.text();
+    let json = null; try { json = text ? JSON.parse(text) : null; } catch {}
+    return { status: res.status, ok: res.ok, json, text: json ? undefined : text.slice(0, 300) };
+  };
+  const SETTING_KEYS = ["max_emails_per_day", "max_new_leads_per_day", "plain_text", "open_tracking",
+    "can_unsubscribe", "unsubscribe_text", "include_auto_replies_in_stats", "sequence_prioritization",
+    "daily_max_sends_per_receiving_domain"];
+  const src = await call("GET", `/campaigns/${source_campaign_id}`);
+  if (!src.ok) throw new Error(`Could not read source campaign (HTTP ${src.status}): ${JSON.stringify(src.json ?? src.text).slice(0, 300)}`);
+  const s = src.json?.data ?? src.json;
+  const settings = Object.fromEntries(SETTING_KEYS.filter(k => k in s).map(k => [k, s[k]]));
+  const schedRes = await call("GET", `/campaigns/${source_campaign_id}/schedule`);
+  const sched = schedRes.json?.data ?? null;
+  const scheduleBody = sched ? Object.fromEntries(Object.entries(sched).filter(([k]) =>
+    !["id", "campaign_id", "created_at", "updated_at", "uuid"].includes(k))) : null;
+  if (dry_run) return { dry_run: true, settings, schedule: scheduleBody, schedule_read_status: schedRes.status };
+
+  const upd = await call("PATCH", `/campaigns/${dest_campaign_id}/update`, settings);
+  let schedWrite = null;
+  if (scheduleBody) {
+    if (scheduleBody.timezone && typeof scheduleBody.timezone === "object") scheduleBody.timezone = scheduleBody.timezone.name ?? scheduleBody.timezone.value;
+    schedWrite = await call("POST", `/campaigns/${dest_campaign_id}/schedule`, { ...scheduleBody, save_as_template: false });
+    if (!schedWrite.ok) schedWrite = await call("PUT", `/campaigns/${dest_campaign_id}/schedule`, { ...scheduleBody, save_as_template: false });
+  }
+  const after = await call("GET", `/campaigns/${dest_campaign_id}`);
+  const afterSched = await call("GET", `/campaigns/${dest_campaign_id}/schedule`);
+  const a = after.json?.data ?? after.json ?? {};
+  return {
+    settings_status: upd.status, settings_error: upd.ok ? null : (upd.json ?? upd.text),
+    schedule_status: schedWrite?.status ?? "no source schedule", schedule_error: schedWrite && !schedWrite.ok ? (schedWrite.json ?? schedWrite.text) : null,
+    settings_after: Object.fromEntries(SETTING_KEYS.map(k => [k, a[k]])),
+    settings_source: settings,
+    schedule_after: afterSched.json?.data ?? null,
+    schedule_source: scheduleBody,
+  };
+}
