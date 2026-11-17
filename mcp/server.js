@@ -129,7 +129,7 @@ export function buildServer({ allowedTools = null, remote = false } = {}) {
   );
 
   server.tool("replace_campaign_sequence",
-    "Replace ALL sequence steps of an existing EmailBison campaign: deletes the current steps, then writes the new ones. Leads, inboxes and settings are untouched. Same step format as create_campaign_with_sequence. Use dry_run=true first to see the steps that would be removed.",
+    "Replace ALL sequence steps of an EmailBison campaign that has NOT sent anything yet (refuses otherwise): writes the new steps, then deletes the old ones. Leads, inboxes and settings are untouched. Same step format as create_campaign_with_sequence. Use dry_run=true first to see the steps that would be removed.",
     {
       client_name: z.string(),
       campaign_id: z.number(),
@@ -149,6 +149,50 @@ export function buildServer({ allowedTools = null, remote = false } = {}) {
       try { return ok(await ops.replaceCampaignSequence(args)); }
       catch (e) { return err(e); }
     }
+  );
+
+  server.tool("delete_sequence_steps",
+    "Delete specific EmailBison sequence steps by id (list variants before their parent). Steps that already sent can't be deleted.",
+    { client_name: z.string(), instance: z.enum(["eb_send", "eb_personal"]).optional(), step_ids: z.array(z.number()) },
+    async (args) => { try { return ok(await ops.deleteSequenceSteps(args)); } catch (e) { return err(e); } }
+  );
+
+  server.tool("update_sequence_steps",
+    "Edit EmailBison sequence steps by step id. Main steps are edited in place (ids, send history and lead progress kept). Because EmailBison detaches any variant it edits, a variant edit is done as: add a new attached variant with the new copy, then delete the old one (or switch it off if it has sends). Use this for ACTIVE campaigns instead of replace_campaign_sequence.",
+    {
+      client_name: z.string(),
+      instance: z.enum(["eb_send", "eb_personal"]).optional(),
+      campaign_id: z.number(),
+      updates: z.array(z.object({
+        id: z.number(),
+        email_subject: z.string().optional(),
+        email_body: z.string().optional(),
+        wait_in_days: z.number().optional(),
+        order: z.number().optional(),
+      variant_from_step: z.number().optional(),
+        thread_reply: z.boolean().optional(),
+      })),
+    },
+    async (args) => { try { return ok(await ops.updateSequenceSteps(args)); } catch (e) { return err(e); } }
+  );
+
+  server.tool("eb_sequence_request",
+    "Diagnostic: raw EmailBison request limited to /campaigns/{id}, /campaigns/{id}/sequence-steps and /campaigns/sequence-steps/{id}. Use on test campaigns.",
+    { client_name: z.string(), instance: z.enum(["eb_send", "eb_personal"]).optional(), method: z.enum(["GET","POST","PUT","PATCH","DELETE"]), path: z.string(), body: z.any().optional() },
+    async (args) => { try { return ok(await ops.ebSequenceRequest(args)); } catch (e) { return err(e); } }
+  );
+
+  server.tool("add_variant_steps",
+    "Add new A/B variants attached to an existing (non-variant) step by its step id. Safe on active campaigns.",
+    { client_name: z.string(), instance: z.enum(["eb_send", "eb_personal"]).optional(), campaign_id: z.number(),
+      variants: z.array(z.object({ parent_step_id: z.number(), email_subject: z.string(), email_body: z.string(), wait_in_days: z.number().optional() })) },
+    async (args) => { try { return ok(await ops.addVariantSteps(args)); } catch (e) { return err(e); } }
+  );
+
+  server.tool("set_steps_active",
+    "Switch sequence steps on or off by id (e.g. old variants that already sent and can't be deleted).",
+    { client_name: z.string(), instance: z.enum(["eb_send", "eb_personal"]).optional(), step_ids: z.array(z.number()), active: z.boolean() },
+    async (args) => { try { return ok(await ops.setStepsActive(args)); } catch (e) { return err(e); } }
   );
 
   server.tool("create_campaign_with_sequence",
@@ -827,12 +871,14 @@ export function buildServer({ allowedTools = null, remote = false } = {}) {
   );
 
   server.tool("copy_campaign_settings",
-    "Copy campaign settings (daily limits, plain text, tracking, unsubscribe, prioritization, per-domain cap) and the sending schedule from one EmailBison campaign to another on the same instance. Sequence, leads and inboxes untouched. Use dry_run=true to see what would be copied.",
+    "Copy campaign settings (daily limits, plain text, tracking, unsubscribe, prioritization, per-domain cap) and the sending schedule from one EmailBison campaign to another (same instance, or set source_instance/dest_instance to copy across eb_send/eb_personal). Sequence, leads and inboxes untouched. Use dry_run=true to see what would be copied.",
     {
       client_name: z.string(),
       source_campaign_id: z.number(),
       dest_campaign_id: z.number(),
       instance: z.enum(["eb_send", "eb_personal"]).optional(),
+      source_instance: z.enum(["eb_send", "eb_personal"]).optional(),
+      dest_instance: z.enum(["eb_send", "eb_personal"]).optional(),
       dry_run: z.boolean().optional(),
     },
     async (args) => {
