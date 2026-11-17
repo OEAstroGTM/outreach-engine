@@ -669,20 +669,22 @@ export async function copyCampaignSequence({
   // Map source step ids → order so variant_from_step can be re-pointed.
   // Main steps by order first, variants (order null) after their parents.
   const sorted = [...srcSteps].sort((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity));
-  const orderById = Object.fromEntries(sorted.map(s => [s.id, s.order]));
+  const orderById = Object.fromEntries(sorted.filter(s => !s.variant).map(s => [s.id, s.order]));
+  const firstOrder = Math.min(...sorted.filter(s => !s.variant).map(s => s.order ?? Infinity));
   const sequence_steps = sorted.map(s => {
     const step = {
       // EmailBison prepends "Re: " to thread replies on write, so strip it to avoid "Re: Re:".
       email_subject: s.thread_reply ? (s.email_subject ?? "").replace(/^(re:\s*)+/i, "") : (s.email_subject ?? ""),
       email_body:    s.email_body ?? "",
       wait_in_days:  s.wait_in_days ?? 1,
-      order:         s.order,
       variant:       !!s.variant,
       thread_reply:  !!s.thread_reply,
     };
-    if (s.variant && s.variant_from_step != null) {
-      step.variant_from_step = orderById[s.variant_from_step] ?? s.variant_from_step;
-    }
+    // Variants share their group's order in EB, and a POST with duplicate
+    // orders is rejected, so only main steps carry an order. Variants point at
+    // their parent's order; a variant whose link was lost goes under step 1.
+    if (!s.variant) step.order = s.order;
+    else step.variant_from_step = orderById[s.variant_from_step] ?? firstOrder;
     return step;
   });
 
@@ -690,6 +692,7 @@ export async function copyCampaignSequence({
   if (dry_run) return { dry_run: true, steps: sequence_steps.length, payload };
 
   const res = await ebFetch("POST", `/campaigns/${dest_campaign_id}/sequence-steps`, client, payload, dest_instance);
+  if (res?.data?.success === false) throw new Error(`Copy rejected by EmailBison, nothing written: ${JSON.stringify(res.data).slice(0, 400)}`);
   const after = await ebFetch("GET", `/campaigns/${dest_campaign_id}/sequence-steps`, client, undefined, dest_instance);
   return {
     source: { campaign_id: source_campaign_id, instance: source_instance, steps: srcSteps.length },
@@ -808,7 +811,12 @@ export async function replaceCampaignSequence({ client_name, campaign_id, instan
     let json = null; try { json = text ? JSON.parse(text) : null; } catch {}
     return { status: res.status, ok: res.ok, json, text: json ? undefined : text.slice(0, 300) };
   };
-  const existing = (await call("GET", `/campaigns/${campaign_id}/sequence-steps`)).json?.data ?? [];
+  const _camp = (await call("GET", `/campaigns/${campaign_id}`)).json?.data;
+  if ((_camp?.emails_sent ?? 0) > 0) {
+    throw new Error(`Campaign ${campaign_id} ("${_camp.name}") has already sent ${_camp.emails_sent} emails. Sent steps can't be deleted, so a full replace would double the sequence. Nothing was changed. Use update_sequence_steps (main steps in place, variants re-added attached) instead.`);
+  }
+  const _ex = (await call("GET", `/campaigns/${campaign_id}/sequence-steps`)).json?.data;
+  const existing = Array.isArray(_ex) ? _ex : [];
   const steps = sequence_steps.map(s => ({
     ...s,
     email_subject: s.thread_reply ? String(s.email_subject ?? "").replace(/^(re:\s*)+/i, "") : String(s.email_subject ?? ""),
@@ -827,11 +835,149 @@ export async function replaceCampaignSequence({ client_name, campaign_id, instan
   const deleted = [], failed = [];
   for (const s of toDelete) {
     const r = await call("DELETE", `/campaigns/sequence-steps/${s.id}`);
-    if (r.ok) deleted.push(s.id); else failed.push({ id: s.id, status: r.status, error: r.json ?? r.text });
+    if (r.ok) deleted.push(s.id); else failed.push({ id: s.id, status: r.status, error: r.json?.data?.message ?? r.json ?? r.text });
   }
-  const after = (await call("GET", `/campaigns/${campaign_id}/sequence-steps`)).json?.data ?? [];
-  return { campaign_id, deleted, failed_deletes: failed, write_status: post.status, steps_after: after.length };
+  let rolled_back = null;
+  if (failed.length) {
+    // Old steps that already sent can't be deleted. Roll back: remove the new
+    // (unsent) steps so the campaign isn't left with a doubled sequence.
+    const oldIds = new Set(existing.map(s => s.id));
+    const _now = (await call("GET", `/campaigns/${campaign_id}/sequence-steps`)).json?.data;
+    const added = (Array.isArray(_now) ? _now : []).filter(s => !oldIds.has(s.id)).sort((a, b) => (b.variant - a.variant));
+    rolled_back = [];
+    for (const s of added) { const r = await call("DELETE", `/campaigns/sequence-steps/${s.id}`); rolled_back.push({ id: s.id, ok: r.ok }); }
+  }
+  const _af = (await call("GET", `/campaigns/${campaign_id}/sequence-steps`)).json?.data;
+  const after = Array.isArray(_af) ? _af : [];
+  return { campaign_id, deleted, failed_deletes: failed, rolled_back, write_status: post.status, steps_after: after.length,
+    note: failed.length ? "Old steps have sends and could not be deleted; new steps were rolled back. Use update_sequence_steps to edit steps in place." : undefined };
 }
+
+async function _ebCall(client_name, instance) {
+  const client = getClient(client_name);
+  const cfg = ebConfig(client, instance);
+  await ebSwitchWorkspace(cfg, client);
+  return async (method, path, body) => {
+    const res = await fetch(`${cfg.base}${path}`, {
+      method,
+      headers: { Authorization: `Bearer ${cfg.key}`, "Content-Type": "application/json", Accept: "application/json" },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    const text = await res.text();
+    let json = null; try { json = text ? JSON.parse(text) : null; } catch {}
+    return { status: res.status, ok: res.ok, json, text: json ? undefined : text.slice(0, 500) };
+  };
+}
+
+// Delete specific sequence steps by id (variants should be listed before parents).
+export async function deleteSequenceSteps({ client_name, instance, step_ids }) {
+  const call = await _ebCall(client_name, instance);
+  const out = [];
+  for (const id of step_ids) { const r = await call("DELETE", `/campaigns/sequence-steps/${id}`); out.push({ id, ok: r.ok, status: r.status, error: r.ok ? undefined : (r.json?.data?.message ?? r.json ?? r.text) }); }
+  return out;
+}
+
+// Edit existing steps in place (keeps step ids, so sent history and lead
+// progress are preserved). Fetches current steps, merges the given fields by
+// id, and PUTs the full sequence back.
+export async function updateSequenceSteps({ client_name, instance, campaign_id, updates }) {
+  // EmailBison quirks (verified on test campaigns 2433/2434, Nov 16):
+  //  - PUT /campaigns/sequence-steps/{sequence_id} only touches the steps sent;
+  //    steps left out are untouched (variants keep their parent link).
+  //  - Any PUT that includes a VARIANT silently clears its parent link
+  //    (variant_from_step -> null), whatever fields are sent.
+  //  - POST with variant_from_step_id = parent step id creates a correctly
+  //    attached variant.
+  // So: main steps are edited in place (PUT with only those steps); a variant
+  // edit is done as "add a new attached variant, then delete (or switch off)
+  // the old one".
+  const call = await _ebCall(client_name, instance);
+  const camp = (await call("GET", `/campaigns/${campaign_id}`)).json?.data;
+  const sequence_id = camp?.sequence_id;
+  if (!sequence_id) throw new Error(`Campaign ${campaign_id} has no sequence_id.`);
+  const cur = (await call("GET", `/campaigns/${campaign_id}/sequence-steps`)).json?.data ?? [];
+  const byId = new Map(cur.map(s => [s.id, s]));
+  for (const u of updates) if (!byId.has(u.id)) throw new Error(`Step ${u.id} not in campaign ${campaign_id}.`);
+  const mains = cur.filter(s => !s.variant);
+  const step1 = mains.slice().sort((a, b) => (a.order ?? 1e9) - (b.order ?? 1e9))[0];
+  const strip = (subj, thread) => thread ? String(subj).replace(/^(re:\s*)+/i, "") : subj;
+
+  const mainUpdates = updates.filter(u => !byId.get(u.id).variant);
+  const varUpdates = updates.filter(u => byId.get(u.id).variant);
+  const result = { campaign_id, sequence_id, main_updated: [], variants_replaced: [], warnings: [] };
+
+  if (mainUpdates.length) {
+    const steps = mainUpdates.map(u => {
+      const s = byId.get(u.id);
+      const thread = u.thread_reply ?? s.thread_reply;
+      return { id: s.id, email_subject: strip(u.email_subject ?? s.email_subject, thread), email_body: u.email_body ?? s.email_body,
+        wait_in_days: u.wait_in_days ?? s.wait_in_days, order: u.order ?? s.order, variant: false, thread_reply: !!thread };
+    });
+    const r = await call("PUT", `/campaigns/sequence-steps/${sequence_id}`, { title: `Campaign ${campaign_id} sequence`, sequence_steps: steps });
+    if (!r.ok) throw new Error(`Main-step update failed (HTTP ${r.status}): ${JSON.stringify(r.json ?? r.text).slice(0, 500)}`);
+    result.main_updated = steps.map(s => s.id);
+  }
+
+  for (const u of varUpdates) {
+    const old = byId.get(u.id);
+    const pid = u.variant_from_step ?? old.variant_from_step ?? step1?.id;
+    const parent = byId.get(pid) && !byId.get(pid).variant ? byId.get(pid) : mains.find(m => m.order === pid) ?? step1;
+    if (!parent) { result.warnings.push(`No parent found for variant ${u.id}; skipped.`); continue; }
+    const post = await call("POST", `/campaigns/${campaign_id}/sequence-steps`, { title: `Campaign ${campaign_id} sequence`, sequence_steps: [{
+      email_subject: u.email_subject ?? old.email_subject, email_body: u.email_body ?? old.email_body,
+      wait_in_days: u.wait_in_days ?? old.wait_in_days, order: old.order ?? parent.order, variant: true,
+      variant_from_step_id: parent.id, thread_reply: false }] });
+    if (!post.ok) { result.warnings.push(`Could not add replacement for variant ${u.id} (HTTP ${post.status}). Old variant left as is.`); continue; }
+    const after = post.json?.data?.sequence_steps ?? [];
+    const created = after.filter(s => !byId.has(s.id) && s.variant).sort((a, b) => b.id - a.id)[0];
+    const del = await call("DELETE", `/campaigns/sequence-steps/${old.id}`);
+    let old_status = del.ok ? "deleted" : "kept";
+    if (!del.ok) {
+      const off = await call("PATCH", `/campaigns/sequence-steps/${old.id}/activate-or-deactivate`, { active: false });
+      old_status = off.ok ? "switched off (has sends, can't delete)" : `kept ACTIVE: can't delete (${del.json?.data?.message ?? del.status}); can't switch off (${off.json?.message ?? off.json?.data?.message ?? off.status}) — switch it off in the dashboard`;
+      if (!off.ok) result.warnings.push(`Old variant ${old.id} is still active and no longer attached.`);
+    }
+    result.variants_replaced.push({ old_id: old.id, new_id: created?.id, parent_id: parent.id, attached: created?.variant_from_step === parent.id, old_status });
+  }
+
+  const fin = (await call("GET", `/campaigns/${campaign_id}/sequence-steps`)).json?.data ?? [];
+  result.steps_after = fin.map(s => ({ id: s.id, order: s.order, variant: s.variant, parent: s.variant_from_step, active: s.active, subject: s.email_subject }));
+  const detached = fin.filter(s => s.variant && s.active && s.variant_from_step == null).map(s => s.id);
+  if (detached.length) result.warnings.push(`Active variants with no parent step: ${detached.join(", ")}`);
+  return result;
+}
+
+// Add new A/B variants attached to an existing step (by parent step id).
+export async function addVariantSteps({ client_name, instance, campaign_id, variants }) {
+  const call = await _ebCall(client_name, instance);
+  const cur = (await call("GET", `/campaigns/${campaign_id}/sequence-steps`)).json?.data ?? [];
+  const ids = new Set(cur.map(s => s.id));
+  const out = [];
+  for (const v of variants) {
+    const parent = cur.find(s => s.id === v.parent_step_id && !s.variant);
+    if (!parent) throw new Error(`Parent step ${v.parent_step_id} not found (or is itself a variant) in campaign ${campaign_id}.`);
+    const r = await call("POST", `/campaigns/${campaign_id}/sequence-steps`, { title: `Campaign ${campaign_id} sequence`, sequence_steps: [{
+      email_subject: v.email_subject, email_body: v.email_body, wait_in_days: v.wait_in_days ?? parent.wait_in_days,
+      order: parent.order, variant: true, variant_from_step_id: parent.id, thread_reply: !!parent.thread_reply }] });
+    if (!r.ok) throw new Error(`Adding variant failed (HTTP ${r.status}): ${JSON.stringify(r.json ?? r.text).slice(0, 300)}`);
+    const created = (r.json?.data?.sequence_steps ?? []).filter(s => !ids.has(s.id)).sort((a, b) => b.id - a.id)[0];
+    if (created) ids.add(created.id);
+    out.push({ new_id: created?.id, parent_id: parent.id, attached: created?.variant_from_step === parent.id });
+  }
+  return { campaign_id, added: out };
+}
+
+// Switch steps on/off (e.g. an old variant that has sends and can't be deleted).
+export async function setStepsActive({ client_name, instance, step_ids, active }) {
+  const call = await _ebCall(client_name, instance);
+  const out = [];
+  for (const id of step_ids) {
+    const r = await call("PATCH", `/campaigns/sequence-steps/${id}/activate-or-deactivate`, { active: !!active });
+    out.push({ id, ok: r.ok, status: r.status, error: r.ok ? undefined : (r.json?.message ?? r.json?.data?.message ?? r.text) });
+  }
+  return out;
+}
+
 
 export async function listMiWorkspaces() {
   return miListWorkspaces();
@@ -885,42 +1031,32 @@ export async function mailboxConnectUrls({ client_name, emails, provider = "goog
 
 // Copy campaign settings and sending schedule from one campaign to another in
 // the same client/instance. Sequence, leads and inboxes are untouched.
-export async function copyCampaignSettings({ client_name, source_campaign_id, dest_campaign_id, instance, dry_run = false }) {
-  const client = getClient(client_name);
-  const cfg = ebConfig(client, instance);
-  await ebSwitchWorkspace(cfg, client);
-  const call = async (method, path, body) => {
-    const res = await fetch(`${cfg.base}${path}`, {
-      method,
-      headers: { Authorization: `Bearer ${cfg.key}`, "Content-Type": "application/json", Accept: "application/json" },
-      body: body ? JSON.stringify(body) : undefined,
-    });
-    const text = await res.text();
-    let json = null; try { json = text ? JSON.parse(text) : null; } catch {}
-    return { status: res.status, ok: res.ok, json, text: json ? undefined : text.slice(0, 300) };
-  };
+export async function copyCampaignSettings({ client_name, source_campaign_id, dest_campaign_id, instance, source_instance, dest_instance, dry_run = false }) {
+  // Source and destination may be on different instances (eb_send -> eb_personal).
+  const srcCall = await _ebCall(client_name, source_instance ?? instance);
+  const dstCall = await _ebCall(client_name, dest_instance ?? instance);
   const SETTING_KEYS = ["max_emails_per_day", "max_new_leads_per_day", "plain_text", "open_tracking",
     "can_unsubscribe", "unsubscribe_text", "include_auto_replies_in_stats", "sequence_prioritization",
     "daily_max_sends_per_receiving_domain"];
-  const src = await call("GET", `/campaigns/${source_campaign_id}`);
+  const src = await srcCall("GET", `/campaigns/${source_campaign_id}`);
   if (!src.ok) throw new Error(`Could not read source campaign (HTTP ${src.status}): ${JSON.stringify(src.json ?? src.text).slice(0, 300)}`);
   const s = src.json?.data ?? src.json;
   const settings = Object.fromEntries(SETTING_KEYS.filter(k => k in s).map(k => [k, s[k]]));
-  const schedRes = await call("GET", `/campaigns/${source_campaign_id}/schedule`);
+  const schedRes = await srcCall("GET", `/campaigns/${source_campaign_id}/schedule`);
   const sched = schedRes.json?.data ?? null;
   const scheduleBody = sched ? Object.fromEntries(Object.entries(sched).filter(([k]) =>
-    !["id", "campaign_id", "created_at", "updated_at", "uuid"].includes(k))) : null;
+    !["id", "campaign_id", "created_at", "updated_at", "uuid", "type", "status"].includes(k))) : null;
   if (dry_run) return { dry_run: true, settings, schedule: scheduleBody, schedule_read_status: schedRes.status };
 
-  const upd = await call("PATCH", `/campaigns/${dest_campaign_id}/update`, settings);
+  const upd = await dstCall("PATCH", `/campaigns/${dest_campaign_id}/update`, settings);
   let schedWrite = null;
   if (scheduleBody) {
     if (scheduleBody.timezone && typeof scheduleBody.timezone === "object") scheduleBody.timezone = scheduleBody.timezone.name ?? scheduleBody.timezone.value;
-    schedWrite = await call("POST", `/campaigns/${dest_campaign_id}/schedule`, { ...scheduleBody, save_as_template: false });
-    if (!schedWrite.ok) schedWrite = await call("PUT", `/campaigns/${dest_campaign_id}/schedule`, { ...scheduleBody, save_as_template: false });
+    schedWrite = await dstCall("POST", `/campaigns/${dest_campaign_id}/schedule`, { ...scheduleBody, save_as_template: false });
+    if (!schedWrite.ok) schedWrite = await dstCall("PUT", `/campaigns/${dest_campaign_id}/schedule`, { ...scheduleBody, save_as_template: false });
   }
-  const after = await call("GET", `/campaigns/${dest_campaign_id}`);
-  const afterSched = await call("GET", `/campaigns/${dest_campaign_id}/schedule`);
+  const after = await dstCall("GET", `/campaigns/${dest_campaign_id}`);
+  const afterSched = await dstCall("GET", `/campaigns/${dest_campaign_id}/schedule`);
   const a = after.json?.data ?? after.json ?? {};
   return {
     settings_status: upd.status, settings_error: upd.ok ? null : (upd.json ?? upd.text),
@@ -930,4 +1066,15 @@ export async function copyCampaignSettings({ client_name, source_campaign_id, de
     schedule_after: afterSched.json?.data ?? null,
     schedule_source: scheduleBody,
   };
+}
+
+
+// Narrow passthrough for diagnosing EmailBison sequence-step writes. Only
+// sequence-step and campaign paths are allowed.
+export async function ebSequenceRequest({ client_name, instance, method, path, body }) {
+  const ok = /^\/campaigns\/(\d+\/)?sequence-steps(\/\d+)?(\/activate-or-deactivate)?$/.test(path) || /^\/campaigns\/\d+$/.test(path) || /^\/campaigns\/\d+\/sequence-steps\/\d+$/.test(path);
+  if (!ok) throw new Error(`Path not allowed: ${path}`);
+  if (!["GET", "POST", "PUT", "PATCH", "DELETE"].includes(method)) throw new Error("Bad method");
+  const call = await _ebCall(client_name, instance);
+  return call(method, path, body);
 }
