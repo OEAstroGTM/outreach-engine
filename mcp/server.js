@@ -16,6 +16,8 @@ const REMOTE_ANNOTATIONS = {
   run_research_agent: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true },
   run_inbox_agent: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true },
   run_campaign_agent: { readOnlyHint: false, destructiveHint: true, idempotentHint: false, openWorldHint: true },
+  namesilo_list_domains: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true },
+  porkbun_list_domains: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true },
 };
 
 export function buildServer({ allowedTools = null, remote = false } = {}) {
@@ -476,6 +478,27 @@ export function buildServer({ allowedTools = null, remote = false } = {}) {
     { domains: z.array(z.string()), registrar: vRegistrar },
     async ({ domains, registrar }) => {
       try { return ok(await infra.checkAvailability({ domains, registrar })); }
+      catch (e) { return err(e); }
+    }
+  );
+
+  server.tool("namesilo_list_domains",
+    "List every NameSilo domain with its portfolio, nameservers, created and expiry dates (read-only). NameSilo's listDomains API returns only names, so each is enriched via getDomainInfo — one call per domain, which is slow on a 1000+ domain account. Pass details:false for names only, or max:N to enrich just the first N.",
+    {
+      details: z.boolean().optional().describe("Default true — enrich each name with portfolio/nameservers/dates. false = names only (one fast call)."),
+      max: z.number().optional().describe("Cap how many domains are enriched (useful to sample a large account)"),
+    },
+    async (a) => {
+      try { return ok(await infra.namesiloListDomains(a)); }
+      catch (e) { return err(e); }
+    }
+  );
+
+  server.tool("porkbun_list_domains",
+    "List every Porkbun domain via the domain/listAll API (read-only): domain, status, tld, created/expiry dates, auto-renew and labels. Pages past the 1000-per-call cap automatically. Nameservers are not included (Porkbun's listAll omits them).",
+    {},
+    async () => {
+      try { return ok(await infra.porkbunListDomains({})); }
       catch (e) { return err(e); }
     }
   );
