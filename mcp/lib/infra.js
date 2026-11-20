@@ -59,7 +59,7 @@ const namesiloRegistrar = {
     const reply = await namesilo("getDomainInfo", { domain });
     const ns = [].concat(reply.nameservers?.nameserver ?? []);
     return {
-      domain, registrar: "namesilo", status: reply.status, expires: reply.expires,
+      domain, registrar: "namesilo", status: reply.status, created: reply.created, expires: reply.expires,
       traffic_type: reply.traffic_type,
       // Portfolios are a NameSilo-only concept; "N/A" means unassigned.
       portfolio: reply.portfolio && reply.portfolio !== "N/A" ? reply.portfolio : null,
@@ -314,6 +314,57 @@ export async function assignPortfolio({ portfolio, domains, verify_sample = 3 })
     failed_batches: batches.filter(b => !b.ok).length,
     verified,
   };
+}
+
+// ── Whole-account domain listings (read-only) ────────────────────────────────
+// NameSilo's listDomains returns ONLY names — not portfolio, nameservers or
+// dates. To include those each name is enriched via getDomainInfo, i.e. one
+// extra API call per domain, so on a 1000+ domain account this is slow and
+// rate-limited (a small pause spaces the calls out). `details:false` returns
+// names only; `max` caps how many are enriched.
+export async function namesiloListDomains({ details = true, max } = {}) {
+  const reply = await namesilo("listDomains");
+  const raw = [].concat(reply.domains?.domain ?? reply.domains ?? []);
+  const names = raw.map(d => (typeof d === "string" ? d : d.domain ?? d["#text"] ?? String(d))).filter(Boolean);
+
+  if (!details) {
+    return { registrar: "namesilo", total: names.length, enriched: 0, domains: names.map(domain => ({ domain })) };
+  }
+  const take = max ? names.slice(0, max) : names;
+  const domains = [];
+  for (const domain of take) {
+    try {
+      const info = await getDomain({ domain, registrar: "namesilo" });   // portfolio / nameservers / created / expires / status
+      domains.push({ domain, portfolio: info.portfolio, nameservers: info.nameservers, created: info.created, expires: info.expires, status: info.status });
+    } catch (e) {
+      domains.push({ domain, error: String(e.message || e).slice(0, 160) });
+    }
+    await new Promise(r => setTimeout(r, 120));   // space out getDomainInfo for rate limits
+  }
+  return {
+    registrar: "namesilo",
+    total: names.length,
+    enriched: domains.length,
+    truncated: !!max && names.length > domains.length,
+    domains,
+  };
+}
+
+// Porkbun's /domain/listAll already returns full records (domain, status, tld,
+// createDate, expireDate, autoRenew, labels…), but caps at 1000 per call — page
+// through with `start` until a short page comes back. Nameservers are NOT in
+// listAll (they need getNs per domain), so they are not included here.
+export async function porkbunListDomains({ all = true } = {}) {
+  const out = [];
+  let start = 0;
+  for (;;) {
+    const data = await porkbun("/domain/listAll", { start: String(start), includeLabels: "yes" });
+    const rows = data.domains ?? [];
+    out.push(...rows);
+    if (!all || rows.length < 1000) break;
+    start += rows.length;
+  }
+  return { registrar: "porkbun", total: out.length, domains: out };
 }
 
 // ── Registrar dispatch (unified interface) ───────────────────────────────────
