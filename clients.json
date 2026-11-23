@@ -234,11 +234,12 @@
     "sequencer": "eb_send",
     "eb_ws_id": null,
     "eb_send_ws_id": 25,
-    "eb_personal_ws_id": null,
+    "eb_personal_ws_id": 5,
     "mi_ws_id": null,
     "mi_key_env": null,
     "inboxing_tags": [],
-    "eb_send_key_env": "EB_SEND_KEY_INBOXING_UPLOADS"
+    "eb_send_key_env": "EB_SEND_KEY_INBOXING_UPLOADS",
+    "eb_personal_key_env": "EB_PERSONAL_KEY_INBOXING_UPLOADS"
   },
   {
     "name": "Bimini Health",
