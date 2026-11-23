@@ -559,5 +559,15 @@
     "eb_send_key_env": "EB_SEND_KEY_METER_COM",
     "status": "churned",
     "churned_at": "2026-11-17"
+  },
+  {
+    "name": "Intellectible - Valley",
+    "sequencer": "none",
+    "eb_ws_id": null,
+    "mi_ws_id": 2909,
+    "mi_key_env": "MI_KEY_INTELLECTIBLE_VALLEY",
+    "inboxing_tags": [
+      "Intellectible - Valley"
+    ]
   }
 ]
