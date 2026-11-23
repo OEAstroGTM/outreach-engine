@@ -900,7 +900,8 @@ export async function updateSequenceSteps({ client_name, instance, campaign_id, 
   for (const u of updates) if (!byId.has(u.id)) throw new Error(`Step ${u.id} not in campaign ${campaign_id}.`);
   const mains = cur.filter(s => !s.variant);
   const step1 = mains.slice().sort((a, b) => (a.order ?? 1e9) - (b.order ?? 1e9))[0];
-  const strip = (subj, thread) => thread ? String(subj).replace(/^(re:\s*)+/i, "") : subj;
+  // EmailBison prepends one "Re: " on write, so strip exactly one to round-trip existing subjects unchanged.
+  const strip = (subj, thread) => thread ? String(subj).replace(/^re:\s*/i, "") : subj;
 
   const mainUpdates = updates.filter(u => !byId.get(u.id).variant);
   const varUpdates = updates.filter(u => byId.get(u.id).variant);
