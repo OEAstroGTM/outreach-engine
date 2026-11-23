@@ -54,7 +54,8 @@
     "inboxing_tags": [
       "Hubengage"
     ],
-    "eb_personal_key_env": "EB_PERSONAL_KEY_HUBENGAGE"
+    "eb_personal_key_env": "EB_PERSONAL_KEY_HUBENGAGE",
+    "eb_personal_ws_id": 16
   },
   {
     "name": "Intellectible",
