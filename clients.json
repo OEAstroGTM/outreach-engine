@@ -208,7 +208,7 @@
     "eb_ws_id": null,
     "eb_send_ws_id": 80,
     "eb_send_key_env": "EB_SEND_KEY_METER",
-    "eb_personal_ws_id": null,
+    "eb_personal_ws_id": 25,
     "eb_personal_key_env": "EB_PERSONAL_KEY_METER",
     "mi_ws_id": 2717,
     "mi_key_env": "MI_KEY_METER",
